@@ -1,13 +1,13 @@
 package task_3_4;
 
-import task_3_4.books.ClassicalBook;
-import task_3_4.books.FantasyBook;
-import task_3_4.books.HistoryBook;
-import task_3_4.books.IBook;
+
+import task_3_4.books.Book;
 import task_3_4.customer.Customer;
 import task_3_4.order.Order;
 import task_3_4.types.BookStatus;
+import task_3_4.types.BookTypes;
 import task_3_4.warehouse_work.Warehouse;
+
 
 import java.util.ArrayList;
 
@@ -15,16 +15,16 @@ public class Test {
     public static void main(String[] args) {
 
         // Creating system----------------------------------------
-        IBook book1 = new FantasyBook("Harry Potter 1", "J.K.Rowlling",
-                2024, BookStatus.InStock, 1500);
-        IBook book2 = new HistoryBook("Peter The First", "A.Tolstoy",
-                2024, BookStatus.InStock, 2100);
-        IBook book3 = new ClassicalBook("The Great Expectations", "C.Dickens",
-                2025, BookStatus.OutOfStock, 1500);
-        IBook book4 = new ClassicalBook("War and Piece", "L.Tolstoy",
-                2025, BookStatus.OutOfStock, 1500);
+        Book book1 = new Book("Harry Potter 1", "J.K.Rowlling",
+                2024, BookStatus.IN_STOCK, 1500, BookTypes.FANTASY);
+        Book book2 = new Book("Peter The First", "A.Tolstoy",
+                2024, BookStatus.IN_STOCK, 2100, BookTypes.HISTORY);
+        Book book3 = new Book("The Great Expectations", "C.Dickens",
+                2025, BookStatus.OUT_OF_STOCK, 1500, BookTypes.CLASSICAL);
+        Book book4 = new Book("War and Piece", "L.Tolstoy",
+                2025, BookStatus.OUT_OF_STOCK, 1500, BookTypes.CLASSICAL);
 
-        ArrayList<IBook> system_books = new ArrayList<>();
+        ArrayList<Book> system_books = new ArrayList<>();
         system_books.add(book1);
         system_books.add(book2);
         system_books.add(book4);
@@ -35,7 +35,7 @@ public class Test {
 
         //--------------------------------------------------
 
-        ArrayList<IBook> books  = shop.getAllBookList();
+        ArrayList<Book> books  = shop.getAllBookList();
         // здесь пользователь просмотрел бы все книги и выбрал индексы тех, которые ему бы понравились
 
         Order order1 = new Order();

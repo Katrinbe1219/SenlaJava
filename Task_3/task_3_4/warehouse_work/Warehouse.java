@@ -1,17 +1,16 @@
 package task_3_4.warehouse_work;
 
-import task_3_4.books.IBook;
+import task_3_4.books.Book;
 import task_3_4.order.Order;
 import task_3_4.types.BookStatus;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Warehouse {
-    ArrayList<IBook> books;
+    ArrayList<Book> books;
     ArrayList<Request> requests;
 
-    public Warehouse(ArrayList<IBook> books) {
+    public Warehouse(ArrayList<Book> books) {
         this.books = books;
         this.requests = new ArrayList<>();
     }
@@ -43,10 +42,10 @@ public class Warehouse {
 //    }
 
     public void receiveBook(String title){
-        IBook book_= null;
-        for (IBook book : books) {
+        Book book_= null;
+        for (Book book : books) {
             if (book.getTitle().equals(title)) {
-                book.setStatus(BookStatus.InStock);
+                book.setStatus(BookStatus.IN_STOCK);
                 book_ = book;
                 break;
             }
@@ -56,10 +55,10 @@ public class Warehouse {
         cancellRequestsByBook(book_);
     }
 
-    Boolean checkBook(IBook book){
-        for(IBook iBook : books){
+    Boolean checkBook(Book book){
+        for(Book iBook : books){
             if (iBook.equals(book)){
-                return iBook.getStatus() == BookStatus.InStock;
+                return iBook.getStatus() == BookStatus.IN_STOCK;
             }
         }
 
@@ -70,7 +69,7 @@ public class Warehouse {
         this.requests.add(request);
     }
 
-    void cancellRequestsByBook(IBook book){
+    void cancellRequestsByBook(Book book){
         this.requests.removeIf(r -> r.getBook().equals(book));
     }
 
@@ -79,7 +78,7 @@ public class Warehouse {
         this.requests.removeIf(r -> r.getOrder().equals(order));
     }
 
-    public ArrayList<IBook> getBooks() {
+    public ArrayList<Book> getBooks() {
         return this.books;
     }
 

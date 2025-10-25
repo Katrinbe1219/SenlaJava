@@ -1,6 +1,6 @@
 package task_3_4;
 
-import task_3_4.books.IBook;
+import task_3_4.books.Book;
 import task_3_4.order.Order;
 import task_3_4.types.BookStatus;
 import task_3_4.types.OrderStatus;
@@ -36,8 +36,8 @@ public class BookShop {
         System.out.println("Обработка заказа в BookShop");
         boolean checking = false;
 
-        for(IBook book: order.getBooks()){
-            if (book.getStatus() == BookStatus.OutOfStock){
+        for(Book book: order.getBooks()){
+            if (book.getStatus() == BookStatus.OUT_OF_STOCK){
                 checking = true;
                 warehouse.addRequest(new Request(book, order));
             }
@@ -52,7 +52,7 @@ public class BookShop {
     void removeOrder(Order order){
         System.out.println("Запрос на отмену заказа");
         for (Order o: this.orders){
-            if (o.equals(order)){
+            if (o.getStatus() != OrderStatus.DONE && o.equals(order)){
                 o.setStatus(OrderStatus.CANCELLED);
                 warehouse.cancellOrderRequests(order);
                 System.out.println("Заказ Отменен");
@@ -61,7 +61,7 @@ public class BookShop {
         }
     }
 
-    ArrayList<IBook> getAllBookList(){
+    ArrayList<Book> getAllBookList(){
         System.out.println("Получение списка всех книг");
         return warehouse.getBooks();
     }

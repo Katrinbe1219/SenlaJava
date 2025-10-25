@@ -1,6 +1,7 @@
 package task_3_4.types;
 
 public enum BookStatus {
-    InStock,
-    OutOfStock
+    IN_STOCK,
+    OUT_OF_STOCK
 }
+
