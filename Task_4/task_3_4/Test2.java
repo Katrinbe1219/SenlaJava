@@ -140,5 +140,21 @@ public class Test2 {
         System.out.print("Выполненные заказы за неделю 2 вариант количество:  ");
         System.out.println(shop.getOrdersAmountInDiapazon(LocalDate.of(2025,10,21), LocalDate.of(2025,11,3)) + "\n");
 
+        System.out.println();
+        System.out.println();
+
+        // orders - only NEW
+        List<Order> orders = shop.getSortedOrders(OrderSorting.NEW);
+        for (Order order : orders) {
+            System.out.println(order);
+        }
+
+
+        // orders - by price
+        System.out.println("Only with price orders");
+        orders = shop.getSortedOrders(OrderSorting.PRICE_DOWN);
+        for (Order order : orders) {
+            System.out.println(order);
+        }
     }
 }

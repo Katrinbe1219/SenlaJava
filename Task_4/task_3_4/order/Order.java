@@ -99,7 +99,7 @@ public class Order {
         StringBuilder booksInfo = new StringBuilder();
         for (Book book: this.books){
 
-            booksInfo.append(book.toString()).append("\n");
+            booksInfo.append(book.getDescription());
         }
 
         return "Customer: " + getCustomer().toString() + "\n" +

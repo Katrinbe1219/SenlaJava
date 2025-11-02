@@ -110,9 +110,11 @@ public class BookShop {
                     .sorted(Comparator.comparing(Order::getTotalCost).reversed())
                     .toList();
             case DATE_UP -> orders.stream()
+                    .filter(p -> p.getStatus()== OrderStatus.DONE)
                     .sorted(Comparator.comparing(Order::getCompletionDate))
                     .toList();
             case DATE_DOWN -> orders.stream()
+                    .filter(p -> p.getStatus()== OrderStatus.DONE)
                     .sorted(Comparator.comparing(Order::getCompletionDate).reversed())
                     .toList();
             default -> orders.stream().toList();
