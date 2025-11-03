@@ -177,17 +177,11 @@ public class BookShop {
     }
 
     Integer getOrdersAmountInDiapazon(LocalDate start, LocalDate end){
-        int amount = 0;
+        return orders.stream()
+                .filter(p -> p.getStatus() == OrderStatus.DONE)
+                .filter(p -> p.getCompletionDate().isAfter(start) && p.getCompletionDate().isBefore(end))
+                .toList().size();
 
-        for (Order order: orders){
-            if (order.getStatus() == OrderStatus.DONE){
-                if (order.getCompletionDate().isBefore(end) && order.getCompletionDate().isAfter(start)){
-                    amount ++;
-                }
-            }
-        }
-
-        return amount;
 
     }
 
