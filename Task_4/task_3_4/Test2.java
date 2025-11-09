@@ -116,45 +116,45 @@ public class Test2 {
         shop.receiveDelivery(deliveryBooks);
 
         System.out.print("Сумма заработанных денег за неделю 1 вариант: ");
-        System.out.println(shop.getIncomeInDiapazon(LocalDate.of(2025,10,21), LocalDate.of(2025,11,3)));
+        System.out.println(shop.getIncomeInDiapazon(LocalDate.of(2025,10,21), LocalDate.of(2025,11,5)));
         System.out.print("Выполненные заказы за неделю 1 вариант: ");
-        List<Order> doneRequests = shop.getDoneOrdersInDiapazon(LocalDate.of(2025,10,21), LocalDate.of(2025,11,3), OrderSorting.PRICE_DOWN);
+        List<Order> doneRequests = shop.getDoneOrdersInDiapazon(LocalDate.of(2025,10,21), LocalDate.of(2025,11,5), OrderSorting.PRICE_DOWN);
         for (Order order : doneRequests) {
             System.out.println(order);
         }
         System.out.print("Выполненные заказы за неделю 2 вариант количество:  ");
-        System.out.println(shop.getOrdersAmountInDiapazon(LocalDate.of(2025,10,21), LocalDate.of(2025,11,3)) + "\n");
+        System.out.println(shop.getOrdersAmountInDiapazon(LocalDate.of(2025,10,21), LocalDate.of(2025,11,5)) + "\n");
 
         // проверка, что считается только то, что входит в диапазон
         order2.setCompletionDate(LocalDate.of(2025,9,22));
 
         System.out.print("\nСумма заработанных денег за неделю 2 вариант: ");
-        System.out.println(shop.getIncomeInDiapazon(LocalDate.of(2025,10,21), LocalDate.of(2025,11,3)));
+        System.out.println(shop.getIncomeInDiapazon(LocalDate.of(2025,10,21), LocalDate.of(2025,11,5)));
         System.out.print("Выполненные заказы за неделю 2 вариант: ");
-        doneRequests = shop.getDoneOrdersInDiapazon(LocalDate.of(2025,10,21), LocalDate.of(2025,11,3), OrderSorting.PRICE_DOWN);
+        doneRequests = shop.getDoneOrdersInDiapazon(LocalDate.of(2025,10,21), LocalDate.of(2025,11,5), OrderSorting.PRICE_DOWN);
         for (Order order : doneRequests) {
             System.out.println(order);
 
         }
 
         System.out.print("Выполненные заказы за неделю 2 вариант количество:  ");
-        System.out.println(shop.getOrdersAmountInDiapazon(LocalDate.of(2025,10,21), LocalDate.of(2025,11,3)) + "\n");
+        System.out.println(shop.getOrdersAmountInDiapazon(LocalDate.of(2025,10,21), LocalDate.of(2025,11,5)) + "\n");
 
         System.out.println();
         System.out.println();
 
         // orders - only NEW
-        List<Order> orders = shop.getSortedOrders(OrderSorting.NEW);
-        for (Order order : orders) {
-            System.out.println(order);
-        }
+//        List<Order> orders = shop.getSortedOrders(OrderSorting.NEW);
+//        for (Order order : orders) {
+//            System.out.println(order);
+//        }
 
 
         // orders - by price
-        System.out.println("Only with price orders");
-        orders = shop.getSortedOrders(OrderSorting.PRICE_DOWN);
-        for (Order order : orders) {
-            System.out.println(order);
-        }
+//        System.out.println("Only with price orders");
+//        orders = shop.getSortedOrders(OrderSorting.PRICE_DOWN);
+//        for (Order order : orders) {
+//            System.out.println(order);
+        //}
     }
 }
