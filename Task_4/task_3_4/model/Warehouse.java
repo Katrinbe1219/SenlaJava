@@ -1,94 +1,97 @@
-package task_3_4.warehouse_work;
+package task_3_4.model;
 
-import task_3_4.books.Book;
-import task_3_4.order.Order;
-import task_3_4.types.BookSorting;
-import task_3_4.types.BookStatus;
-import task_3_4.types.LongLiedBookSorting;
-import task_3_4.types.RequestSorting;
+import task_3_4.model.types.*;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Warehouse {
     ArrayList<Book> books;
     ArrayList<Request> requests;
 
-    public Warehouse(ArrayList<Book> books) {
-        this.books = books;
+    private static volatile Warehouse instance;
+
+    private  Warehouse() {
+        this.books = new ArrayList<>();
         this.requests = new ArrayList<>();
+        initializeData();
     }
 
-//    void addBook(IBook book){
-//        IBook foundBook = null;
-//        for (IBook iBook : books) {
-//            if (iBook.equals(book)) {
-//                foundBook = iBook;
-//                break;
-//            }
-//        }
-//
-//        assert foundBook != null: "Не найдена книга";
-//        foundBook.setStatus(BookStatus.InStock);
-//    }
-//
-//    void removeBook(IBook book){
-//        IBook foundBook = null;
-//        for (IBook iBook : books) {
-//            if (iBook.equals(book)) {
-//                foundBook = iBook;
-//                break;
-//            }
-//        }
-//
-//        assert foundBook != null: "Не найдена книга";
-//        foundBook.setStatus(BookStatus.OutOfStock);
-//    }
+    private void  initializeData(){
+        Book book1 = new Book("Harry Potter 1", "J.K.Rowlling",
+                2024, BookStatus.IN_STOCK, 1500, BookTypes.FANTASY);
+        Book book2 = new Book("Peter The First", "A.Tolstoy",
+                2024, BookStatus.IN_STOCK, 2100, BookTypes.HISTORY);
+        Book book3 = new Book("The Great Expectations", "C.Dickens",
+                2025, BookStatus.OUT_OF_STOCK, 1500, BookTypes.CLASSICAL);
+        Book book4 = new Book("War and Piece", "L.Tolstoy",
+                2025, BookStatus.OUT_OF_STOCK, 1500, BookTypes.CLASSICAL);
+        Book book5 = new Book("Oblomov", "I.Goncharov",
+                2023, BookStatus.OUT_OF_STOCK, 1400, BookTypes.HISTORY);
 
-    public void receiveBook(String title){
-        Book book_= null;
-        for (Book book : books) {
-            if (book.getTitle().equals(title)) {
-                book.setStatus(BookStatus.IN_STOCK);
-                book.setAdmissionDate(LocalDate.now());
-                book_ = book;
-                break;
+        books.add(book1);
+        books.add(book2);
+        books.add(book4);
+        books.add(book5);
+        books.add(book3);
+    }
+
+    public static Warehouse getInstance(){
+        if (instance == null){
+            synchronized (Warehouse.class){
+                if (instance == null){
+                    instance = new Warehouse();
+                }
             }
         }
-
-        assert book_ != null:"Book was not found";
-        cancellRequestsByBook(book_);
+        return instance;
     }
 
-    Boolean checkBook(Book book){
-        for(Book iBook : books){
-            if (iBook.equals(book)){
-                return iBook.getStatus() == BookStatus.IN_STOCK;
-            }
-        }
-
-        return false;
+    //added - оставить
+    public ArrayList<Book> getBooks() {
+        return new ArrayList<>(this.books);
     }
 
+    //added - оставить
     public void addRequest(Request request){
         this.requests.add(request);
     }
 
+    public void deleteRequest(Request request){
+        this.requests.remove(request);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // added
     void cancellRequestsByBook(Book book){
         this.requests.removeIf(r -> r.getBook().equals(book));
     }
 
+    //added
     public void cancellOrderRequests(Order order){
         System.out.println("Удаление запросов, связанных с заказом");
         this.requests.removeIf(r -> r.getOrder().equals(order));
     }
 
-    public ArrayList<Book> getBooks() {
-        return this.books;
-    }
 
+
+    //added
     public Map<String, Integer> getRequestsGroupByBooks(){
         Map<String, Integer> groupedRequests = new HashMap<>();
         for (Request request : requests) {
@@ -102,6 +105,7 @@ public class Warehouse {
         return groupedRequests;
     }
 
+    //added
     public List<List<Object>> getSortedRequests(RequestSorting sortingType){
 
         Map<String, Integer> requestsGroupByBooks = getRequestsGroupByBooks();
@@ -127,7 +131,7 @@ public class Warehouse {
     }
 
 
-
+    //added
     public void sortRequestsByParameter(List<List<Object>> groupedRequests, int index, boolean asc){
         Comparator<List<Object>> comparator = Comparator.comparing(
                 list -> (Comparable)list.get(index)
@@ -139,6 +143,7 @@ public class Warehouse {
         groupedRequests.sort(comparator);
     }
 
+    //added
     public List<Book> getSortedBooks(BookSorting sortingType){
         List<Book> sortedBooks;
         switch (sortingType) {
@@ -195,6 +200,7 @@ public class Warehouse {
 
     }
 
+    //added
     public String getBookDescription(String bookName){
         String foundBook =  "Такой книги не нашлось";
         for (Book book : books) {
@@ -208,13 +214,14 @@ public class Warehouse {
 
     }
 
-
+    //added
     public void setLastPurchase(List<Book> books){
         for (Book book : books) {
             book.setLastPurchaseDate(LocalDate.now());
         }
     }
 
+    //added
     public List<Book> getLongLiedBooks(LongLiedBookSorting sortingType){
         return switch(sortingType) {
             case PRICE_DOWN -> books.stream()
@@ -246,6 +253,38 @@ public class Warehouse {
                     .filter(p -> ChronoUnit.MONTHS.between(p.getLastPurchaseDate(), LocalDate.now()) > 6)
                     .toList();
         };
+    }
+
+    // added - оставить
+    public List<Request> getRequests(){
+        return new ArrayList<Request>(requests);
+    }
+
+    // added
+    public void receiveBook(String title){
+        Book book_= null;
+        for (Book book : books) {
+            if (book.getTitle().equals(title)) {
+                book.setStatus(BookStatus.IN_STOCK);
+                book.setAdmissionDate(LocalDate.now());
+                book_ = book;
+                break;
+            }
+        }
+
+        assert book_ != null:"Book was not found";
+        cancellRequestsByBook(book_);
+    }
+
+    //added
+    Boolean checkBook(Book book){
+        for(Book iBook : books){
+            if (iBook.equals(book)){
+                return iBook.getStatus() == BookStatus.IN_STOCK;
+            }
+        }
+
+        return false;
     }
 
 

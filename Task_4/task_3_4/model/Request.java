@@ -1,7 +1,4 @@
-package task_3_4.warehouse_work;
-
-import task_3_4.books.Book;
-import task_3_4.order.Order;
+package task_3_4.model;
 
 public class Request {
     private Book book;
@@ -9,16 +6,15 @@ public class Request {
 
 
     public Request(Book book, Order order){
-        System.out.println("Создан запрос на книгу " + book.getTitle());
         this.book = book;
         this.order = order;
     }
 
-    Order getOrder(){
+    public Order getOrder(){
         return this.order;
     }
 
-    Book getBook(){
+    public Book getBook(){
         return this.book;
     }
 }

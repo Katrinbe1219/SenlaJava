@@ -1,4 +1,4 @@
-package task_3_4.types;
+package task_3_4.model.types;
 
 public enum OrderStatus {
     NEW,
