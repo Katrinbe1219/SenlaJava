@@ -1,7 +1,7 @@
-package task_3_4.books;
+package task_3_4.model;
 
-import task_3_4.types.BookStatus;
-import task_3_4.types.BookTypes;
+import task_3_4.model.types.BookStatus;
+import task_3_4.model.types.BookTypes;
 
 import java.time.LocalDate;
 
@@ -87,7 +87,10 @@ public class Book {
     }
 
     public String getDescription(){
-        return "The author of this books is "  + this.author + ". The publication date is " + this.year + ". The genre is " + this.genre + "\n";
+        return title + ":\n" + "The author of this books is "  + this.author +
+                ".\nThe publication date is " + this.year +
+                ".\nThe genre is " + this.genre + "\n"
+                + "price is " + this.price + "\n";
     }
 
     public void setLastPurchaseDate(LocalDate date){

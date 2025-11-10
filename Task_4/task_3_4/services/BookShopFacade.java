@@ -1,98 +1,71 @@
-package task_3_4;
+package task_3_4.services;
 
-import task_3_4.books.Book;
-import task_3_4.order.Order;
-import task_3_4.types.*;
-import task_3_4.warehouse_work.Request;
-import task_3_4.warehouse_work.Warehouse;
+import task_3_4.model.Book;
+import task_3_4.model.Order;
+import task_3_4.model.Request;
+import task_3_4.model.types.BookStatus;
+import task_3_4.model.types.OrderSorting;
+import task_3_4.model.types.OrderStatus;
+import task_3_4.repositories.OrderRepository;
+import task_3_4.repositories.RequestRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class BookShop {
-    double totalIncome;
-    Warehouse warehouse;
-    ArrayList<Order> orders;
+public class BookShopFacade {
+    private OrderRepository orderRepository;
+    private RequestRepository requestRepository;
 
-
-    BookShop(Warehouse warehouse){
-        this.warehouse = warehouse;
-        this.totalIncome  = 0;
-        this.orders = new ArrayList<>();
+    public BookShopFacade(OrderRepository orderRepository,  RequestRepository requestRepository) {
+        this.orderRepository = orderRepository;
+        this.requestRepository = requestRepository;
     }
 
-    double getTotalIncome(){
-        return this.totalIncome;
-    }
-    void addTotalIncome(double add){
-        this.totalIncome += add;
-    }
-
-    void subTotalIncome(double sub){
-        this.totalIncome -= sub;
-    }
-
-    void createOrder(Order order){
+    public boolean createOrder(Order order){
         System.out.println("Обработка заказа в BookShop");
         boolean checking = false;
 
         for(Book book: order.getBooks()){
             if (book.getStatus() == BookStatus.OUT_OF_STOCK){
                 checking = true;
-                warehouse.addRequest(new Request(book, order));
+                requestRepository.add(new Request(book, order));
             }
         }
 
         if (!checking){
             order.setStatus(OrderStatus.DONE);
-            warehouse.setLastPurchase(order.getBooks());
+            order.setCompletionDate(LocalDate.now());
+
         }
-        System.out.println("Статус заказа " + order.getStatus());
-        this.orders.add(order);
-        System.out.println("заказ добавлен в историю ");
+        orderRepository.addOrder(order);
+        if (order.getStatus() == OrderStatus.DONE){ return true;}
+        else {return false;}
+
     }
 
-    void removeOrder(Order order){
+
+    public boolean removeOrder(Order order){
         System.out.println("Запрос на отмену заказа");
-        for (Order o: this.orders){
+        List<Order> orders = orderRepository.getOrders();
+        for (Order o: orders){
             if (o.getStatus() != OrderStatus.DONE && o.equals(order)){
                 o.setStatus(OrderStatus.CANCELLED);
-                warehouse.cancellOrderRequests(order);
-                System.out.println("Заказ Отменен");
-                break;
+                return true;
+
+
             }
         }
+        return false;
     }
 
-    ArrayList<Book> getAllBookList(){
-        System.out.println("Получение списка всех книг");
-        return warehouse.getBooks();
+    public String getOrderDetails(Order order){
+        return order.toString();
     }
 
-    void receiveDelivery(ArrayList<String> booksTitles){
-        for (String bookTitle: booksTitles){
-            System.out.println("Была завезена книга "+ bookTitle);
-            warehouse.receiveBook(bookTitle);
-            updateOrdersStatus(bookTitle);
-        }
-    }
-
-    void updateOrdersStatus(String bookTitle){
-        for (Order order: orders){
-            if (order.getStatus() == OrderStatus.NEW){
-                OrderStatus newStatus= order.checkUpdateByBook(bookTitle);
-
-                if (newStatus == OrderStatus.DONE){
-                    warehouse.setLastPurchase(order.getBooks());
-                }
-            }
-        }
-    }
-
-    List<Order> getSortedOrders(OrderSorting sortingType){
-
+    public List<Order> getSortedOrders(OrderSorting sortingType){
+        List<Order> orders = orderRepository.getOrders();
         return switch (sortingType) {
             case DONE -> orders.stream()
                     .filter(p -> p.getStatus() == OrderStatus.DONE)
@@ -121,7 +94,8 @@ public class BookShop {
         };
     }
 
-    List<Order> getDoneOrdersInDiapazon(LocalDate start, LocalDate end, OrderSorting sortingType){
+    public List<Order> getDoneOrdersInDiapazon(LocalDate start, LocalDate end, OrderSorting sortingType){
+        List<Order> orders = orderRepository.getOrders();
         if (sortingType == OrderSorting.PRICE_UP){
             return orders.stream()
                     .filter(p -> p.getStatus() == OrderStatus.DONE)
@@ -156,27 +130,8 @@ public class BookShop {
 
     }
 
-    List<Book> getSortedBooks(BookSorting sortingType){
-        return warehouse.getSortedBooks(sortingType);
-    }
-
-    List<List<Object>> getSortedRequests(RequestSorting sortingType){
-        return warehouse.getSortedRequests(sortingType);
-    }
-
-    String getBookDescription(String bookName){
-        return warehouse.getBookDescription(bookName);
-    }
-
-    String getOrderDetails(Order order){
-        return order.toString();
-    }
-
-    List<Book> getLongLiedBooks(LongLiedBookSorting sortingType){
-        return warehouse.getLongLiedBooks(sortingType);
-    }
-
-    Integer getOrdersAmountInDiapazon(LocalDate start, LocalDate end){
+    public Integer getOrdersAmountInDiapazon(LocalDate start, LocalDate end){
+        List<Order> orders = orderRepository.getOrders();
         return orders.stream()
                 .filter(p -> p.getStatus() == OrderStatus.DONE)
                 .filter(p -> p.getCompletionDate().isAfter(start) && p.getCompletionDate().isBefore(end))
@@ -185,9 +140,9 @@ public class BookShop {
 
     }
 
-    Double getIncomeInDiapazon(LocalDate start, LocalDate end){
+    public Double getIncomeInDiapazon(LocalDate start, LocalDate end){
         double amount = 0;
-
+        List<Order> orders = orderRepository.getOrders();
         for (Order order: orders){
             if (order.getStatus() == OrderStatus.DONE){
 
@@ -199,7 +154,6 @@ public class BookShop {
 
         return amount;
     }
-
 
 
 
