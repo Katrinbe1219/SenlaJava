@@ -23,5 +23,19 @@ public class OrderRepository {
         return bookShop.getOrders();
     }
 
+    public int getCurrentMaxId(){
+        return bookShop.getCountAllOrder();
+    }
+
+    public void incrementMaxId(){
+        bookShop.incrementAllOrder();
+    }
+
+    public void checkMaxId(int num){
+        bookShop.checkMaxCountOrder(num);
+    }
+
+
+
 
 }

@@ -2,11 +2,7 @@ package task_3_4.repositories;
 
 import task_3_4.model.Book;
 import task_3_4.model.Warehouse;
-import task_3_4.model.types.BookStatus;
-
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 
 public class BookRepository {
     Warehouse warehouse;
@@ -28,4 +24,19 @@ public class BookRepository {
         }
         return book_;
     }
+
+    public int getCurrentMaxId(){
+        return warehouse.getCountAllBooks();
+    }
+
+
+    public void addNewBook(Book book){
+        warehouse.addNewBook(book);
+    }
+
+    public void checkMaxBookId(int id){
+        warehouse.checkMaxBookId(id);
+    }
+
+
 }

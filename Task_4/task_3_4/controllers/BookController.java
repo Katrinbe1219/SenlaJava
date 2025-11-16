@@ -99,6 +99,12 @@ public class BookController {
         bookService.setLastPurchase(books);
     }
 
+    public String importBook(String fileName){
+        return bookService.importNewBook(fileName);
+    }
 
+    public String exportBook(String fileName){
+        return bookService.exportBook(fileName);
+    }
 
 }

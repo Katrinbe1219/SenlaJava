@@ -44,4 +44,12 @@ public class RequestController {
         return "1. По алфавиту (по возрастанию)\n2. По алфавиту (по убыванию)\n" +
                 "3. По количеству (по возрастанию)\n4. По количеству (по убыванию)\n";
     }
+
+    public String importRequest(String filename){
+        return bookService.importRequest(filename);
+    }
+
+    public String exportRequest(String id){
+        return bookService.exportRequest(id);
+    }
 }

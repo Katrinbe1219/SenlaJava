@@ -5,18 +5,28 @@ import task_3_4.model.types.OrderStatus;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
-public class Order {
+public class Order implements Comparable<Order> {
     OrderStatus status;
     Customer customer;
     ArrayList<Book> books;
     double totalCost;
     LocalDate completionDate;
+    int id;
 
-    public Order(){
+    public Order(int id){
+        this.id = id;
         books = new ArrayList<>();
         totalCost = 0;
         status = OrderStatus.NEW;
+    }
+
+
+
+    public int getId() {
+        return this.id;
     }
 
     public void setStatus(OrderStatus status){
@@ -30,7 +40,7 @@ public class Order {
         this.customer = customer;
     }
 
-    Customer getCustomer(){
+    public Customer getCustomer(){
         return this.customer;
     }
 
@@ -99,4 +109,57 @@ public class Order {
     }
 
 
+    @Override
+    public int compareTo(Order o) {
+        return Comparator
+                .comparing(Order::getId, Comparator.nullsFirst(Integer::compareTo))
+                .thenComparing(Order::getStatus, Comparator.nullsFirst(Comparator.naturalOrder()))
+                .thenComparing(Order::getCompletionDate, Comparator.nullsFirst(LocalDate::compareTo))
+                .thenComparing(Order::getTotalCost)
+                .thenComparing(Order::getCustomer, Comparator.nullsFirst(Customer::compareTo))
+                .thenComparing(this::getSortedBookIds, Comparator.nullsFirst(this::compareBookIdLists))
+                .compare(this,o);
+    }
+
+    private List<Integer> getSortedBookIds(Order order){
+        if (order.getBooks() == null) return null;
+        return order.getBooks().stream()
+                .map(Book::getId)
+                .sorted().toList();
+    }
+
+    private int compareBookIdLists(List<Integer> list1, List<Integer> list2){
+        if (list1==null && list2==null) return 0;
+
+        if (list1==null) return -1;
+        if (list2==null) return 1;
+        int miniSize = Math.min(list1.size(), list2.size());
+
+        for (int i=0; i< miniSize; i++){
+            int comparison = Integer.compare(list1.get(i), list2.get(i));
+            if (comparison != 0) return comparison;
+        }
+
+        return Integer.compare(list1.size(), list2.size());
+    }
+
+    public int compareList(Order o){
+        List<Integer> list1 = getSortedBookIds(this);
+        List<Integer> list2 = getSortedBookIds(o);
+        return  compareBookIdLists(list1, list2);
+    }
+
+    public void clearBooks(){
+        books.clear();
+        this.totalCost = 0;
+    }
+
+    public String getCsvBooks(){
+        StringBuilder res = new StringBuilder(String.valueOf(this.books.getFirst().getId()));
+        for (int i=1; i< books.size(); i++){
+            res.append(";").append(books.get(i).getId());
+        }
+
+        return res.toString();
+    }
 }

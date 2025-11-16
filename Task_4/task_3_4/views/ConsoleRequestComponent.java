@@ -14,7 +14,9 @@ public class ConsoleRequestComponent  implements UIComponent{
             System.out.println("\nРАЗДЕЛ ЗАПРОСОВ:");
             System.out.println("1. Список запросов");
             System.out.println("2. Получить книгу и удалить запросы");
-            System.out.println("3. Выход");
+            System.out.println("3. Импортировать запросы");
+            System.out.println("4. Экспортировать запросы");
+            System.out.println("5. Выход");
             return;
         };
 

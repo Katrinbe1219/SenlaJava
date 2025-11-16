@@ -9,6 +9,7 @@ import task_3_4.repositories.OrderRepository;
 import task_3_4.repositories.RequestRepository;
 import task_3_4.services.BookService;
 import task_3_4.services.BookShopFacade;
+import task_3_4.services.OrderFileService;
 import task_3_4.views.ConsoleUIFactory;
 import task_3_4.views.UIComponent;
 import task_3_4.views.UIFactory;
@@ -27,6 +28,7 @@ public class BookStoreController {
     BookController bookController;
     OrderController orderController;
     RequestController requestController;
+    OrderFileService orderFileService;
 
 
     public BookStoreController() {
@@ -41,12 +43,14 @@ public class BookStoreController {
         OrderRepository or = new OrderRepository();
         RequestRepository rr = new RequestRepository(warehouse);
 
-        BookService bs = new BookService(br,rr);
+        BookService bs = new BookService(br,rr, or);
         BookShopFacade bsf = new BookShopFacade(or, rr);
 
         bookController = new BookController(bs);
         orderController = new OrderController(bsf);
         requestController = new RequestController(bs);
+
+        orderFileService = new OrderFileService(or, br);
 
     }
 
@@ -103,7 +107,7 @@ public class BookStoreController {
                     break;
                 }
                 case "3":{
-                    System.out.println("Введите название книги");
+                    bookComponent.display("Введите название книги");
                     choice = bookComponent.input();
                     String description  = bookController.displayBookDescription(choice);
                     orderComponent.display(description);
@@ -119,12 +123,24 @@ public class BookStoreController {
                     break;
                 }
                 case "5" :{
-                    System.out.println("Введите название книги");
+                    bookComponent.display("Введите название книги");
                     choice = bookComponent.input();
                     orderComponent.display(bookController.checkBook(choice));
                     break;
                 }
                 case "6" :{
+                    bookComponent.display("Введите название книги");
+                    choice = bookComponent.input();
+                    String success = bookController.exportBook(choice);
+                    if (!success.isEmpty()) bookComponent.display(success);
+
+                    return;
+                }
+                case "7" :{
+                    bookComponent.display("Введите название файла, находящегося в данном каталоге");
+                    choice = bookComponent.input();
+                    String success = bookController.importBook(choice);
+                    if (!success.isEmpty()) bookComponent.display(success);
                     return;
                 }
                 default: {
@@ -151,6 +167,7 @@ public class BookStoreController {
                     Boolean done = orderController.createOrder(order);
                     if (done) {
                         bookController.setLastPurchase(order.getBooks());
+                        orderController.incrementMaxId();
 
                     }
                     orderComponent.display("Ваш заказ добавлен в историю со статусом " + order.getStatus());
@@ -222,6 +239,20 @@ public class BookStoreController {
                     break;
                 }
                 case "8" :{
+                    orderComponent.display("Введите наименование файла");
+                    choice = orderComponent.input();
+                    String success = orderFileService.importOrder(choice);
+                    if (success != null) orderComponent.display(success);
+                    break;
+                }
+                case "9" :{
+                    orderComponent.display("Введите id заказа");
+                    choice = orderComponent.input();
+                    String success = orderFileService.exportOrder(choice);
+                    if (success != null) orderComponent.display(success);
+                    break;
+                }
+                case "10" :{
                     return;
                 }
                 default: {
@@ -250,13 +281,13 @@ public class BookStoreController {
                     break;
                 }
                 case "2":{
-                        System.out.println("Введите наименование книги");
+                        requestComponent.display("Введите наименование книги");
 
                         String name =  requestComponent.input();
 
                         Boolean checking = bookController.receiveBook(name);
                         if (!checking){
-                            orderComponent.display("Такой книги не было найдено");
+                            requestComponent.display("Такой книги не было найдено");
                             break;
                         }
                         orders = orderController.getAllOrders("6");
@@ -274,6 +305,21 @@ public class BookStoreController {
                 }
 
                 case "3" :{
+                    requestComponent.display("Введите название файла");
+                    choice = requestComponent.input();
+                    String success = requestController.importRequest(choice);
+                    if (success!=null) requestComponent.display(success);
+                    break;
+                }
+                case "4" :{
+                    requestComponent.display("Введите id запроса");
+                    choice = requestComponent.input();
+                    String success = requestController.exportRequest(choice);
+                    if (success!=null) requestComponent.display(success);
+                    break;
+
+                }
+                case "5" :{
                     return;
                 }
                 default: {
@@ -284,7 +330,9 @@ public class BookStoreController {
     }
 
     Order createOrder(){
-        Order order = new Order();
+        // добавить счетсик заказов
+        int max = orderController.getMaxId()+1;
+        Order order = new Order( max);
 
         orderComponent.display("Введите свое имя");
         String name = orderComponent.input();

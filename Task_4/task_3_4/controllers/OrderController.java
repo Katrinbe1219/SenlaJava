@@ -93,6 +93,14 @@ public class OrderController {
         return false;
     }
 
+    public int getMaxId(){
+        return bookshop.getMaxCurrentId();
+    }
+
+    public void incrementMaxId(){
+        bookshop.incrementMaxId();
+    }
+
 
 
 }

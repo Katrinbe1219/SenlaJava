@@ -27,4 +27,16 @@ public class RequestRepository {
         warehouse.addRequest(request);
     }
 
+    public int getCurrentMaxRequestId(){
+        return warehouse.getCountAllRequests();
+    }
+
+    public void incrementMaxRequestId(){
+        warehouse.incrementCountAllRequests();
+    }
+
+    public void checkMaxRequestId(int id){
+        warehouse.checkMaxRequestId(id);
+    }
+
 }
