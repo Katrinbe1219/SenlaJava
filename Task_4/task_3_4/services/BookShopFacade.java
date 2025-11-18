@@ -66,7 +66,9 @@ public class BookShopFacade {
     }
 
     public String getOrderDetails(Order order){
-        return order.toString();
+        if (order != null) return order.toString();
+        else return "Заказ не существует, создайте заказ";
+
     }
 
     public List<Order> getSortedOrders(OrderSorting sortingType){

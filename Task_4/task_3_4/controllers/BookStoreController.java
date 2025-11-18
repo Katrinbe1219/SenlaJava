@@ -100,6 +100,7 @@ public class BookStoreController {
                 case "2":{
                     bookComponent.display(bookController.getForDisplayType("Lbook"));
                     choice = bookComponent.input();
+                    // если введено не то, то тогда получаем выбор NONE
                     books = bookController.displayLongLiedBooks(choice);
                     for (Book book : books) {
                         bookComponent.display(book.getDescription());
@@ -109,6 +110,7 @@ public class BookStoreController {
                 case "3":{
                     bookComponent.display("Введите название книги");
                     choice = bookComponent.input();
+                    // Если не найдена книга,  то возвращается Не найдено
                     String description  = bookController.displayBookDescription(choice);
                     orderComponent.display(description);
                     break;
@@ -116,6 +118,7 @@ public class BookStoreController {
                 case"4":{
                     bookComponent.display(bookController.getForDisplayType("book"));
                     choice = bookComponent.input();
+                    // если введено не из диапазона, то статус ALL
                     books = bookController.displaySortedBooks(choice);
                     for (Book book : books) {
                         bookComponent.display(book.getDescription());
@@ -131,16 +134,22 @@ public class BookStoreController {
                 case "6" :{
                     bookComponent.display("Введите название книги");
                     choice = bookComponent.input();
+                    // если есть ошибка, то возвращается текст, а не пустая строка
                     String success = bookController.exportBook(choice);
                     if (!success.isEmpty()) bookComponent.display(success);
 
-                    return;
+                    break;
                 }
                 case "7" :{
                     bookComponent.display("Введите название файла, находящегося в данном каталоге");
                     choice = bookComponent.input();
                     String success = bookController.importBook(choice);
+                    // если есть ошибка, то возвращается текст, а не пустая строка
                     if (!success.isEmpty()) bookComponent.display(success);
+                    break;
+                }
+
+                case "8":{
                     return;
                 }
                 default: {
@@ -175,13 +184,15 @@ public class BookStoreController {
                 }
                 case "2":{
                         if (order == null){
-                           orderComponent.display("Создайте, чтобы отменить");
+                           orderComponent.display("Создайте заказ, чтобы отменить");
                            break;
                         }
                         Boolean cancelled = orderController.deleteOrder(order);
                         if (cancelled) {
                             requestController.deleteRequestByOrder(order);
                             order = null;
+                        }else{
+                            requestComponent.display("Заказ для удаления не был найден. Создайте заказ");
                         }
 
 
@@ -189,7 +200,7 @@ public class BookStoreController {
                 }
                 case "3":{
                     if (order == null){
-                        orderComponent.display("Создайте, чтобы получить детали");
+                        orderComponent.display("Создайте заказ, чтобы получить детали");
                         break;
                     }
                     String details = orderController.getOrderDetails(order);
@@ -199,6 +210,7 @@ public class BookStoreController {
                 case"4":{
                     orderComponent.display(orderController.getOrderTypes());
                     choice = orderComponent.input();
+                    // если веден индекс вне диапазона, выдается DATE_UP
                     orders = orderController.getAllOrders(choice);
                     for (Order o: orders){
                         orderComponent.display(o.toString());
@@ -214,6 +226,11 @@ public class BookStoreController {
                     choice = orderComponent.input();
                     orders  = orderController.displayOrdersInDiapazon(first, second, choice);
 
+                    if (orders == null) {
+                        orderComponent.display("Не найдено заказов");
+                        break;
+                    }
+
                     for (Order o: orders){
                         orderComponent.display(o.toString());
                     }
@@ -226,7 +243,7 @@ public class BookStoreController {
                     orderComponent.display("Введите дату конца в формате год-месяц-день");
                     String second = orderComponent.input();
                     int amount = orderController.displayOrderAmountInDiapazon(first, second);
-                    orderComponent.display("Количество заказов " + amount);
+                    if (amount != -1) orderComponent.display("Количество заказов " + amount);
                     break;
                 }
                 case "7" :{
@@ -235,7 +252,8 @@ public class BookStoreController {
                     orderComponent.display("Введите дату конца в формате год-месяц-день");
                     String second =orderComponent.input();
                     double income =  orderController.displayIncomeInDiapazon(first, second);
-                    orderComponent.display("Размер прибыли " + income);
+                    if (income != -1) orderComponent.display("Размер прибыли " + income);
+
                     break;
                 }
                 case "8" :{
@@ -275,6 +293,10 @@ public class BookStoreController {
             switch(choice){
                 case "1": {
                     requests = requestController.getAllRequests(requestController.getRequestTypes());
+                    if (requests == null){
+                        requestComponent.display("Запрос не было найдено");
+                        break;
+                    }
                     for (List<Object> request : requests){
                         System.out.println(request.toString());
                     }
@@ -349,27 +371,38 @@ public class BookStoreController {
             orderComponent.display(i + " " + books.get(i).getTitle());
         }
         String flag =orderComponent.input();
-        while(!flag.equals("-1")){
-            if (Integer.parseInt(flag) < books.size()) {
-                order.addBook(books.get(Integer.parseInt(flag)));
-                orderComponent.display("Добавлена книга "  + books.get(Integer.parseInt(flag)).getTitle() );
-            }
-            else {orderComponent.display("Неправильный индекс");}
 
-            flag = orderComponent.input();
+        while(!flag.equals("-1")){
+            try {
+                if (Integer.parseInt(flag) < books.size()) {
+                    order.addBook(books.get(Integer.parseInt(flag)));
+                    orderComponent.display("Добавлена книга "  + books.get(Integer.parseInt(flag)).getTitle() );
+                }
+                else {orderComponent.display("Неправильный индекс");}
+
+                flag = orderComponent.input();
+            }catch(NumberFormatException e){
+                orderComponent.display("Вы вели некорректное число");
+            }
+
 
         }
 
         orderComponent.display("Есть ли книги,  которые вы все таки хотите удалить из заказа? (или -1)");
         flag =orderComponent.input();
         while(!flag.equals("-1")){
-            if (Integer.parseInt(flag) < books.size()) {
-                order.delBook(books.get(Integer.parseInt(flag)));
-                orderComponent.display("Удалена книга "  + books.get(Integer.parseInt(flag)).getTitle() );
-            }
-            else orderComponent.display("Неправильный индекс");
+            try {
+                if (Integer.parseInt(flag) < books.size()) {
+                    order.delBook(books.get(Integer.parseInt(flag)));
+                    orderComponent.display("Удалена книга "  + books.get(Integer.parseInt(flag)).getTitle() );
+                }
+                else orderComponent.display("Неправильный индекс");
 
-            flag = orderComponent.input();
+                flag = orderComponent.input();
+            }catch (NumberFormatException e){
+                orderComponent.display("Вы вели некорректно число");
+            }
+
 
         }
 

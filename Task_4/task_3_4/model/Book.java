@@ -95,7 +95,9 @@ public class Book implements Comparable<Book> {
         return title + ":\n" + "The author of this books is "  + this.author +
                 ".\nThe publication date is " + this.year +
                 ".\nThe genre is " + this.genre + "\n"
-                + "price is " + this.price + "\n";
+                + "price is " + this.price + "\n" +
+                "status is " + this.status + "\n" +
+                "last purchase data is " + this.lastPurchaseDate + "\n";
     }
 
     public void setLastPurchaseDate(LocalDate date){

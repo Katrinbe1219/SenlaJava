@@ -19,7 +19,7 @@ public class ConsoleBookComponent implements UIComponent{
             System.out.println("5. Проверить наличие книги в магазине");
             System.out.println("6. Экспортировать книгу по названию");
             System.out.println("7. Импортировать книгу");
-            System.out.println("6. Назад");
+            System.out.println("8. Назад");
             return;
 
         }
