@@ -20,7 +20,9 @@ public class ConsoleOrderComponent implements UIComponent{
             System.out.println("5. Получить список заказов за определенное время");
             System.out.println("6. Получить количество заказов за определенное время");
             System.out.println("7. Получить доход за определенное время");
-            System.out.println("8. Выход");
+            System.out.println("8. Импортировать заказы");
+            System.out.println("9. Экспортировать заказ по его id");
+            System.out.println("10. Выход");
             return;
         }
         System.out.println(what);

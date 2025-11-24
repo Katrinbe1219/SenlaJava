@@ -1,11 +1,13 @@
 package task_3_4.controllers;
 
+import task_3_4.exceptions.OrderCanNotBeCreated;
 import task_3_4.model.Order;
 import task_3_4.model.types.OrderSorting;
 import task_3_4.model.types.OrderStatus;
 import task_3_4.services.BookShopFacade;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 public class OrderController {
@@ -45,30 +47,48 @@ public class OrderController {
 
     List<Order> displayOrdersInDiapazon(String firstDate, String secondDate, String type){
         // yyyy-MM-dd
-        LocalDate first = LocalDate.parse(firstDate);
-        LocalDate second = LocalDate.parse(secondDate);
-        OrderSorting sorting = getOrderSorting(type);
-        List<Order> orders = bookshop.getDoneOrdersInDiapazon(first,second, sorting);
+        try {
+            LocalDate first = LocalDate.parse(firstDate);
+            LocalDate second = LocalDate.parse(secondDate);
+            OrderSorting sorting = getOrderSorting(type);
+            List<Order> orders = bookshop.getDoneOrdersInDiapazon(first,second, sorting);
 
-        return orders;
+            return orders;
+        } catch (DateTimeParseException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
 
     }
 
     int displayOrderAmountInDiapazon(String firstDate, String secondDate){
-        LocalDate first = LocalDate.parse(firstDate);
-        LocalDate second = LocalDate.parse(secondDate);
-        int orders = bookshop.getOrdersAmountInDiapazon(first,second);
+        try {
+            LocalDate first = LocalDate.parse(firstDate);
+            LocalDate second = LocalDate.parse(secondDate);
+            int orders = bookshop.getOrdersAmountInDiapazon(first,second);
 
-        return orders;
+            return orders;
+        } catch (DateTimeParseException e) {
+            System.out.println(e.getMessage());
+            return -1;
+        }
+
 
     }
 
     double displayIncomeInDiapazon(String firstDate, String secondDate){
-        LocalDate first = LocalDate.parse(firstDate);
-        LocalDate second = LocalDate.parse(secondDate);
-        double orders = bookshop.getIncomeInDiapazon(first, second);
+        try {
+            LocalDate first = LocalDate.parse(firstDate);
+            LocalDate second = LocalDate.parse(secondDate);
+            double orders = bookshop.getIncomeInDiapazon(first, second);
 
-        return orders;
+            return orders;
+        } catch (DateTimeParseException e) {
+            System.out.println(e.getMessage());
+            return -1;
+        }
+
 
     }
 
@@ -92,6 +112,15 @@ public class OrderController {
         }
         return false;
     }
+
+    public int getMaxId(){
+        return bookshop.getMaxCurrentId();
+    }
+
+    public void incrementMaxId(){
+        bookshop.incrementMaxId();
+    }
+
 
 
 

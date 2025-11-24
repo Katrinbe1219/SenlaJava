@@ -1,6 +1,8 @@
 package task_3_4.services;
 
+import task_3_4.exceptions.OrderCanNotBeCreated;
 import task_3_4.model.Book;
+import task_3_4.model.Customer;
 import task_3_4.model.Order;
 import task_3_4.model.Request;
 import task_3_4.model.types.BookStatus;
@@ -9,6 +11,8 @@ import task_3_4.model.types.OrderStatus;
 import task_3_4.repositories.OrderRepository;
 import task_3_4.repositories.RequestRepository;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -24,13 +28,15 @@ public class BookShopFacade {
     }
 
     public boolean createOrder(Order order){
-        System.out.println("Обработка заказа в BookShop");
         boolean checking = false;
 
         for(Book book: order.getBooks()){
             if (book.getStatus() == BookStatus.OUT_OF_STOCK){
                 checking = true;
-                requestRepository.add(new Request(book, order));
+
+                int new_id = requestRepository.getCurrentMaxRequestId() + 1;
+                requestRepository.add(new Request( new_id,book, order));
+                requestRepository.incrementMaxRequestId();
             }
         }
 
@@ -47,7 +53,6 @@ public class BookShopFacade {
 
 
     public boolean removeOrder(Order order){
-        System.out.println("Запрос на отмену заказа");
         List<Order> orders = orderRepository.getOrders();
         for (Order o: orders){
             if (o.getStatus() != OrderStatus.DONE && o.equals(order)){
@@ -61,7 +66,9 @@ public class BookShopFacade {
     }
 
     public String getOrderDetails(Order order){
-        return order.toString();
+        if (order != null) return order.toString();
+        else return "Заказ не существует, создайте заказ";
+
     }
 
     public List<Order> getSortedOrders(OrderSorting sortingType){
@@ -154,6 +161,19 @@ public class BookShopFacade {
 
         return amount;
     }
+
+    public int getMaxCurrentId(){
+        return orderRepository.getCurrentMaxId();
+    }
+
+    public void incrementMaxId(){
+        orderRepository.incrementMaxId();
+    }
+
+
+
+
+
 
 
 

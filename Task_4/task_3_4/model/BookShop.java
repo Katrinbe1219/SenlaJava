@@ -6,14 +6,26 @@ import java.util.List;
 public class BookShop {
     double totalIncome;
     ArrayList<Order> orders;
+    int countAllOrder;
 
 
     public BookShop() {
-
+        this.countAllOrder = 0;
         this.totalIncome = 0;
         this.orders = new ArrayList<>();
     }
 
+    public int getCountAllOrder() {
+        return this.countAllOrder;
+    }
+
+    public void incrementAllOrder() {
+        this.countAllOrder++;
+    }
+
+    public void checkMaxCountOrder(int num){
+        countAllOrder = Math.max(num, countAllOrder);
+    }
 
     public double getTotalIncome() {
         return this.totalIncome;

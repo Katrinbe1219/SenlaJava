@@ -4,10 +4,11 @@ import task_3_4.model.types.BookStatus;
 import task_3_4.model.types.BookTypes;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 
-public class Book {
+public class Book implements Comparable<Book> {
     String title;
-
+    int id;
     String author;
     int year;
     BookStatus status;
@@ -16,7 +17,8 @@ public class Book {
     LocalDate lastPurchaseDate;
     LocalDate admissionDate;
 
-    public Book(String title, String author, int year, BookStatus status, double price, BookTypes type) {
+    public Book(int id, String title, String author, int year, BookStatus status, double price, BookTypes type) {
+        this.id = id;
         this.title = title;
         this.author = author;
         this.year = year;
@@ -85,12 +87,17 @@ public class Book {
     public BookTypes getGenre() {
         return this.genre;
     }
+    public void setGenre(BookTypes genre) {
+        this.genre = genre;
+    }
 
     public String getDescription(){
         return title + ":\n" + "The author of this books is "  + this.author +
                 ".\nThe publication date is " + this.year +
                 ".\nThe genre is " + this.genre + "\n"
-                + "price is " + this.price + "\n";
+                + "price is " + this.price + "\n" +
+                "status is " + this.status + "\n" +
+                "last purchase data is " + this.lastPurchaseDate + "\n";
     }
 
     public void setLastPurchaseDate(LocalDate date){
@@ -107,5 +114,24 @@ public class Book {
 
     public void setAdmissionDate(LocalDate admissionDate){
         this.admissionDate = admissionDate;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    @Override
+    public int compareTo(Book o) {
+        return Comparator
+                .comparing(Book::getId, Comparator.nullsFirst(Integer::compareTo))
+                .thenComparing(Book::getTitle, Comparator.nullsFirst(String::compareTo))
+                .thenComparing(Book::getAuthor, Comparator.nullsFirst(String::compareTo))
+                .thenComparing(Book::getYear, Comparator.nullsFirst(Integer::compareTo))
+                .thenComparing(Book::getPrice, Comparator.nullsFirst(Double::compareTo))
+                .thenComparing(Book::getStatus, Comparator.nullsFirst(Comparator.naturalOrder()))
+                .thenComparing(Book::getLastPurchaseDate, Comparator.nullsFirst(LocalDate::compareTo))
+                .thenComparing(Book::getAdmissionDate, Comparator.nullsFirst(LocalDate::compareTo))
+                .thenComparing(Book::getGenre, Comparator.nullsFirst(Comparator.naturalOrder()))
+                .compare(this, o);
     }
 }
