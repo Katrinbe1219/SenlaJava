@@ -20,4 +20,9 @@ public class ConsoleUIFactory implements UIFactory {
     public UIComponent createRequestMenu() {
         return new ConsoleRequestComponent();
     }
+
+    @Override
+    public UIComponent createSettingMenu(){
+        return new ConsoleSettingsComponent();
+    }
 }

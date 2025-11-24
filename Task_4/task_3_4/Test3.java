@@ -12,7 +12,12 @@ public class Test3 {
         // Creating system----------------------------------------
 
 
-        BookStoreController bc = new BookStoreController();
-        bc.run();
+        try {
+            BookStoreController bc = new BookStoreController();
+            bc.run();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 }

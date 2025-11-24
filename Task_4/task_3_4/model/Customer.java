@@ -1,8 +1,9 @@
 package task_3_4.model;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class Customer  implements Comparable<Customer>{
+public class Customer  implements Comparable<Customer>, Serializable {
     String name;
     String surname;
     String email;

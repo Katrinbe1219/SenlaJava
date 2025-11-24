@@ -11,8 +11,8 @@ import java.util.List;
 public class OrderRepository {
     private BookShop bookShop;
 
-    public OrderRepository() {
-        this.bookShop = new BookShop();
+    public OrderRepository(BookShop bookShop) {
+        this.bookShop = bookShop;
     }
 
     public void addOrder(Order order){

@@ -2,25 +2,32 @@ package task_3_4.model;
 
 import task_3_4.model.types.*;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-public class Warehouse {
+public class Warehouse implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     ArrayList<Book> books;
     ArrayList<Request> requests;
     int countAllBooks; // добавлено, чтобы id были инкрементированы, даже если книга удалена из склада, счетсчик не уменьшается
     int countAllRequests;
 
-    private static volatile Warehouse instance;
+    //private static volatile Warehouse instance;
 
-    private  Warehouse() {
-        this.books = new ArrayList<>();
+    public   Warehouse() {
         this.requests = new ArrayList<>();
-        initializeData();
+        this.books = new ArrayList<>();
+        this.countAllBooks = 0;
+        this.countAllRequests = 0;
     }
 
-    private void  initializeData(){
+    public void  initializeData(){
         Book book1 = new Book(1,"Harry Potter 1", "J.K.Rowlling",
                 2024, BookStatus.IN_STOCK, 1500, BookTypes.FANTASY);
         Book book2 = new Book(2,"Peter The First", "A.Tolstoy",
@@ -41,16 +48,16 @@ public class Warehouse {
         this.countAllRequests = 0;
     }
 
-    public static Warehouse getInstance(){
-        if (instance == null){
-            synchronized (Warehouse.class){
-                if (instance == null){
-                    instance = new Warehouse();
-                }
-            }
-        }
-        return instance;
-    }
+//    public static Warehouse getInstance(){
+//        if (instance == null){
+//            synchronized (Warehouse.class){
+//                if (instance == null){
+//                    instance = new Warehouse();
+//                }
+//            }
+//        }
+//        return instance;
+//    }
 
     //added - оставить
     public ArrayList<Book> getBooks() {

@@ -16,7 +16,8 @@ public class ConsoleMenuComponent implements  UIComponent{
             System.out.println("1. Книги");
             System.out.println("2. Заказы");
             System.out.println("3. Запросы");
-            System.out.println("4. Выход");
+            System.out.println("4. Настройки");
+            System.out.println("5. Выход");
             System.out.println("Введите индекс интересующего вас раздела");
         }else {
             System.out.println(what);
