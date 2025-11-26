@@ -103,7 +103,8 @@ public class Order implements Comparable<Order>, Serializable {
             booksInfo.append(book.getDescription());
         }
 
-        return "Customer: " + getCustomer().toString() + "\n" +
+        return "ID: "+ this.id + "\n"
+                + "Customer: " + getCustomer().toString() + "\n" +
                  "Status: " + status + "\n" +
                 "Books: " + booksInfo +
                 "Price: " + this.totalCost + "\n";

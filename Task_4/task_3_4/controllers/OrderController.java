@@ -121,6 +121,17 @@ public class OrderController {
         bookshop.incrementMaxId();
     }
 
+    public Order getOrderById(String id_){
+        try {
+            int id = Integer.parseInt(id_);
+            return bookshop.getOrderById(id);
+
+        }catch (NumberFormatException e){
+            return null;
+        }
+
+    }
+
 
 
 

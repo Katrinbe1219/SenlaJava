@@ -255,10 +255,14 @@ public class BookStoreController {
                     break;
                 }
                 case "2":{
-                        if (order == null){
-                           orderComponent.display("Создайте заказ, чтобы отменить");
-                           break;
+                        orderComponent.display("Какой id заказа, который вы хотите удалить?");
+                        choice = orderComponent.input();
+                        order = orderController.getOrderById(choice);
+                        if (order == null) {
+                            orderComponent.display("Ваш id не был корректен");
+                            break;
                         }
+                    System.out.println(order.getCustomer().getCsvInfo());
                         Boolean cancelled = orderController.deleteOrder(order);
                         if (cancelled) {
                             requestController.deleteRequestByOrder(order);
@@ -271,10 +275,15 @@ public class BookStoreController {
                         break;
                 }
                 case "3":{
-                    if (order == null){
-                        orderComponent.display("Создайте заказ, чтобы получить детали");
+
+                    orderComponent.display("Какой id заказа, про который вы хотите узнать?");
+                    choice = orderComponent.input();
+                    order = orderController.getOrderById(choice);
+                    if (order == null) {
+                        orderComponent.display("Ваш id не был корректен");
                         break;
                     }
+                    
                     String details = orderController.getOrderDetails(order);
                     orderComponent.display(details);
                     break;

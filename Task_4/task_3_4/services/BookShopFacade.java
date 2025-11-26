@@ -170,6 +170,17 @@ public class BookShopFacade {
         orderRepository.incrementMaxId();
     }
 
+    public Order getOrderById(int id){
+        List<Order> orders=  orderRepository.getOrders();
+        for (Order o : orders){
+            if (o.getId() == id ){
+                return o;
+            }
+        }
+
+        return null;
+    }
+
 
 
 
