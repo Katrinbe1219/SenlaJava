@@ -8,6 +8,7 @@ import task_3_4.services.BookShopFacade;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderController {
@@ -100,7 +101,7 @@ public class OrderController {
         return bookshop.removeOrder(order);
     }
 
-    Boolean createOrder(Order order){
+    ArrayList<Integer> createOrder(Order order){
         return bookshop.createOrder(order);
     }
 

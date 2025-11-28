@@ -245,11 +245,15 @@ public class BookStoreController {
             switch(choice){
                 case "1": {
                     order = createOrder();
-                    Boolean done = orderController.createOrder(order);
-                    if (done) {
+                    ArrayList<Integer> done = orderController.createOrder(order);
+                    if (done == null) {
                         bookController.setLastPurchase(order.getBooks());
                         orderController.incrementMaxId();
 
+                    }else {
+                        for (Integer i : done) {
+                            orderComponent.display("Создан новый запрос с id " + i);
+                        }
                     }
                     orderComponent.display("Ваш заказ добавлен в историю со статусом " + order.getStatus());
                     break;
@@ -379,7 +383,7 @@ public class BookStoreController {
                         break;
                     }
                     for (List<Object> request : requests){
-                        System.out.println(request.toString());
+                        requestComponent.display(request.toString());
                     }
                     break;
                 }

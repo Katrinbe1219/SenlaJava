@@ -41,7 +41,6 @@ public class BookService {
         }
         book_.setStatus(BookStatus.IN_STOCK);
         book_.setAdmissionDate(LocalDate.now());
-        cancellRequestsByBook(book_);
         return true;
     }
 
