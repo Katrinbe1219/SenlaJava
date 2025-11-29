@@ -1,0 +1,5 @@
+.out
+.idea
+.gradle
+custom_annotations/.gradle
+processing_annotations/.gradle
