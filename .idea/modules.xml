@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Task_3_2/Task_3_2.iml" filepath="$PROJECT_DIR$/Task_3_2/Task_3_2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/application/application.iml" filepath="$PROJECT_DIR$/application/application.iml" />
+      <module fileurl="file://$PROJECT_DIR$/custom_annotations/custom_annotations.iml" filepath="$PROJECT_DIR$/custom_annotations/custom_annotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/processing_annotations/processing_annotations.iml" filepath="$PROJECT_DIR$/processing_annotations/processing_annotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/senla.iml" filepath="$PROJECT_DIR$/senla.iml" />
+    </modules>
+  </component>
+</project>
