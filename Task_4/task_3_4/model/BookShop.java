@@ -1,9 +1,14 @@
 package task_3_4.model;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookShop {
+public class BookShop implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     double totalIncome;
     ArrayList<Order> orders;
     int countAllOrder;

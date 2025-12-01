@@ -41,7 +41,6 @@ public class BookService {
         }
         book_.setStatus(BookStatus.IN_STOCK);
         book_.setAdmissionDate(LocalDate.now());
-        cancellRequestsByBook(book_);
         return true;
     }
 
@@ -195,36 +194,36 @@ public class BookService {
         groupedRequests.sort(comparator);
     }
 
-    public List<Book> getLongLiedBooks(LongLiedBookSorting sortingType){
+    public List<Book> getLongLiedBooks(LongLiedBookSorting sortingType, int numberOfMonth){
         List<Book> books = bookRepository.getBooks();
         return switch(sortingType) {
             case PRICE_DOWN -> books.stream()
                     .filter(p -> p.getStatus() == BookStatus.IN_STOCK)
-                    .filter(p -> ChronoUnit.MONTHS.between(p.getLastPurchaseDate(), LocalDate.now()) > 6)
+                    .filter(p -> ChronoUnit.MONTHS.between(p.getLastPurchaseDate(), LocalDate.now()) > numberOfMonth)
                     .sorted(Comparator.comparing(Book::getPrice))
                     .toList();
 
 
             case DATE_UP -> books.stream()
                     .filter(p -> p.getStatus() == BookStatus.IN_STOCK)
-                    .filter(p -> ChronoUnit.MONTHS.between(p.getLastPurchaseDate(), LocalDate.now()) > 6)
+                    .filter(p -> ChronoUnit.MONTHS.between(p.getLastPurchaseDate(), LocalDate.now()) > numberOfMonth)
                     .sorted(Comparator.comparing(Book::getAdmissionDate))
                     .toList();
 
             case DATE_DOWN -> books.stream()
                     .filter(p -> p.getStatus() == BookStatus.IN_STOCK)
-                    .filter(p -> ChronoUnit.MONTHS.between(p.getLastPurchaseDate(), LocalDate.now()) > 6)
+                    .filter(p -> ChronoUnit.MONTHS.between(p.getLastPurchaseDate(), LocalDate.now()) > numberOfMonth)
                     .sorted(Comparator.comparing(Book::getAdmissionDate).reversed()).toList();
 
             case PRICE_UP -> books.stream()
                     .filter(p -> p.getStatus() == BookStatus.IN_STOCK)
-                    .filter(p -> ChronoUnit.MONTHS.between(p.getLastPurchaseDate(), LocalDate.now()) > 6)
+                    .filter(p -> ChronoUnit.MONTHS.between(p.getLastPurchaseDate(), LocalDate.now()) > numberOfMonth)
                     .sorted(Comparator.comparing(Book::getPrice).reversed())
                     .toList();
 
             case NONE -> books.stream()
                     .filter(p -> p.getStatus() == BookStatus.IN_STOCK)
-                    .filter(p -> ChronoUnit.MONTHS.between(p.getLastPurchaseDate(), LocalDate.now()) > 6)
+                    .filter(p -> ChronoUnit.MONTHS.between(p.getLastPurchaseDate(), LocalDate.now()) > numberOfMonth)
                     .toList();
         };
     }

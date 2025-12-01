@@ -4,4 +4,5 @@ public interface UIFactory {
     UIComponent createBookMenu();
     UIComponent createOrderMenu();
     UIComponent createRequestMenu();
+    UIComponent createSettingMenu();
 }

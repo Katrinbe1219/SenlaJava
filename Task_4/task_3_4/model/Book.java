@@ -3,10 +3,11 @@ package task_3_4.model;
 import task_3_4.model.types.BookStatus;
 import task_3_4.model.types.BookTypes;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Comparator;
 
-public class Book implements Comparable<Book> {
+public class Book implements Comparable<Book>, Serializable {
     String title;
     int id;
     String author;

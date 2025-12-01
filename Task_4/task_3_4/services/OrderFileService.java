@@ -42,6 +42,7 @@ public class OrderFileService {
                         orderRepository.addOrder(newOrder);
                         orderRepository.checkMaxId(parseInt(fields[0]));
                 }else {
+
                     checkOrChange(order, newOrder);
                 }
             }
@@ -66,13 +67,10 @@ public class OrderFileService {
 
     private Order createOrder(String[] fields)  throws OrderCanNotBeCreated {
 
-
         Order order  = new Order(parseInt(fields[0]));
 
         Customer customer = new Customer(fields[1], fields[2], fields[3]);
         order.setCustomer(customer);
-        System.out.println(fields[5]);
-        System.out.println(fields[6]);
         String[] booksIds = fields[7].split(",");
         Book foundBook;
         for (String bookId: booksIds) {

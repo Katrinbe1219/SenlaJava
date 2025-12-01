@@ -3,12 +3,13 @@ package task_3_4.model;
 import task_3_4.model.types.BookStatus;
 import task_3_4.model.types.OrderStatus;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class Order implements Comparable<Order> {
+public class Order implements Comparable<Order>, Serializable {
     OrderStatus status;
     Customer customer;
     ArrayList<Book> books;
@@ -102,7 +103,8 @@ public class Order implements Comparable<Order> {
             booksInfo.append(book.getDescription());
         }
 
-        return "Customer: " + getCustomer().toString() + "\n" +
+        return "ID: "+ this.id + "\n"
+                + "Customer: " + getCustomer().toString() + "\n" +
                  "Status: " + status + "\n" +
                 "Books: " + booksInfo +
                 "Price: " + this.totalCost + "\n";

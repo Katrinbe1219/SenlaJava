@@ -27,8 +27,9 @@ public class BookShopFacade {
         this.requestRepository = requestRepository;
     }
 
-    public boolean createOrder(Order order){
+    public ArrayList<Integer> createOrder(Order order){
         boolean checking = false;
+        ArrayList<Integer> new_ids = new ArrayList<>();
 
         for(Book book: order.getBooks()){
             if (book.getStatus() == BookStatus.OUT_OF_STOCK){
@@ -37,6 +38,7 @@ public class BookShopFacade {
                 int new_id = requestRepository.getCurrentMaxRequestId() + 1;
                 requestRepository.add(new Request( new_id,book, order));
                 requestRepository.incrementMaxRequestId();
+                new_ids.add(new_id);
             }
         }
 
@@ -46,8 +48,8 @@ public class BookShopFacade {
 
         }
         orderRepository.addOrder(order);
-        if (order.getStatus() == OrderStatus.DONE){ return true;}
-        else {return false;}
+        if (order.getStatus() == OrderStatus.DONE){ return null;}
+        else {return new_ids;}
 
     }
 
@@ -168,6 +170,17 @@ public class BookShopFacade {
 
     public void incrementMaxId(){
         orderRepository.incrementMaxId();
+    }
+
+    public Order getOrderById(int id){
+        List<Order> orders=  orderRepository.getOrders();
+        for (Order o : orders){
+            if (o.getId() == id ){
+                return o;
+            }
+        }
+
+        return null;
     }
 
 

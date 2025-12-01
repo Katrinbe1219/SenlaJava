@@ -6,14 +6,18 @@ import task_3_4.model.Order;
 import task_3_4.model.Warehouse;
 import task_3_4.repositories.BookRepository;
 import task_3_4.repositories.OrderRepository;
+import task_3_4.repositories.PropertiesRepository;
 import task_3_4.repositories.RequestRepository;
+import task_3_4.serialization.BookStoreSystem;
 import task_3_4.services.BookService;
 import task_3_4.services.BookShopFacade;
 import task_3_4.services.OrderFileService;
+import task_3_4.services.SettingsService;
 import task_3_4.views.ConsoleUIFactory;
 import task_3_4.views.UIComponent;
 import task_3_4.views.UIFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -23,12 +27,18 @@ public class BookStoreController {
     UIComponent bookComponent;
     UIComponent orderComponent;
     UIComponent requestComponent;
+    UIComponent settingsComponent;
     UIFactory consoleFactory;
 
     BookController bookController;
     OrderController orderController;
     RequestController requestController;
     OrderFileService orderFileService;
+    SettingController settingController;
+
+    BookStoreSystem bookStoreSystem;
+
+    private final String FILENAME = "bookstore_system.dat";
 
 
     public BookStoreController() {
@@ -37,20 +47,28 @@ public class BookStoreController {
         bookComponent = consoleFactory.createBookMenu();
         orderComponent = consoleFactory.createOrderMenu();
         requestComponent = consoleFactory.createRequestMenu();
+        settingsComponent = consoleFactory.createSettingMenu();
 
-        Warehouse warehouse = Warehouse.getInstance();
+        this.bookStoreSystem = loadOrCreateSystem();
+
+        Warehouse warehouse = bookStoreSystem.getWarehouse();
         BookRepository br = new BookRepository(warehouse);
-        OrderRepository or = new OrderRepository();
+        OrderRepository or = new OrderRepository(bookStoreSystem.getBookshop());
         RequestRepository rr = new RequestRepository(warehouse);
+        PropertiesRepository pr = new PropertiesRepository();
+
 
         BookService bs = new BookService(br,rr, or);
         BookShopFacade bsf = new BookShopFacade(or, rr);
+        SettingsService ss = new SettingsService(pr);
 
         bookController = new BookController(bs);
         orderController = new OrderController(bsf);
         requestController = new RequestController(bs);
 
         orderFileService = new OrderFileService(or, br);
+
+        settingController = new SettingController(ss);
 
     }
 
@@ -75,9 +93,61 @@ public class BookStoreController {
                     break;
                 }
                 case "4": {
+                    handleSettingsSection();
+                    break;
+                }
+                case "5": {
+                    saveSystem();
                     return;
                 }
                 default:{break;}
+            }
+        }
+    }
+
+    void handleSettingsSection(){
+        String choice;
+        String success;
+        while(true){
+            settingsComponent.display(null);
+            choice = settingsComponent.input();
+
+            switch (choice){
+                case "1": {
+                    settingsComponent.display("Введите количество месяц, превышение которого ведет к причислению книгу к залежавшейся");
+                    choice = settingsComponent.input();
+                    success = settingController.changeNumberOfMonth(choice);
+
+                    if (success != null) settingsComponent.display(success);
+                    else settingsComponent.display("Все изменено успешно");
+
+                    break;
+                }
+                case "2": {
+                    int numberOfMonth = settingController.getNumberOfMonth();
+                    settingsComponent.display("Книга считается залежавшейся, если срок его пролеживания более: " + numberOfMonth);
+                    break;
+                }
+                case "3": {
+                    settingsComponent.display("Введите true/false для функции");
+                    choice = settingsComponent.input();
+                    success = settingController.setWarehouseFunction(choice);
+                    if (success != null) settingsComponent.display(success);
+                    else settingsComponent.display("Все прошло успешно");
+
+                    break;
+                }
+                case "4": {
+                    String warehouseFunction = settingController.getWarehouseOption();
+                    settingsComponent.display(warehouseFunction);
+                    break;
+                }
+                case "5": {
+                    return;
+                }
+                default: {
+                    settingsComponent.display("Такого выбора не существует");
+                    break;}
             }
         }
     }
@@ -101,7 +171,9 @@ public class BookStoreController {
                     bookComponent.display(bookController.getForDisplayType("Lbook"));
                     choice = bookComponent.input();
                     // если введено не то, то тогда получаем выбор NONE
-                    books = bookController.displayLongLiedBooks(choice);
+                    int numberOfMonth = settingController.getNumberOfMonth();
+                    books = bookController.displayLongLiedBooks(choice, numberOfMonth);
+
                     for (Book book : books) {
                         bookComponent.display(book.getDescription());
                     }
@@ -173,20 +245,28 @@ public class BookStoreController {
             switch(choice){
                 case "1": {
                     order = createOrder();
-                    Boolean done = orderController.createOrder(order);
-                    if (done) {
+                    ArrayList<Integer> done = orderController.createOrder(order);
+                    if (done == null) {
                         bookController.setLastPurchase(order.getBooks());
                         orderController.incrementMaxId();
 
+                    }else {
+                        for (Integer i : done) {
+                            orderComponent.display("Создан новый запрос с id " + i);
+                        }
                     }
                     orderComponent.display("Ваш заказ добавлен в историю со статусом " + order.getStatus());
                     break;
                 }
                 case "2":{
-                        if (order == null){
-                           orderComponent.display("Создайте заказ, чтобы отменить");
-                           break;
+                        orderComponent.display("Какой id заказа, который вы хотите удалить?");
+                        choice = orderComponent.input();
+                        order = orderController.getOrderById(choice);
+                        if (order == null) {
+                            orderComponent.display("Ваш id не был корректен");
+                            break;
                         }
+                    System.out.println(order.getCustomer().getCsvInfo());
                         Boolean cancelled = orderController.deleteOrder(order);
                         if (cancelled) {
                             requestController.deleteRequestByOrder(order);
@@ -199,10 +279,15 @@ public class BookStoreController {
                         break;
                 }
                 case "3":{
-                    if (order == null){
-                        orderComponent.display("Создайте заказ, чтобы получить детали");
+
+                    orderComponent.display("Какой id заказа, про который вы хотите узнать?");
+                    choice = orderComponent.input();
+                    order = orderController.getOrderById(choice);
+                    if (order == null) {
+                        orderComponent.display("Ваш id не был корректен");
                         break;
                     }
+                    
                     String details = orderController.getOrderDetails(order);
                     orderComponent.display(details);
                     break;
@@ -298,7 +383,7 @@ public class BookStoreController {
                         break;
                     }
                     for (List<Object> request : requests){
-                        System.out.println(request.toString());
+                        requestComponent.display(request.toString());
                     }
                     break;
                 }
@@ -320,8 +405,12 @@ public class BookStoreController {
                             }
                         }
 
-                        book = bookController.getBookByTitle(name);
-                        requestController.deleteRequestByBook(book);
+                        String warehouseFunction = settingController.getWarehouseOption();
+                        if (warehouseFunction.equals("true")){
+                            book = bookController.getBookByTitle(name);
+                            requestController.deleteRequestByBook(book);
+                        }
+
 
                     break;
                 }
@@ -409,5 +498,28 @@ public class BookStoreController {
     return order;
 
 
+    }
+
+    private BookStoreSystem loadOrCreateSystem(){
+        if (BookStoreSystem.systemFileExists(FILENAME)){
+            try {
+                return BookStoreSystem.loadSystem(FILENAME);
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("Проблема при загрузке дерева: " + e.getMessage());
+                System.out.println("Будет создана новая система");
+            }
+        }
+        BookStoreSystem newSystem = new BookStoreSystem();
+        newSystem.initializeSystem(true);
+        return newSystem;
+    }
+
+    private void saveSystem(){
+        try {
+            bookStoreSystem.saveSystem(FILENAME);
+            System.out.println("Система сохранена");
+        } catch (IOException e) {
+            System.out.println("Неудача сохранения системы " + e.getMessage());
+        }
     }
 }

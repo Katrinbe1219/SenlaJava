@@ -1,8 +1,9 @@
 package task_3_4.model;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class Request implements Comparable<Request> {
+public class Request implements Comparable<Request>, Serializable {
     private Book book;
     private Order order;
     int id;

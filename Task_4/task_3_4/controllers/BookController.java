@@ -27,9 +27,9 @@ public class BookController {
 
     }
 
-    public List<Book> displayLongLiedBooks(String type){
+    public List<Book> displayLongLiedBooks(String type, int numberOfMonth){
         LongLiedBookSorting sorting= getLongLiedBookType(type);
-        return bookService.getLongLiedBooks(sorting);
+        return bookService.getLongLiedBooks(sorting, numberOfMonth);
 
 
     }

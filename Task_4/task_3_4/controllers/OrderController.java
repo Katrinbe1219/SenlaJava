@@ -8,6 +8,7 @@ import task_3_4.services.BookShopFacade;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderController {
@@ -100,7 +101,7 @@ public class OrderController {
         return bookshop.removeOrder(order);
     }
 
-    Boolean createOrder(Order order){
+    ArrayList<Integer> createOrder(Order order){
         return bookshop.createOrder(order);
     }
 
@@ -119,6 +120,17 @@ public class OrderController {
 
     public void incrementMaxId(){
         bookshop.incrementMaxId();
+    }
+
+    public Order getOrderById(String id_){
+        try {
+            int id = Integer.parseInt(id_);
+            return bookshop.getOrderById(id);
+
+        }catch (NumberFormatException e){
+            return null;
+        }
+
     }
 
 
