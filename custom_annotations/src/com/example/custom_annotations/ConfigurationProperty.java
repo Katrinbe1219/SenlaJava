@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ConfigurationProperty {
     String configFileName() default "config.properties";
-    String propertyName() default "PropertiesRepository.Properties";
-    String type() default "properties";
+    String propertyName() default "numberOfMonth";
+    String type() default "int";
 
 }

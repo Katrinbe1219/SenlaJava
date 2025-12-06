@@ -2,7 +2,6 @@ package com.example.application.serialization;
 
 import com.example.application.model.BookShop;
 import com.example.application.model.Warehouse;
-import com.example.application.repositories.PropertiesRepository;
 
 import java.io.*;
 

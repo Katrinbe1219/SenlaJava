@@ -26,11 +26,7 @@ public class BookService {
     @Inject
     private OrderRepository orderRepository;
 
-//    public BookService(BookRepository bookRepository, RequestRepository requestRepository, OrderRepository orderRepository) {
-//        this.bookRepository = bookRepository;
-//        this.requestRepository = requestRepository;
-//        this.orderRepository = orderRepository;
-//    }
+
     public List<Book> getAllBooks(){
         return bookRepository.getBooks();
     }

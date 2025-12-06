@@ -1,10 +1,9 @@
 package com.example.application.controllers;
 
 import com.example.application.model.*;
-import com.example.processing_annotations.ConfigurationAnnotationProcessor;
+
 import com.example.application.repositories.BookRepository;
 import com.example.application.repositories.OrderRepository;
-import com.example.application.repositories.PropertiesRepository;
 import com.example.application.repositories.RequestRepository;
 import com.example.application.serialization.BookStoreSystem;
 import com.example.application.services.BookService;
@@ -14,6 +13,7 @@ import com.example.application.services.SettingsService;
 import com.example.application.views.ConsoleUIFactory;
 import com.example.application.views.UIComponent;
 import com.example.application.views.UIFactory;
+import com.example.custom_annotations.Inject;
 import com.example.processing_annotations.InjectAnnotationProcessor;
 
 import java.io.IOException;
@@ -21,20 +21,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+@Inject
 public class BookStoreController {
     UIComponent menuComponent;
+
     UIComponent bookComponent;
     UIComponent orderComponent;
     UIComponent requestComponent;
     UIComponent settingsComponent;
     UIFactory consoleFactory;
 
+    @Inject
     BookController bookController;
+    @Inject
     OrderController orderController;
+    @Inject
     RequestController requestController;
+    @Inject
     OrderFileService orderFileService;
+    @Inject
     SettingController settingController;
-
+    @Inject
     BookStoreSystem bookStoreSystem;
 
     private final String FILENAME = "bookstore_system.dat";
@@ -50,39 +57,38 @@ public class BookStoreController {
 
 
 
-        this.bookStoreSystem = loadOrCreateSystem();
-        Warehouse warehouse = bookStoreSystem.getWarehouse();
-        BookShop bookshop = bookStoreSystem.getBookshop();
-
-        InjectAnnotationProcessor di = InjectAnnotationProcessor.getInstance();
-        di.registerSingleton(Warehouse.class, warehouse);
-        di.registerSingleton(BookShop.class, bookshop);
+////        this.bookStoreSystem = loadOrCreateSystem();
+//        Warehouse warehouse = bookStoreSystem.getWarehouse();
+//        BookShop bookshop = bookStoreSystem.getBookshop();
+//
+//        InjectAnnotationProcessor di = InjectAnnotationProcessor.getInstance();
+//        di.registerSingleton(Warehouse.class, warehouse);
+//        di.registerSingleton(BookShop.class, bookshop);
 
         // функция возвращает новый экзмепляр, а также сохраняет его у себя в di контейнере
-        di.getInstance(BookRepository.class);
-
-
-
-        di.getInstance(OrderRepository.class);
-        di.getInstance(RequestRepository.class);
-        di.getInstance(PropertiesRepository.class);
+//        di.getInstance(BookRepository.class);
+//
+//
+//
+//        di.getInstance(OrderRepository.class);
+//        di.getInstance(RequestRepository.class);
 
         // так было до второго задания
 //        ConfigurationAnnotationProcessor processor = new ConfigurationAnnotationProcessor();
 //        processor.loadProperties(pr);
 
 
-        di.getInstance(BookService.class);
-       di.getInstance(BookShopFacade.class);
-        di.getInstance(SettingsService.class);
+//        di.getInstance(BookService.class);
+//       di.getInstance(BookShopFacade.class);
+//        di.getInstance(SettingsService.class);
 
-        bookController = di.getInstance(BookController.class);
-        orderController = di.getInstance(OrderController.class);
-        requestController = di.getInstance(RequestController.class);
-
-        orderFileService = di.getInstance(OrderFileService.class);
-
-        settingController = di.getInstance(SettingController.class);
+//        bookController = di.getInstance(BookController.class);
+//        orderController = di.getInstance(OrderController.class);
+//        requestController = di.getInstance(RequestController.class);
+//
+//        orderFileService = di.getInstance(OrderFileService.class);
+//
+//        settingController = di.getInstance(SettingController.class);
 
     }
 
@@ -514,19 +520,6 @@ public class BookStoreController {
 
     }
 
-    private BookStoreSystem loadOrCreateSystem(){
-        if (BookStoreSystem.systemFileExists(FILENAME)){
-            try {
-                return BookStoreSystem.loadSystem(FILENAME);
-            } catch (IOException | ClassNotFoundException e) {
-                System.out.println("Проблема при загрузке дерева: " + e.getMessage());
-                System.out.println("Будет создана новая система");
-            }
-        }
-        BookStoreSystem newSystem = new BookStoreSystem();
-        newSystem.initializeSystem(true);
-        return newSystem;
-    }
 
     private void saveSystem(){
         try {

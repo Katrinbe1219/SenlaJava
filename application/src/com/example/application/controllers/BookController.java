@@ -14,9 +14,7 @@ public class BookController {
     @Inject
     private BookService bookService;
 
-//    BookController(BookService bookService) {
-//        this.bookService = bookService;
-//    }
+
 
     public List<Book> displayAllBooks(){
         return  bookService.getAllBooks();

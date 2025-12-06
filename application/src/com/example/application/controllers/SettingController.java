@@ -8,9 +8,7 @@ public class SettingController {
     @Inject
     private SettingsService settingsService;
 
-//    SettingController(SettingsService settingsService) {
-//        this.settingsService = settingsService;
-//    }
+
 
     public int getNumberOfMonth(){
         return settingsService.getNumberOfMonth();

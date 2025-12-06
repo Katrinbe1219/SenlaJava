@@ -41,11 +41,9 @@ public class ConfigurationAnnotationProcessor {
                type = annotation.type();
                propertyName = annotation.propertyName();
                configName = annotation.configFileName();
-               if (!type.equals("properties")){
-                   throw  new IllegalArgumentException("тип поля должен быть properties");
-               }
+
                field.setAccessible(true);
-               setField(field, obj);
+               setField(field, obj, type, propertyName);
            }
        }
    }
@@ -71,12 +69,26 @@ public class ConfigurationAnnotationProcessor {
        }
    }
 
-   private void setField(Field field,  Object instance ) throws IllegalAccessException {
-       // у меня заполняется репозиторий PropertiesRepository with variable type properties
-       if (field.getType() == Properties.class){
-           field.set(instance, this.properties);
-       }else{
-           throw new IllegalArgumentException("Class " + field.getType().getName() + " is not with type Properties");
+   private void setField(Field field,  Object instance, String type, String propertyName ) throws IllegalAccessException {
+       String value = properties.getProperty(propertyName);
+       if (type.toLowerCase().equals("string")){
+           field.set(instance, value);
+       }else if (type.toLowerCase().equals("int")){
+           int intValue = parseInt(value);
+           field.set(instance, intValue);
+
+       } else{
+           throw new IllegalArgumentException("Class " + field.getType().getName() + " is not with appropriate type");
        }
    }
+
+    private int parseInt(String number) {
+        try {
+            return Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+            // возвращаю дефолтный
+            System.out.println("При попытке обработки int переменной в properties произошла ошибка. Полю было присвоено дефолтное значение");
+            return 6;
+        }
+    }
 }

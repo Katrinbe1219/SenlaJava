@@ -1,26 +1,40 @@
 package com.example.application.services;
 
 import com.example.application.exceptions.NumberCanNotBeChanged;
-import com.example.application.repositories.PropertiesRepository;
+import com.example.custom_annotations.ConfigurableClass;
+import com.example.custom_annotations.ConfigurationProperty;
 import com.example.custom_annotations.Inject;
 
-@Inject
-public class SettingsService {
-    @Inject
-    private PropertiesRepository repo;
+import java.io.FileOutputStream;
+import java.util.Properties;
 
-//    public SettingsService(PropertiesRepository repo) {
-//        this.repo = repo;
-//    }
+@Inject
+@ConfigurableClass
+public class SettingsService {
+
+    @ConfigurationProperty(propertyName = "numberOfMonth", type = "int")
+    private int numberOfMonth;
+
+    @ConfigurationProperty(propertyName = "warehouseFunction", type = "String")
+    private String isFunction;
+
+    private static final String CONFIG_FILE = "config.properties";
+
+
 
     public int getNumberOfMonth(){
-        return repo.getNumberOfMonth();
+        return this.numberOfMonth;
     }
 
     public String changeNumberOfMonth(String month){
         try {
             int number = parseInt(month);
-            return repo.changeNumberOfMonth(number);
+
+            this.numberOfMonth = number;
+            System.out.println("Hekllo" + numberOfMonth);
+            saveChanges();
+
+           return "";
         } catch (NumberCanNotBeChanged e) {
             return e.getMessage();
         }
@@ -28,15 +42,16 @@ public class SettingsService {
     }
 
     public String getWarehouseOption(){
-        return repo.getWarehouseFunction();
+        return this.isFunction;
     }
 
     public String setWarehouseFunction(String func){
-        System.out.println(func.toLowerCase());
         if (!func.toLowerCase().equals("true") && !func.toLowerCase().equals("false")){
-            return "Не правильно введны значения";
+            return "Не правильно введены значения";
         }
-        return repo.setWarehouseFunction(func);
+        this.isFunction = func;
+        saveChanges();
+        return null;
     }
 
     private int parseInt(String number) throws NumberCanNotBeChanged{
@@ -45,5 +60,17 @@ public class SettingsService {
         } catch (NumberFormatException e) {
             throw new NumberCanNotBeChanged(number);
         }
+    }
+
+    private void saveChanges(){
+        Properties prop = new Properties();
+        prop.setProperty("numberOfMonth", String.valueOf(numberOfMonth));
+        prop.setProperty("warehouseFunction", isFunction);
+        try (FileOutputStream file = new FileOutputStream(CONFIG_FILE)){
+            prop.store(file, "BookStore Configuration");
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+
     }
 }
