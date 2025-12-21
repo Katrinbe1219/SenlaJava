@@ -7,7 +7,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-       <orderEntry type="module" module-name="custom_annotations" exported="" />
-      <orderEntry type="module" module-name="processing_annotations" exported="" />
+    <orderEntry type="module" module-name="custom_annotations" exported="" />
+    <orderEntry type="module" module-name="processing_annotations" exported="" />
   </component>
 </module>
