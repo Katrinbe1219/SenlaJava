@@ -19,6 +19,14 @@ SELECT pr.maker, l.speed FROM product AS pr
     INNER JOIN laptop AS l ON pr.model = l.model
     WHERE l.hd >= 100;
 
+-- Найти номера моделей и цены всех продуктов (любого типа), выпущенных производителем B (латинская буква).
+WITH needed_model AS (SELECT model FROM product WHERE maker = 'B')
+SELECT p.model, p.price FROM printer AS p WHERE p.model IN (SELECT model FROM needed_model)
+UNION ALL
+SELECT p.model, p.price FROM laptop AS p WHERE p.model IN (SELECT model FROM needed_model)
+UNION ALL
+SELECT p.model, p.price FROM pc AS p WHERE p.model IN (SELECT model FROM needed_model);
+
 --Найти производителя, выпускающего ПК, но не ноутбуки.
 -- у меня таких два
 -- A - принтеры и компьютеры и laptop
