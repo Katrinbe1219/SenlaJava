@@ -16,17 +16,15 @@ public class RequestController {
     @Inject
     private BookService bookService;
 
-//    public RequestController(BookService bookService) {
-//        this.bookService = bookService;
-//    }
+
 
     List<List<Object>> getAllRequests(String type){
         RequestSorting sorting = getRequestSorting(type);
         return bookService.getSortedRequests(sorting);
     }
 
-    void deleteRequestByBook(Book book){
-        bookService.cancellRequestsByBook(book);
+    void deleteRequestByBook(Integer book_id){
+        bookService.cancellRequestsByBook(book_id);
     }
 
     void deleteRequestByOrder(Order order){
@@ -48,11 +46,12 @@ public class RequestController {
                 "3. По количеству (по возрастанию)\n4. По количеству (по убыванию)\n";
     }
 
-    public String importRequest(String filename){
-        return bookService.importRequest(filename);
-    }
-
-    public String exportRequest(String id){
-        return bookService.exportRequest(id);
-    }
+//    public String importRequest(String filename){
+//        return "";
+//        //return bookService.importRequest(filename);
+//    }
+//
+//    public String exportRequest(String id){
+//        return bookService.exportRequest(id);
+//    }
 }

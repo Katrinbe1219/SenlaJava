@@ -7,23 +7,42 @@ public class Customer  implements Comparable<Customer>, Serializable {
     String name;
     String surname;
     String email;
+    Integer customer_id;
 
     public Customer(String name, String surname, String email){
         this.name = name;
         this.surname = surname;
         this.email = email;
     }
+    public Customer(){}
 
+    public Integer getCustomerId(){
+        return customer_id;
+    }
 
-    String getName(){
+    public void setCustomerId(Integer customer_id){
+        this.customer_id = customer_id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getName(){
         return name;
     }
 
-    String getSurname(){
+    public String getSurname(){
         return surname;
     }
 
-    String getEmail(){
+    public String getEmail(){
         return email;
     }
 

@@ -28,26 +28,26 @@ public class Warehouse implements Serializable {
         this.countAllRequests = 0;
     }
 
-    public void  initializeData(){
-        Book book1 = new Book(1,"Harry Potter 1", "J.K.Rowlling",
-                2024, BookStatus.IN_STOCK, 1500, BookTypes.FANTASY);
-        Book book2 = new Book(2,"Peter The First", "A.Tolstoy",
-                2024, BookStatus.IN_STOCK, 2100, BookTypes.HISTORY);
-        Book book3 = new Book(3,"The Great Expectations", "C.Dickens",
-                2025, BookStatus.OUT_OF_STOCK, 1500, BookTypes.CLASSICAL);
-        Book book4 = new Book(4,"War and Piece", "L.Tolstoy",
-                2025, BookStatus.OUT_OF_STOCK, 1500, BookTypes.CLASSICAL);
-        Book book5 = new Book(5,"Oblomov", "I.Goncharov",
-                2023, BookStatus.OUT_OF_STOCK, 1400, BookTypes.HISTORY);
-
-        books.add(book1);
-        books.add(book2);
-        books.add(book4);
-        books.add(book5);
-        books.add(book3);
-        this.countAllBooks = 5;
-        this.countAllRequests = 0;
-    }
+//    public void  initializeData(){
+//        Book book1 = new Book(1,"Harry Potter 1", "J.K.Rowlling",
+//                2024, BookStatus.IN_STOCK, 1500, BookTypes.FANTASY);
+//        Book book2 = new Book(2,"Peter The First", "A.Tolstoy",
+//                2024, BookStatus.IN_STOCK, 2100, BookTypes.HISTORY);
+//        Book book3 = new Book(3,"The Great Expectations", "C.Dickens",
+//                2025, BookStatus.OUT_OF_STOCK, 1500, BookTypes.CLASSICAL);
+//        Book book4 = new Book(4,"War and Piece", "L.Tolstoy",
+//                2025, BookStatus.OUT_OF_STOCK, 1500, BookTypes.CLASSICAL);
+//        Book book5 = new Book(5,"Oblomov", "I.Goncharov",
+//                2023, BookStatus.OUT_OF_STOCK, 1400, BookTypes.HISTORY);
+//
+//        books.add(book1);
+//        books.add(book2);
+//        books.add(book4);
+//        books.add(book5);
+//        books.add(book3);
+//        this.countAllBooks = 5;
+//        this.countAllRequests = 0;
+//    }
 
 //    public static Warehouse getInstance(){
 //        if (instance == null){

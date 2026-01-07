@@ -24,10 +24,17 @@ public class Order implements Comparable<Order>, Serializable {
         totalCost = 0;
         status = OrderStatus.NEW;
     }
+    public Order(){
+        books = new ArrayList<>();
+        totalCost = 0;
+        status = OrderStatus.NEW;
+    }
 
 
-
-    public int getId() {
+    public void setId(int id){
+        this.id = id;
+    }
+    public Integer getId() {
         return this.id;
     }
 

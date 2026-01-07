@@ -4,34 +4,35 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 public class Request implements Comparable<Request>, Serializable {
-    private Book book;
-    private Order order;
+    private int book;
+    private int order;
     int id;
 
 
-    public Request(int id, Book book, Order order){
+    public Request(){}
+
+    public void setId(int id){
         this.id = id;
-        this.book = book;
-        this.order = order;
     }
 
-    public Order getOrder(){
+    public Integer getId(){
+        return id;
+    }
+    public Integer getOrder(){
         return this.order;
     }
 
-    public Book getBook(){
+    public Integer getBook(){
         return this.book;
     }
 
-    public int getId(){
-        return this.id;
-    }
 
-    public void setBook(Book book){
+
+    public void setBook(Integer book){
         this.book = book;
     }
 
-    public void setOrder (Order order){
+    public void setOrder (Integer order){
         this.order = order;
     }
 
@@ -39,8 +40,8 @@ public class Request implements Comparable<Request>, Serializable {
     public int compareTo(Request o) {
         return Comparator
                 .comparing(Request::getId, Comparator.nullsFirst(Integer::compareTo))
-                .thenComparing(r -> r.getBook().getId(), Comparator.nullsFirst(Integer::compareTo))
-                .thenComparing(r -> r.getOrder().getId(), Comparator.nullsFirst(Integer::compareTo))
+                .thenComparing(Request::getBook, Comparator.nullsFirst(Integer::compareTo))
+                .thenComparing(Request::getOrder, Comparator.nullsFirst(Integer::compareTo))
                 .compare(this,o);
     }
 }

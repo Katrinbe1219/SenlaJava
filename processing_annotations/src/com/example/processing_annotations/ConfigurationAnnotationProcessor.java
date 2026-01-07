@@ -34,6 +34,10 @@ public class ConfigurationAnnotationProcessor {
        ConfigurationProperty annotation;
        String propertyName;
        String configName;
+//       properties.setProperty("jdbc", "jdbc:postgresql://localhost:5432/db_java_senla");
+//       properties.setProperty("jdbcDriver", "org.postgresql.Driver");
+//       properties.setProperty("user", "postgres");
+//       properties.setProperty("password", "postgres");
 
        for (Field field: classInstance.getDeclaredFields()){
            if (field.isAnnotationPresent(ConfigurationProperty.class)){
@@ -54,6 +58,10 @@ public class ConfigurationAnnotationProcessor {
        if (!file.exists()){
            properties.setProperty("numberOfMonth", "6" );
            properties.setProperty("warehouseFunction", "true" );
+           properties.setProperty("jdbc", "jdbc:postgresql://localhost:5432/db_java_senla");
+           properties.setProperty("jdbcDriver", "org.postgresql.Driver");
+           properties.setProperty("user", "postgres");
+           properties.setProperty("password", "postgres");
 
            try (OutputStream output = new FileOutputStream(file)){
                properties.store(output, "BookStore Configuration");

@@ -21,7 +21,7 @@ public class BookStoreSystem implements Serializable {
         if (!this.initialized){
             if (loadSampleData){
                 // если файл с историей не был найден, то используем изначальные данные для склада
-                warehouse.initializeData();
+                //warehouse.initializeData();
             }
             this.initialized = true;
         }

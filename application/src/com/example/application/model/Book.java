@@ -12,7 +12,7 @@ import java.util.Comparator;
 public class Book implements Comparable<Book>, Serializable {
     String title;
     int id;
-    String author;
+    Author author;
     int year;
     BookStatus status;
     double price;
@@ -20,7 +20,7 @@ public class Book implements Comparable<Book>, Serializable {
     LocalDate lastPurchaseDate;
     LocalDate admissionDate;
 
-    public Book(int id, String title, String author, int year, BookStatus status, double price, BookTypes type) {
+    public Book(int id, String title, Author author, int year, BookStatus status, double price, BookTypes type) {
         this.id = id;
         this.title = title;
         this.author = author;
@@ -37,7 +37,11 @@ public class Book implements Comparable<Book>, Serializable {
 
     }
 
+    public Book (){}
 
+    public void setId(int id) {
+        this.id = id;
+    }
     public void setStatus(BookStatus status) {
         this.status = status;
     }
@@ -58,12 +62,12 @@ public class Book implements Comparable<Book>, Serializable {
     }
 
 
-    public void setAuthor(String author) {
+    public void setAuthor(Author author) {
         this.author = author;
     }
 
 
-    public String getAuthor() {
+    public Author getAuthor() {
         return this.author;
     }
 
@@ -95,7 +99,7 @@ public class Book implements Comparable<Book>, Serializable {
     }
 
     public String getDescription(){
-        return title + ":\n" + "The author of this books is "  + this.author +
+        return title + ":\n" + "The author of this books is "  + this.author.getInfo() +
                 ".\nThe publication date is " + this.year +
                 ".\nThe genre is " + this.genre + "\n"
                 + "price is " + this.price + "\n" +
@@ -128,7 +132,7 @@ public class Book implements Comparable<Book>, Serializable {
         return Comparator
                 .comparing(Book::getId, Comparator.nullsFirst(Integer::compareTo))
                 .thenComparing(Book::getTitle, Comparator.nullsFirst(String::compareTo))
-                .thenComparing(Book::getAuthor, Comparator.nullsFirst(String::compareTo))
+                .thenComparing(Book::getAuthor, Comparator.nullsFirst(Author::compareTo))
                 .thenComparing(Book::getYear, Comparator.nullsFirst(Integer::compareTo))
                 .thenComparing(Book::getPrice, Comparator.nullsFirst(Double::compareTo))
                 .thenComparing(Book::getStatus, Comparator.nullsFirst(Comparator.naturalOrder()))

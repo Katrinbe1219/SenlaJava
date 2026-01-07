@@ -8,6 +8,7 @@ import com.example.application.services.BookService;
 import com.example.custom_annotations.Inject;
 
 import java.util.List;
+import java.util.Optional;
 
 @Inject
 public class BookController {
@@ -16,7 +17,7 @@ public class BookController {
 
 
 
-    public List<Book> displayAllBooks(){
+    public Optional<List<Book>> displayAllBooks(){
         return  bookService.getAllBooks();
 
     }
@@ -88,7 +89,7 @@ public class BookController {
                 "6. Дата (по возрастанию)\n7. Дата (по убыванию)\n8.Без фильтра";
     }
 
-    Book getBookByTitle(String name){
+    Optional<Book> getBookByTitle(String name){
         return bookService.getBookByTitle(name);
     }
 
@@ -100,12 +101,12 @@ public class BookController {
         bookService.setLastPurchase(books);
     }
 
-    public String importBook(String fileName){
-        return bookService.importNewBook(fileName);
-    }
+//    public String importBook(String fileName){
+//        return bookService.importNewBook(fileName);
+//    }
 
-    public String exportBook(String fileName){
-        return bookService.exportBook(fileName);
-    }
+//    public String exportBook(String fileName){
+//        return bookService.exportBook(fileName);
+//    }
 
 }

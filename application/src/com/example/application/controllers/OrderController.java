@@ -57,6 +57,7 @@ public class OrderController {
             OrderSorting sorting = getOrderSorting(type);
             List<Order> orders = bookshop.getDoneOrdersInDiapazon(first,second, sorting);
 
+
             return orders;
         } catch (DateTimeParseException e) {
             System.out.println(e.getMessage());
@@ -110,20 +111,14 @@ public class OrderController {
 
     public Boolean changeOrderStatus(Order order, String bookTitle){
         if (order.getStatus() == OrderStatus.NEW){
-            System.out.println("here");
             order.checkUpdateByBook(bookTitle);
+            bookshop.saveOrder(order);
             return order.getStatus() == OrderStatus.DONE;
         }
         return false;
     }
 
-    public int getMaxId(){
-        return bookshop.getMaxCurrentId();
-    }
 
-    public void incrementMaxId(){
-        bookshop.incrementMaxId();
-    }
 
     public Order getOrderById(String id_){
         try {

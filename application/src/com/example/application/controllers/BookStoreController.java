@@ -1,5 +1,6 @@
 package com.example.application.controllers;
 
+import com.example.application.dao.BookImplementation;
 import com.example.application.model.*;
 
 import com.example.application.repositories.BookRepository;
@@ -19,6 +20,7 @@ import com.example.processing_annotations.InjectAnnotationProcessor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 @Inject
@@ -41,8 +43,11 @@ public class BookStoreController {
     OrderFileService orderFileService;
     @Inject
     SettingController settingController;
+//    @Inject
+//    BookStoreSystem bookStoreSystem;
+
     @Inject
-    BookStoreSystem bookStoreSystem;
+    BookImplementation bookDb;
 
     private final String FILENAME = "bookstore_system.dat";
 
@@ -102,6 +107,7 @@ public class BookStoreController {
             switch (choice){
                 case "1": {
                     handleBookSection();
+
                     break;
                 }
                 case "2" :{
@@ -117,7 +123,8 @@ public class BookStoreController {
                     break;
                 }
                 case "5": {
-                    saveSystem();
+                    System.out.println("Пока");
+//                    saveSystem();
                     return;
                 }
                 default:{break;}
@@ -174,6 +181,7 @@ public class BookStoreController {
 
     void handleBookSection(){
 
+        Optional<List<Book>> books_;
         List<Book> books;
         String choice;
         while(true){
@@ -181,10 +189,15 @@ public class BookStoreController {
             choice = bookComponent.input();
             switch(choice){
                 case "1": {
-                    books = bookController.displayAllBooks();
-                    for (Book book : books) {
-                        bookComponent.display(book.getDescription());
+                    books_ = bookController.displayAllBooks();
+                    if (books_.isEmpty()){
+                        bookComponent.display("Книг нет");
+                    }else{
+                        for (Book book : books_.get()) {
+                            bookComponent.display(book.getDescription());
+                        }
                     }
+
                     break;
                 }
                 case "2":{
@@ -194,6 +207,10 @@ public class BookStoreController {
                     int numberOfMonth = settingController.getNumberOfMonth();
                     books = bookController.displayLongLiedBooks(choice, numberOfMonth);
 
+                    if (books == null || books.isEmpty()) {
+                        bookComponent.display("Таких книг нет");
+                        break;
+                    }
                     for (Book book : books) {
                         bookComponent.display(book.getDescription());
                     }
@@ -224,20 +241,21 @@ public class BookStoreController {
                     break;
                 }
                 case "6" :{
-                    bookComponent.display("Введите название книги");
-                    choice = bookComponent.input();
-                    // если есть ошибка, то возвращается текст, а не пустая строка
-                    String success = bookController.exportBook(choice);
-                    if (!success.isEmpty()) bookComponent.display(success);
+                    bookComponent.display("Функция выключена");
+//                    choice = bookComponent.input();
+//                    // если есть ошибка, то возвращается текст, а не пустая строка
+//                    String success = bookController.exportBook(choice);
+//                    if (!success.isEmpty()) bookComponent.display(success);
 
                     break;
                 }
                 case "7" :{
-                    bookComponent.display("Введите название файла, находящегося в данном каталоге");
-                    choice = bookComponent.input();
-                    String success = bookController.importBook(choice);
-                    // если есть ошибка, то возвращается текст, а не пустая строка
-                    if (!success.isEmpty()) bookComponent.display(success);
+//                    bookComponent.display("Введите название файла, находящегося в данном каталоге");
+//                    choice = bookComponent.input();
+//                    String success = bookController.importBook(choice);
+//                    // если есть ошибка, то возвращается текст, а не пустая строка
+//                    if (!success.isEmpty()) bookComponent.display(success);
+                    bookComponent.display("Функция выключена");
                     break;
                 }
 
@@ -268,7 +286,7 @@ public class BookStoreController {
                     ArrayList<Integer> done = orderController.createOrder(order);
                     if (done == null) {
                         bookController.setLastPurchase(order.getBooks());
-                        orderController.incrementMaxId();
+
 
                     }else {
                         for (Integer i : done) {
@@ -286,7 +304,7 @@ public class BookStoreController {
                             orderComponent.display("Ваш id не был корректен");
                             break;
                         }
-                    System.out.println(order.getCustomer().getCsvInfo());
+
                         Boolean cancelled = orderController.deleteOrder(order);
                         if (cancelled) {
                             requestController.deleteRequestByOrder(order);
@@ -317,6 +335,10 @@ public class BookStoreController {
                     choice = orderComponent.input();
                     // если веден индекс вне диапазона, выдается DATE_UP
                     orders = orderController.getAllOrders(choice);
+                    if (orders == null ){
+                        orderComponent.display("Заказов нет");
+                        break;
+                    }
                     for (Order o: orders){
                         orderComponent.display(o.toString());
                     }
@@ -362,17 +384,17 @@ public class BookStoreController {
                     break;
                 }
                 case "8" :{
-                    orderComponent.display("Введите наименование файла");
-                    choice = orderComponent.input();
-                    String success = orderFileService.importOrder(choice);
-                    if (success != null) orderComponent.display(success);
+                    orderComponent.display("В данный момент недоступно");
+//                    choice = orderComponent.input();
+//                    String success = orderFileService.importOrder(choice);
+//                    if (success != null) orderComponent.display(success);
                     break;
                 }
                 case "9" :{
-                    orderComponent.display("Введите id заказа");
-                    choice = orderComponent.input();
-                    String success = orderFileService.exportOrder(choice);
-                    if (success != null) orderComponent.display(success);
+                    orderComponent.display("В данный момент недоступно");
+//                    choice = orderComponent.input();
+//                    String success = orderFileService.exportOrder(choice);
+//                    if (success != null) orderComponent.display(success);
                     break;
                 }
                 case "10" :{
@@ -427,8 +449,11 @@ public class BookStoreController {
 
                         String warehouseFunction = settingController.getWarehouseOption();
                         if (warehouseFunction.equals("true")){
-                            book = bookController.getBookByTitle(name);
-                            requestController.deleteRequestByBook(book);
+                            Optional<Book> book_ = bookController.getBookByTitle(name);
+                            if (book_.isPresent()){
+                                requestController.deleteRequestByBook(book_.get().getId());
+                            }
+
                         }
 
 
@@ -436,17 +461,17 @@ public class BookStoreController {
                 }
 
                 case "3" :{
-                    requestComponent.display("Введите название файла");
-                    choice = requestComponent.input();
-                    String success = requestController.importRequest(choice);
-                    if (success!=null) requestComponent.display(success);
+                    requestComponent.display("В данный момент не доступно");
+//                    choice = requestComponent.input();
+//                    String success = requestController.importRequest(choice);
+//                    if (success!=null) requestComponent.display(success);
                     break;
                 }
                 case "4" :{
-                    requestComponent.display("Введите id запроса");
-                    choice = requestComponent.input();
-                    String success = requestController.exportRequest(choice);
-                    if (success!=null) requestComponent.display(success);
+                    requestComponent.display("В данный момент недоступно");
+//                    choice = requestComponent.input();
+//                    String success = requestController.exportRequest(choice);
+//                    if (success!=null) requestComponent.display(success);
                     break;
 
                 }
@@ -462,8 +487,8 @@ public class BookStoreController {
 
     Order createOrder(){
         // добавить счетсик заказов
-        int max = orderController.getMaxId()+1;
-        Order order = new Order( max);
+
+        Order order = new Order( );
 
         orderComponent.display("Введите свое имя");
         String name = orderComponent.input();
@@ -474,7 +499,12 @@ public class BookStoreController {
         Customer customer = new Customer(name, surname, email);
         order.setCustomer(customer);
 
-        List<Book> books = bookController.displayAllBooks();
+        Optional<List<Book>> books_ = bookController.displayAllBooks();
+        if (books_.isEmpty()){
+            orderComponent.display("Книг нет, заказ невозможен");
+            return null;
+        }
+        List<Book> books = books_.get();
         orderComponent.display("Выберите книги, отправив индекс, начиная с 0\nПри окончании введите -1");
         for (int i=0; i<books.size(); i++){
             orderComponent.display(i + " " + books.get(i).getTitle());
@@ -492,6 +522,7 @@ public class BookStoreController {
                 flag = orderComponent.input();
             }catch(NumberFormatException e){
                 orderComponent.display("Вы вели некорректное число");
+                flag =orderComponent.input();
             }
 
 
@@ -521,12 +552,12 @@ public class BookStoreController {
     }
 
 
-    private void saveSystem(){
-        try {
-            bookStoreSystem.saveSystem(FILENAME);
-            System.out.println("Система сохранена");
-        } catch (IOException e) {
-            System.out.println("Неудача сохранения системы " + e.getMessage());
-        }
-    }
+//    private void saveSystem(){
+//        try {
+//            bookStoreSystem.saveSystem(FILENAME);
+//            System.out.println("Система сохранена");
+//        } catch (IOException e) {
+//            System.out.println("Неудача сохранения системы " + e.getMessage());
+//        }
+//    }
 }

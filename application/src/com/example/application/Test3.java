@@ -1,6 +1,7 @@
 package com.example.application;
 
 import com.example.application.controllers.*;
+import com.example.application.dao.*;
 import com.example.application.model.BookShop;
 import com.example.application.model.Warehouse;
 import com.example.application.repositories.BookRepository;
@@ -13,7 +14,9 @@ import com.example.application.services.OrderFileService;
 import com.example.application.services.SettingsService;
 import com.example.processing_annotations.InjectAnnotationProcessor;
 
+
 import java.io.IOException;
+import java.sql.Connection;
 
 public class Test3 {
     public static void main(String[] args)  {
@@ -23,48 +26,57 @@ public class Test3 {
 
 
         // загрузка системы из бэкапа
-        final String FILENAME = "bookstore_system.dat";
-        BookStoreSystem bookStoreSystem = null;
+//        final String FILENAME = "bookstore_system.dat";
+//        BookStoreSystem bookStoreSystem = null;
+//
+//        if (BookStoreSystem.systemFileExists(FILENAME)){
+//            try {
+//                bookStoreSystem = BookStoreSystem.loadSystem(FILENAME);
+//                System.out.println("Загрузка системы произошла успешно");
+//            } catch (IOException | ClassNotFoundException e) {
+//                System.out.println("Проблема при загрузке дерева: " + e.getMessage());
+//                System.out.println("Будет создана новая система");
+//            }
+//        }else{
+//            bookStoreSystem = new BookStoreSystem();
+//            bookStoreSystem.initializeSystem(true);
+//        }
 
-        if (BookStoreSystem.systemFileExists(FILENAME)){
-            try {
-                bookStoreSystem = BookStoreSystem.loadSystem(FILENAME);
-                System.out.println("Загрузка системы произошла успешно");
-            } catch (IOException | ClassNotFoundException e) {
-                System.out.println("Проблема при загрузке дерева: " + e.getMessage());
-                System.out.println("Будет создана новая система");
-            }
-        }else{
-            bookStoreSystem = new BookStoreSystem();
-            bookStoreSystem.initializeSystem(true);
-        }
 
-
-        Warehouse warehouse = bookStoreSystem.getWarehouse();
-        BookShop bookshop = bookStoreSystem.getBookshop();
+        Warehouse warehouse = new Warehouse();
+        BookShop bookshop =new BookShop();
 
         // начинается добавление зависимостей
         InjectAnnotationProcessor di = InjectAnnotationProcessor.getInstance();
         di.registerSingleton(Warehouse.class, warehouse);
         di.registerSingleton(BookShop.class, bookshop);
-        di.registerSingleton(BookStoreSystem.class, bookStoreSystem);
+        //di.registerSingleton(BookStoreSystem.class, bookStoreSystem);
         // функция возвращает новый экзмепляр, а также сохраняет его у себя в di контейнере
 
         try{
+            JDBCConnection idbc_ = di.getInstance(JDBCConnection.class);
+            di.registerSingleton(Connection.class, idbc_.getConnection());
+            di.getInstance(BookImplementation.class);
+            di.getInstance(OrderBooksImplementation.class);
+            di.getInstance(OrderImplementation.class);
+            di.getInstance(CustomerImplemenation.class);
+            di.getInstance(RequestImplementation.class);
+
             di.getInstance(BookRepository.class);
             di.getInstance(OrderRepository.class);
             di.getInstance(RequestRepository.class);
 
             di.getInstance(BookService.class);
            di.getInstance(BookShopFacade.class);
+
             di.getInstance(SettingsService.class);
+            di.getInstance(OrderFileService.class);
+
             di.getInstance(BookController.class);
             di.getInstance(OrderController.class);
            di.getInstance(RequestController.class);
-
-             di.getInstance(OrderFileService.class);
-
             di.getInstance(SettingController.class);
+
         } catch (Exception e){
             System.out.println("Появилась проблема при попытке установления зависимостей " + e.getMessage());
         }
