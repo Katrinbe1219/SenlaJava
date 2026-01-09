@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.senla</groupId>
+        <artifactId>java-senla</artifactId>
+        <version>1.0.0-SNAPHOT</version>
+    </parent>
+
+    <artifactId>application</artifactId>
+    <packaging>jar</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.senla</groupId>
+            <artifactId>custom_annotations</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.senla</groupId>
+            <artifactId>processing_annotations</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <!-- Версия унаследуется из dependencyManagement -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

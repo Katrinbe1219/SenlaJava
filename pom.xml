@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd"
+>
+    <modelVersion>4.0.0</modelVersion>
+    <!--1. Метаданные род модуля - проекта-->
+    <groupId>com.senla</groupId>
+    <artifactId>java-senla</artifactId>
+    <version>1.0.0-SNAPHOT</version>
+    <!--для многомодульного ствится pom-->
+    <packaging>pom</packaging>
+
+    <!--указываем в необходимом порядке модули-->
+    <modules>
+        <module>custom_annotations</module>
+        <module>processing_annotations</module>
+        <module>application</module>
+    </modules>
+
+    <!--прописываются константы для файла-->
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!--        вынесли версии зависимостей, которые потом будут прописываться в dependency-->
+        <junit.version>4.13.2</junit.version>
+        <postgresql.version>42.6.0</postgresql.version>
+        <logging.version>2.25.3</logging.version>
+        <style.version>3.6.0</style.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!--ТОлько для одного модуля, который его использлует-->
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version> <!--автоматически compile-->
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${logging.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${style.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
+<!--тег для сборки проекта-->
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <!--Плагин компилирует JAva код в байт-код-->
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                    <configuration>
+                        <source>${maven.compiler.source}</source><!--версия джавы исходного кода-->
+                        <target>${maven.compiler.target}</target><!--версия джавы JVM - для которой создается байт-код-->
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.6.0</version>
+
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>10.12.0</version>
+                        </dependency>
+                    </dependencies>
+
+                    <configuration>
+                        <configLocation>checkstyles.xml</configLocation>
+                        <suppressionsLocation>suppressions.xml</suppressionsLocation>
+                        <encoding>UTF-8</encoding>
+                        <consoleOutput>true</consoleOutput>
+                        <failsOnError>true</failsOnError>
+                        <logViolationsToConsole>true</logViolationsToConsole>
+                        <linkXRef>false</linkXRef>
+                    </configuration>
+
+                    <executions>
+                        <execution>
+                            <id>validate</id>
+                            <phase>validate</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+
+                </plugin>
+            </plugins>
+
+        </pluginManagement>
+    </build>
+
+    <!--тег для генерации отчетов-->
+    <!--выполняется в фазах site, site-deploy-->
+    <!--НЕТ executions, так как всегда во время выполнения работают reporting-->
+    <!--результат - html отчеты-->
+    <!--есть вариант добавить его в build, чтобы во время компиляции происходила проверка-->
+<!--    <reporting>-->
+<!--        <plugins>-->
+<!--            <plugin>-->
+<!--                <groupId>org.apache.maven.plugins</groupId>-->
+<!--                <artifactId>maven-checkstyle-plugin</artifactId>-->
+<!--                <version>3.5.0</version>-->
+<!--                <reportSets>-->
+<!--                    <reportSet>-->
+<!--                        <reports>-->
+<!--                            <report>checkstyle</report>-->
+<!--                        </reports>-->
+<!--                    </reportSet>-->
+<!--                </reportSets>-->
+<!--            </plugin>-->
+<!--        </plugins>-->
+<!--    </reporting>-->
+</project>
