@@ -1,7 +1,12 @@
 package com.example.application.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
 import java.util.Comparator;
 
+@Entity
+@Table(name = "authors")
 public class Author implements Comparable<Author>{
     // author_id |  name  |   paternal    | surname
     String name;

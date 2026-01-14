@@ -52,11 +52,28 @@
                 <artifactId>log4j-core</artifactId>
                 <version>${logging.version}</version>
             </dependency>
+            <dependency>
+                <groupId>javax.persistence</groupId>
+                <artifactId>javax.persistence-api</artifactId>
+                <version>2.2</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>${style.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.hibernate.orm</groupId>
+                <artifactId>hibernate-core</artifactId>
+                <version>6.4.0.Final</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.3.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -93,7 +110,7 @@
                     <configuration>
                         <configLocation>checkstyles.xml</configLocation>
                         <suppressionsLocation>suppressions.xml</suppressionsLocation>
-                        <encoding>UTF-8</encoding>
+                        <!--<encoding>UTF-8</encoding>-->
                         <consoleOutput>true</consoleOutput>
                         <failsOnError>true</failsOnError>
                         <logViolationsToConsole>true</logViolationsToConsole>
@@ -116,25 +133,5 @@
         </pluginManagement>
     </build>
 
-    <!--тег для генерации отчетов-->
-    <!--выполняется в фазах site, site-deploy-->
-    <!--НЕТ executions, так как всегда во время выполнения работают reporting-->
-    <!--результат - html отчеты-->
-    <!--есть вариант добавить его в build, чтобы во время компиляции происходила проверка-->
-<!--    <reporting>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-checkstyle-plugin</artifactId>-->
-<!--                <version>3.5.0</version>-->
-<!--                <reportSets>-->
-<!--                    <reportSet>-->
-<!--                        <reports>-->
-<!--                            <report>checkstyle</report>-->
-<!--                        </reports>-->
-<!--                    </reportSet>-->
-<!--                </reportSets>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </reporting>-->
+
 </project>

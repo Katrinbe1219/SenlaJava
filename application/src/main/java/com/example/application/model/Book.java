@@ -4,14 +4,23 @@ package com.example.application.model;
 
 import com.example.application.model.types.BookStatus;
 import com.example.application.model.types.BookTypes;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Comparator;
 
+@Entity
+@Table(name = "books")
 public class Book implements Comparable<Book>, Serializable {
-    String title;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
+
+    String title;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
     Author author;
     int year;
     BookStatus status;
