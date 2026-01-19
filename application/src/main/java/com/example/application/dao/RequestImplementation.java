@@ -4,6 +4,7 @@ import com.example.application.errors.CanNotMakeExecution;
 import com.example.application.model.Request;
 import com.example.application.model.RequestResult;
 import com.example.custom_applications.Inject;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public class RequestImplementation extends AbstractDao<Request, Integer>{
     Connection connection;
 
     @Override
-    protected Request mapRow(ResultSet resultSet) throws CanNotMakeExecution {
+    protected Request mapRow(ResultSet resultSet, Logger logger) throws CanNotMakeExecution {
         Request request = new Request();
         try {
             request.setBook(resultSet.getInt("book_id"));
@@ -25,17 +26,18 @@ public class RequestImplementation extends AbstractDao<Request, Integer>{
             return request;
         }
         catch (Exception e) {
+            logger.error("Проблема mapROw RequestImpl: " + e.getMessage());
             throw new CanNotMakeExecution("Проблема при получении обьекта запроса: " + e.getMessage());
         }
     }
 
     @Override
-    protected Integer getId(Request request) throws CanNotMakeExecution {
+    protected Integer getId(Request request, Logger logger) throws CanNotMakeExecution {
         return 0;
     }
 
     @Override
-    protected Request insert(Request request) throws CanNotMakeExecution {
+    protected Request insert(Request request, Logger logger) throws CanNotMakeExecution {
         return null;
     }
 
@@ -50,11 +52,32 @@ public class RequestImplementation extends AbstractDao<Request, Integer>{
     }
 
     @Override
-    protected Request update(Request request) throws CanNotMakeExecution {
+    protected Request update(Request request, Logger logger) throws CanNotMakeExecution {
         return null;
     }
 
-    public List<Integer> insertMany(List<Integer> book_ids, int order_id) throws CanNotMakeExecution {
+    public List<RequestResult> getRequestsSorted(String field, String descCondition, Logger logger) throws CanNotMakeExecution {
+        String sql = "SELECT b.title, count(r.request_id) AS amount FROM requests AS r INNER JOIN books AS b on b.book_id = r.book_id GROUP BY r.book_id,  b.title ORDER BY " +
+                field + " " + descCondition;
+        ArrayList<RequestResult> results = new ArrayList<>();
+
+        try (Statement st = getConnection().createStatement()){
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                results.add(new RequestResult(
+                        rs.getString("title"),
+                        rs.getInt("amount")
+                ));
+            }
+            return results;
+        }
+        catch (Exception e) {
+            logger.error("Проблема в requestImplementation, getRequested Sorted: " + e.getMessage());
+            throw new CanNotMakeExecution("Проблема при получении отсортированных заявок: " + e.getMessage());
+        }
+    }
+
+    public List<Integer> insertMany(List<Integer> book_ids, int order_id, Logger logger) throws CanNotMakeExecution {
         String sql = "INSERT INTO requests(order_id, book_id) VALUES (?, ?)";
 
         try  (PreparedStatement pr = getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
@@ -71,11 +94,12 @@ public class RequestImplementation extends AbstractDao<Request, Integer>{
             throw new CanNotMakeExecution("Не все запросы были добавлены в бд. Проблема на сервере");
         }
         catch (Exception e) {
+            logger.error("Проблема в requestImplementation, insertMany: " + e.getMessage());
             throw new CanNotMakeExecution("Проблема при добавлении запросов: " + e.getMessage());
         }
     }
 
-    public void deleteManyByBook(Integer book_id) throws CanNotMakeExecution {
+    public void deleteManyByBook(Integer book_id, Logger logger) throws CanNotMakeExecution {
         String sql = "DELETE FROM requests WHERE book_id = ?";
         try (PreparedStatement pr = getConnection().prepareStatement(sql)) {
 
@@ -87,11 +111,12 @@ public class RequestImplementation extends AbstractDao<Request, Integer>{
             }
             throw  new CanNotMakeExecution("Не все запросы были удалены");
         }catch (Exception e) {
+            logger.error("Проблема в requestImplementation, deleteManyByBook: " + e.getMessage());
             throw new CanNotMakeExecution("Проблема при удалении нескольких запросов: " +e.getMessage());
         }
     }
 
-    public void deleteManyByOrder(Integer order_id) throws CanNotMakeExecution {
+    public void deleteManyByOrder(Integer order_id, Logger logger) throws CanNotMakeExecution {
         String sql = "DELETE FROM requests WHERE order_id = ?";
         try (PreparedStatement pr = getConnection().prepareStatement(sql)) {
 
@@ -103,6 +128,7 @@ public class RequestImplementation extends AbstractDao<Request, Integer>{
             }
             throw  new CanNotMakeExecution("Не все запросы были удалены");
         }catch (Exception e) {
+            logger.error("Проблема в requestImplementation, deleteManyByOrder: " + e.getMessage());
             throw new CanNotMakeExecution("Проблема при удалении нескольких запросов: " +e.getMessage());
         }
     }

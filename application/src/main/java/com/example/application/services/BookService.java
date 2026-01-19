@@ -14,8 +14,6 @@ import org.apache.logging.log4j.Logger;
 import com.example.custom_applications.Inject;
 
 import java.sql.Connection;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 
@@ -23,8 +21,6 @@ import java.util.*;
 @Inject
 public class BookService {
 
-//    @Inject
-//    private RequestRepository requestRepository;
     @Inject
     private RequestImplementation requestDao;
 
@@ -34,13 +30,10 @@ public class BookService {
     @Inject
     Connection connection;
 
-//    @Inject
-//    OrderImplementation orderDao;
-
 
     public Optional<List<Book>> getAllBooks(Logger logger){
         try {
-            return bookDao.findAll();
+            return bookDao.findAll(logger);
         } catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
             return Optional.empty();
@@ -53,7 +46,7 @@ public class BookService {
 
     public boolean receiveBook(String title,Logger logger){
         try {
-            bookDao.save(title);
+            bookDao.save(title, logger);
             return true;
         } catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
@@ -66,7 +59,7 @@ public class BookService {
 
     public Optional<Book> getBookByTitle(String title, Logger logger){
         try {
-            return bookDao.getByTitle(title);
+            return bookDao.getByTitle(title, logger);
         }catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
             return Optional.empty();
@@ -79,7 +72,7 @@ public class BookService {
 
     public boolean checkBook (String book, Logger logger){
         try {
-            Optional<Book> book_  = bookDao.getByTitle(book);
+            Optional<Book> book_  = bookDao.getByTitle(book, logger);
             if (book_.isEmpty()) return false;
             return book_.get().getStatus() == BookStatus.IN_STOCK;
         }catch (CanNotMakeExecution e) {
@@ -95,58 +88,70 @@ public class BookService {
 
     public List<Book> getSortedBooks(BookSorting sortingType, Logger logger){
         try {
-            List<Book> sortedBooks;
-            Optional<List<Book> >books_ = bookDao.findAll();
-            if (books_.isEmpty()) { return null; }
+            List<Book> sortedBooks = null;
+            Optional<List<Book> >books_;
 
-            List<Book> books = books_.get();
             switch (sortingType) {
                 case ALPHABETICAL_UP:
-                    sortedBooks = books.stream()
-                            .sorted(Comparator.comparing(Book::getTitle))
-                            .toList();
+                    books_ = bookDao.getSortedBooks("title", "ASC", logger);
+                    if (books_.isPresent()){
+                        sortedBooks = books_.get();
+                    }
+
                     break;
                 case ALPHABETICAL_DOWN:
-                    sortedBooks =  books.stream()
-                            .sorted(Comparator.comparing(Book::getTitle).reversed())
-                            .toList();
+                    books_ = bookDao.getSortedBooks("title", "DESC", logger);
+                    if (books_.isPresent()){
+                        sortedBooks = books_.get();
+                    }
                     break;
                 case INSTOCK:
-                    sortedBooks = books.stream()
-                            .filter(p -> p.getStatus() == BookStatus.IN_STOCK)
-                            .toList();
+                    books_ = bookDao.getSortedBooks("status", "I", logger);
+                    if (books_.isPresent()){
+                        sortedBooks = books_.get();
+                    }
                     break;
 
                 case DATE_UP:
-                    sortedBooks = books.stream()
-                            .sorted(Comparator.comparing(Book::getYear))
-                            .toList();
+                    books_ = bookDao.getSortedBooks("admission_date", "ASC", logger);
+                    if (books_.isPresent()){
+                        sortedBooks = books_.get();
+                    }
                     break;
 
                 case DATE_DOWN:
-                    sortedBooks = books.stream()
-                            .sorted(Comparator.comparing(Book::getYear).reversed())
-                            .toList();
+                    books_ = bookDao.getSortedBooks("admission_date", "DESC", logger);
+                    if (books_.isPresent()){
+                        sortedBooks = books_.get();
+                    }
                     break;
 
                 case PRICE_UP:
-                    sortedBooks = books.stream()
-                            .sorted(Comparator.comparing(Book::getPrice))
-                            .toList();
+                    books_ = bookDao.getSortedBooks("price", "ASC", logger);
+                    if (books_.isPresent()){
+                        sortedBooks = books_.get();
+                    }
                     break;
 
                 case PRICE_DOWN:
-                    sortedBooks = books.stream()
-                            .sorted(Comparator.comparing(Book::getPrice).reversed())
-                            .toList() ;
+                    books_ = bookDao.getSortedBooks("price", "DESC", logger);
+                    if (books_.isPresent()){
+                        sortedBooks = books_.get();
+                    }
                     break;
 
                 case ALL:
-                    sortedBooks = books.stream().toList();
+                    books_ = bookDao.getSortedBooks("book_id", "ASC", logger);
+                    if (books_.isPresent()){
+                        sortedBooks = books_.get();
+                    }
                     break;
 
                 default:
-                    sortedBooks = books.stream().toList();
+                    books_ = bookDao.getSortedBooks("book_id", "ASC", logger);
+                    if (books_.isPresent()){
+                        sortedBooks = books_.get();
+                    }
                     break;
             }
 
@@ -164,7 +169,7 @@ public class BookService {
 
     public String getBookDescription(String bookName,Logger logger){
         try {
-            Optional<Book> book_  = bookDao.getByTitle(bookName);
+            Optional<Book> book_  = bookDao.getByTitle(bookName, logger);
             if (book_.isEmpty())  return "Такой книги не нашлось";
             return book_.get().getDescription();
         }catch (CanNotMakeExecution e) {
@@ -179,66 +184,37 @@ public class BookService {
     }
 
     public void setLastPurchase(List<Book> books){
-        for (Book book : books) {
-            book.setLastPurchaseDate(LocalDate.now());
-        }
+        bookDao.updateBooksLastPurchase(books);
     }
 
     public List<Book> getLongLiedBooks(LongLiedBookSorting sortingType, int numberOfMonth, Logger logger){
         try {
-            Optional<List<Book>> books_ = bookDao.findAll();
-            if (books_.isEmpty()) { return null; }
-
-            List<Book> books = books_.get();
             return switch(sortingType) {
-                case PRICE_DOWN -> books.stream()
-                        .filter(p -> p.getStatus() == BookStatus.IN_STOCK)
-                        .filter(p ->{
-                            LocalDate lastP = p.getLastPurchaseDate();
-                            return lastP != null &&
-                                    ChronoUnit.MONTHS.between(lastP, LocalDate.now()) > numberOfMonth;
-                        })
-                        .sorted(Comparator.comparing(Book::getPrice))
-                        .toList();
+                case PRICE_DOWN -> {
+                    Optional<List<Book>> sortedBooks = bookDao.getLongLiedBooks(numberOfMonth, "price", "ASC", logger);
+                   yield sortedBooks.orElse(null) ;
+                }
 
 
-                case DATE_UP -> books.stream()
-                        .filter(p -> p.getStatus() == BookStatus.IN_STOCK)
-                        .filter(p ->{
-                            LocalDate lastP = p.getLastPurchaseDate();
-                            return lastP != null &&
-                                    ChronoUnit.MONTHS.between(lastP, LocalDate.now()) > numberOfMonth;
-                        })
-                        .sorted(Comparator.comparing(Book::getAdmissionDate))
-                        .toList();
+                case DATE_UP -> {
+                    Optional<List<Book>> sortedBooks = bookDao.getLongLiedBooks(numberOfMonth, "last_date_purchase", "DESC", logger);
+                    yield sortedBooks.orElse(null) ;
+                }
 
-                case DATE_DOWN -> books.stream()
-                        .filter(p -> p.getStatus() == BookStatus.IN_STOCK)
-                        .filter(p ->{
-                            LocalDate lastP = p.getLastPurchaseDate();
-                            return lastP != null &&
-                                    ChronoUnit.MONTHS.between(lastP, LocalDate.now()) > numberOfMonth;
-                        })
-                        .sorted(Comparator.comparing(Book::getAdmissionDate).reversed()).toList();
+                case DATE_DOWN -> {
+                    Optional<List<Book>> sortedBooks = bookDao.getLongLiedBooks(numberOfMonth, "last_date_purchase", "ASC", logger);
+                    yield sortedBooks.orElse(null) ;
+                }
 
-                case PRICE_UP -> books.stream()
-                        .filter(p -> p.getStatus() == BookStatus.IN_STOCK)
-                        .filter(p ->{
-                            LocalDate lastP = p.getLastPurchaseDate();
-                            return lastP != null &&
-                                    ChronoUnit.MONTHS.between(lastP, LocalDate.now()) > numberOfMonth;
-                        })
-                        .sorted(Comparator.comparing(Book::getPrice).reversed())
-                        .toList();
+                case PRICE_UP -> {
+                    Optional<List<Book>> sortedBooks = bookDao.getLongLiedBooks(numberOfMonth, "price", "DESC", logger);
+                    yield sortedBooks.orElse(null) ;
+                }
 
-                case NONE -> books.stream()
-                        .filter(p -> p.getStatus() == BookStatus.IN_STOCK)
-                        .filter(p ->{
-                            LocalDate lastP = p.getLastPurchaseDate();
-                            return lastP != null &&
-                                    ChronoUnit.MONTHS.between(lastP, LocalDate.now()) > numberOfMonth;
-                        })
-                        .toList();
+                case NONE -> {
+                    Optional<List<Book>> sortedBooks = bookDao.getLongLiedBooks(numberOfMonth, "book_id", "DESC", logger);
+                    yield sortedBooks.orElse(null) ;
+                }
             };
         }catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
@@ -250,9 +226,9 @@ public class BookService {
 
     }
 
-    Book getBookById(Integer id){
+    Book getBookById(Integer id, Logger logger){
         try {
-            Optional<List<Book>> books = bookDao.findAll();
+            Optional<List<Book>> books = bookDao.findAll(logger);
             for (Book book : books.get()) {
                 if (book.getId() == id){
                     return book;
@@ -272,7 +248,7 @@ public class BookService {
 
     public void cancellRequestsByBook(Integer book_id, Logger logger){
         try {
-            requestDao.deleteManyByBook(book_id);
+            requestDao.deleteManyByBook(book_id, logger);
         }catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
 
@@ -289,7 +265,7 @@ public class BookService {
 
     public void cancellOrderRequests(Order order, Logger logger){
         try {
-            requestDao.deleteManyByOrder(order.getId());
+            requestDao.deleteManyByOrder(order.getId(), logger);
         }catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
 
@@ -300,19 +276,29 @@ public class BookService {
 
     }
 
-    private Map<String, Integer> getRequestsGroupByBooks(Logger logger){
+
+
+    public List<RequestResult> getSortedRequests(RequestSorting sortingType, Logger logger){
+
         try {
-            Map<String, Integer> groupedRequests = new HashMap<>();
-            List<RequestResult> requests = requestDao.getRequestsByBook();
-            for (RequestResult request : requests) {
-                if ( !groupedRequests.containsKey(request.getBook())){
-                    groupedRequests.put(request.getBook(), 1);
-                }else{
-                    groupedRequests.merge(request.getBook(), 1, Integer::sum);
+            List<RequestResult> requests = null;
+            switch(sortingType){
+                case RequestSorting.ALPHABETICAL_UP -> {
+                    requests = requestDao.getRequestsSorted("b.title", "ASC", logger);
+                }
+                case RequestSorting.ALPHABETICAL_DOWN -> {
+                    requests = requestDao.getRequestsSorted("b.title", "DESC", logger);
+                }
+                case RequestSorting.AMOUNT_UP -> {
+                    requests = requestDao.getRequestsSorted("amount", "ASC", logger);
+                }
+                case RequestSorting.AMOUNT_DOWN -> {
+                    requests = requestDao.getRequestsSorted("amount", "DESC", logger);
                 }
             }
 
-            return groupedRequests;
+
+            return requests;
         }catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
             return null;
@@ -320,31 +306,6 @@ public class BookService {
             logger.error("Проблема не SQLExecution: " + e.getMessage());
             return null;
         }
-
-    }
-
-    public List<List<Object>> getSortedRequests(RequestSorting sortingType, Logger logger){
-
-        Map<String, Integer> requestsGroupByBooks = getRequestsGroupByBooks(logger);
-        List<List<Object>> listOfRequests = new ArrayList<>();
-
-        for (String key : requestsGroupByBooks.keySet()) {
-            listOfRequests.add(new ArrayList<>(Arrays.asList(key, requestsGroupByBooks.get(key))));
-        }
-
-
-
-        if (sortingType == RequestSorting.ALPHABETICAL_UP){
-            sortRequestsByParameter(listOfRequests, 0, true);
-        }else if (sortingType == RequestSorting.ALPHABETICAL_DOWN) {
-            sortRequestsByParameter(listOfRequests, 0, false);
-        } else if (sortingType == RequestSorting.AMOUNT_UP){
-            sortRequestsByParameter(listOfRequests, 1, true);
-        }else{
-            sortRequestsByParameter(listOfRequests, 1, false);
-        }
-
-        return listOfRequests;
     }
 
     private void sortRequestsByParameter(List<List<Object>> groupedRequests, int index, boolean asc){
@@ -359,8 +320,8 @@ public class BookService {
     }
 
 
-    private Request getRequestById(int id){
-        Optional<List<Request>> req_ = requestDao.findAll();
+    private Request getRequestById(int id, Logger logger){
+        Optional<List<Request>> req_ = requestDao.findAll(logger);
         if (req_.isEmpty()) {return null;}
 
         List<Request> requests = req_.get();

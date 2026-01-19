@@ -7,6 +7,7 @@ import com.example.application.model.OrderBooks;
 import com.example.application.model.types.BookStatus;
 import com.example.application.model.types.BookTypes;
 import com.example.custom_applications.Inject;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,7 +24,7 @@ public class OrderBooksImplementation extends AbstractDao<OrderBooks, Integer>{
     Connection connection;
 
     @Override
-    protected OrderBooks mapRow(ResultSet resultSet) throws CanNotMakeExecution {
+    protected OrderBooks mapRow(ResultSet resultSet, Logger logger) throws CanNotMakeExecution {
         //order_book_id | order_id | book_id
         OrderBooks orderBooks = new OrderBooks();
         try {
@@ -32,12 +33,13 @@ public class OrderBooksImplementation extends AbstractDao<OrderBooks, Integer>{
             orderBooks.setOrderBookId(resultSet.getInt("order_book_id"));
             return orderBooks;
         }catch (Exception e) {
+            logger.error("Проблема mapROw OrderBooksImpl: " + e.getMessage());
             throw new CanNotMakeExecution("Проблема при mapRow orderBooks " + e.getMessage());
         }
 
     }
 
-    private Book mapBookRow(ResultSet resultSet) throws CanNotMakeExecution {
+    private Book mapBookRow(ResultSet resultSet, Logger logger) throws CanNotMakeExecution {
         Book book = new Book();
         try {
             // b.book_id, b.title, g.genre_name, a.name, a.paternal, a.surname, a.author_id, b.year, b.status, b.price, b.last_date_purchase, b.admission_date
@@ -53,17 +55,18 @@ public class OrderBooksImplementation extends AbstractDao<OrderBooks, Integer>{
             return book;
 
         } catch (SQLException e) {
+            logger.error("Проблема mapBookRow OrderBooksImpl: " + e.getMessage());
             throw new CanNotMakeExecution("Problem during mapRow " +  e.getMessage());
         }
     }
 
     @Override
-    protected Integer getId(OrderBooks orderBooks) throws CanNotMakeExecution {
+    protected Integer getId(OrderBooks orderBooks, Logger logger) throws CanNotMakeExecution {
         return 0;
     }
 
     @Override
-    protected OrderBooks insert(OrderBooks orderBooks) throws CanNotMakeExecution {
+    protected OrderBooks insert(OrderBooks orderBooks, Logger logger) throws CanNotMakeExecution {
         return null;
     }
 
@@ -78,11 +81,11 @@ public class OrderBooksImplementation extends AbstractDao<OrderBooks, Integer>{
     }
 
     @Override
-    protected OrderBooks update(OrderBooks orderBooks) throws CanNotMakeExecution {
+    protected OrderBooks update(OrderBooks orderBooks, Logger logger) throws CanNotMakeExecution {
         return null;
     }
 
-    public List<Book> getOrdersBook(int order_id) throws CanNotMakeExecution {
+    public List<Book> getOrdersBook(int order_id, Logger logger) throws CanNotMakeExecution {
         List<Book> orderBooksList = new ArrayList<Book>();
 
         String sql = "SELECT b.book_id, b.title, g.genre_name, a.name, a.paternal, a.surname, a.author_id,b.year, b.status, b.price, b.last_date_purchase, b.admission_date FROM order_books AS ob INNER JOIN books AS b  ON b.book_id = ob.book_id INNER JOIN genres AS g ON g.genre_id = b.genre_id INNER JOIN authors AS a ON a.author_id = b.author_id WHERE ob.order_id = ?; ";
@@ -92,16 +95,17 @@ public class OrderBooksImplementation extends AbstractDao<OrderBooks, Integer>{
             pr.setInt(1, order_id);
             ResultSet rs = pr.executeQuery();
             while (rs.next()) {
-                orderBooksList.add(mapBookRow(rs));
+                orderBooksList.add(mapBookRow(rs, logger));
             }
             return orderBooksList;
         }
         catch (Exception e) {
+            logger.error("Проблема getOrdersBook OrderBooksImpl: " + e.getMessage());
             throw new CanNotMakeExecution("Проблема при получении книг заказа: " + e.getMessage());
         }
     }
 
-    public List<Book> addOrderBooks(List<Book> books, int order_id) throws CanNotMakeExecution {
+    public List<Book> addOrderBooks(List<Book> books, int order_id, Logger logger) throws CanNotMakeExecution {
         // эта функция является частью транзакции в BookShopFacade, так что не начинаем ее здесь
         // если здесь будет проблема, то rollback сработает в основной функции в BookShopFacade createOrder
         // connection один на всю программу
@@ -122,6 +126,7 @@ public class OrderBooksImplementation extends AbstractDao<OrderBooks, Integer>{
             throw new CanNotMakeExecution("Не все книги были добавлены в бд. Проблема на сервер");
         }
         catch (SQLException e){
+            logger.error("Проблема mapROw OrderBooksImpl: " + e.getMessage());
             throw new CanNotMakeExecution("Проблема при добавлении книг в бд: " + e.getMessage());
         }
 

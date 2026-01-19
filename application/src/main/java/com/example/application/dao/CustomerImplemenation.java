@@ -3,6 +3,7 @@ package com.example.application.dao;
 import com.example.application.errors.CanNotMakeExecution;
 import com.example.application.model.Customer;
 import com.example.custom_applications.Inject;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 
@@ -13,7 +14,7 @@ public class CustomerImplemenation extends AbstractDao<Customer, Integer>{
     Connection connection;
 
     @Override
-    protected Customer mapRow(ResultSet resultSet) throws CanNotMakeExecution {
+    protected Customer mapRow(ResultSet resultSet, Logger logger) throws CanNotMakeExecution {
         Customer customer = new Customer();
         try {
             customer.setCustomerId(resultSet.getInt("customer_id"));
@@ -22,6 +23,7 @@ public class CustomerImplemenation extends AbstractDao<Customer, Integer>{
             customer.setSurname(resultSet.getString("surname"));
             return customer;
         }catch (SQLException e) {
+            logger.error("Проблема mapROw CustomerImpl: " + e.getMessage());
             throw new CanNotMakeExecution("Проблема с получением покупателя: "+ e.getMessage());
         }
 
@@ -29,7 +31,7 @@ public class CustomerImplemenation extends AbstractDao<Customer, Integer>{
     }
 
     @Override
-    protected Integer getId(Customer customer) throws CanNotMakeExecution {
+    protected Integer getId(Customer customer, Logger logger) throws CanNotMakeExecution {
 
         String sql = "SELECT customer_id FROM customers WHERE name = ? AND  surname = ? AND email = ?";
         try (
@@ -46,12 +48,13 @@ public class CustomerImplemenation extends AbstractDao<Customer, Integer>{
             return null;
         }
         catch (SQLException e) {
+            logger.error("Проблема getId CustomerImpl: " + e.getMessage());
             throw new CanNotMakeExecution("Проблема с получением id покупателя: "+ e.getMessage());
         }
     }
 
     @Override
-    protected Customer insert(Customer customer) throws CanNotMakeExecution {
+    protected Customer insert(Customer customer, Logger logger) throws CanNotMakeExecution {
         String sql = "INSERT INTO customers (name, surname, email) VALUES(?,?,?) ";
         try (PreparedStatement pr = getConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
             pr.setString(1,customer.getName());
@@ -71,6 +74,7 @@ public class CustomerImplemenation extends AbstractDao<Customer, Integer>{
             throw new CanNotMakeExecution("Новых ключей не обнаружено. Пробелемы на сервере. Customer");
         }
         catch (SQLException e) {
+            logger.error("Проблема insert CustomerImpl: " + e.getMessage());
             throw new CanNotMakeExecution("Проблема при добавлении пользователя: "+ e.getMessage());
         }
     }
@@ -86,7 +90,7 @@ public class CustomerImplemenation extends AbstractDao<Customer, Integer>{
     }
 
     @Override
-    protected Customer update(Customer customer) throws CanNotMakeExecution {
+    protected Customer update(Customer customer, Logger logger) throws CanNotMakeExecution {
         // в программе такой функции не наблюдается, поэтому будем считать, что изменяется пользователь по его customer_id
         String sql = "UPDATE customers SET name = ?, surname = ?, email = ? WHERE customer_id = ?";
         try (PreparedStatement pr = getConnection().prepareStatement(sql)){
@@ -103,6 +107,7 @@ public class CustomerImplemenation extends AbstractDao<Customer, Integer>{
             return customer;
         }
         catch (SQLException e) {
+            logger.error("Проблема update CustomerImpl: " + e.getMessage());
             throw new CanNotMakeExecution("Проблема при обновлении пользователя: "+ e.getMessage());
         }
     }
