@@ -1,19 +1,16 @@
 package com.example.application.dao;
-
-
 import com.example.application.errors.CanNotMakeExecution;
 import com.example.application.model.Author;
 import com.example.application.model.types.BookStatus;
 import com.example.application.model.types.BookTypes;
 import com.example.custom_applications.Inject;
-
-
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import com.example.application.model.Book;
+import org.apache.logging.log4j.Logger;
 
 @Inject
 public class BookImplementation extends AbstractDao<Book, Integer> {
@@ -26,7 +23,7 @@ public class BookImplementation extends AbstractDao<Book, Integer> {
     private Connection connection;
 
     @Override
-    public Optional<List<Book>> findAll() throws CanNotMakeExecution{
+    public Optional<List<Book>> findAll(Logger logger) throws CanNotMakeExecution{
         String sql = "SELECT b.book_id, b.title, g.genre_name, a.name, a.paternal, a.surname, a.author_id,b.year, b.status, b.price, b.last_date_purchase, b.admission_date FROM books AS b INNER JOIN genres AS g ON g.genre_id = b.genre_id INNER JOIN authors AS a ON a.author_id = b.author_id;";
         List<Book> books = new ArrayList<>();
         try (
@@ -35,9 +32,9 @@ public class BookImplementation extends AbstractDao<Book, Integer> {
         {
             ResultSet res = pr.executeQuery(sql);
             if (res.next()){
-                books.add(mapRow(res));
+                books.add(mapRow(res, logger));
                 while(res.next()) {
-                    books.add(mapRow(res));
+                    books.add(mapRow(res, logger));
                 }
                 return Optional.of(books);
             }
@@ -46,11 +43,12 @@ public class BookImplementation extends AbstractDao<Book, Integer> {
 
         }
         catch (SQLException e) {
+            logger.error("Проблема findAll in BookImpl: " + e.getMessage());
             throw new CanNotMakeExecution(e.getMessage());
         }
     }
 
-    public Optional<Book> getByTitle(String title) throws CanNotMakeExecution {
+    public Optional<Book> getByTitle(String title, Logger logger) throws CanNotMakeExecution {
         String sql = "SELECT b.book_id, b.title, g.genre_name, a.name, a.paternal, a.surname, a.author_id,b.year, b.status, b.price, b.last_date_purchase, b.admission_date FROM books AS b INNER JOIN genres AS g ON g.genre_id = b.genre_id INNER JOIN authors AS a ON a.author_id = b.author_id WHERE b.title = ?;";
 
         try (
@@ -60,28 +58,77 @@ public class BookImplementation extends AbstractDao<Book, Integer> {
             pr.setString(1, title);
             ResultSet res = pr.executeQuery();
             if (res.next()){
-                return Optional.of(mapRow(res));
+                return Optional.of(mapRow(res, logger));
             }
             return Optional.empty();
 
 
         } catch (Exception e) {
+            logger.error("Проблема getByTitle in BookImpl: " + e.getMessage());
             throw new CanNotMakeExecution("Проблема при получении книги по названию "+ e.getMessage());
         }
 
     }
 
+    public Optional<List<Book>> getLongLiedBooks(int months, String field, String descCondition, Logger logger) throws CanNotMakeExecution {
+        String sql =  "SELECT  b.book_id, b.title, g.genre_name, a.name, a.paternal, a.surname, a.author_id, b.year, b.status, b.price, b.last_date_purchase, b.admission_date FROM books  AS b "  +
+                "INNER JOIN genres AS g ON g.genre_id = b.genre_id INNer JOIN authors AS a ON a.author_id = b.author_id " +
+                "WHERE EXTRACT(YEAR FROM AGE(?, last_date_purchase)) > ? "
+                + "ORDER BY " + field + " " + descCondition;
+        try (PreparedStatement pr = getConnection().prepareStatement(sql)){
+            pr.setDate(1, Date.valueOf(LocalDate.now()));
+            pr.setInt(2, months);
 
-    public void save (String title) throws CanNotMakeExecution {
+            ResultSet res = pr.executeQuery();
+            List<Book> books = new ArrayList<>();
+
+            while (res.next()) {
+                books.add(mapRow(res, logger));
+            }
+            return Optional.of(books);
+
+        } catch (Exception e) {
+            logger.error("Проблема getLongLiedBooks in BookImpl ^ " + e.getMessage());
+            throw new CanNotMakeExecution(e.getMessage());
+        }
+
+    }
+
+    public Optional<List<Book>> getSortedBooks(String field, String descCondition, Logger logger) throws CanNotMakeExecution{
+        String sql;
+        if (field.equals("status")){
+            sql = "SELECT  b.book_id, b.title, g.genre_name, a.name, a.paternal, a.surname, a.author_id, b.year, b.status, b.price, b.last_date_purchase, b.admission_date FROM books  AS b "  +
+                    "INNER JOIN genres AS g ON g.genre_id = b.genre_id INNer JOIN authors AS a ON a.author_id = b.author_id " +
+                    "WHERE status = 'I'" ;
+        }else{
+            sql = "SELECT  b.book_id, b.title, g.genre_name, a.name, a.paternal, a.surname, a.author_id, b.year, b.status, b.price, b.last_date_purchase, b.admission_date FROM books  AS b "  +
+                    "INNER JOIN genres AS g ON g.genre_id = b.genre_id INNer JOIN authors AS a ON a.author_id = b.author_id " +
+                    "ORDER BY " + field + " " + descCondition ;
+        }
+
+        try (Statement pr = getConnection().createStatement()){
+            ResultSet res = pr.executeQuery(sql);
+            List<Book> books = new ArrayList<>();
+            while (res.next()) {
+                books.add(mapRow(res, logger));
+            }
+            return Optional.of(books);
+        }
+        catch (SQLException e) {
+            logger.error("Проблема getSortedBooks in BookImpl: " + e.getMessage());
+            throw new CanNotMakeExecution("Проблема при сортировке: " + e.getMessage());
+        }
+    }
+    public void save (String title, Logger logger) throws CanNotMakeExecution {
         // так как импорт выключен, ввиду наличия бд, то новые книги поступать здесь не могут
         // следовательно, только изменение информации о книги -> завоз, изменение статуса и даты
         Connection conn = getConnection();
         try {
             conn.setAutoCommit(false);
-            Optional<Book> book_  = getByTitle(title);
+            Optional<Book> book_  = getByTitle(title, logger);
             if (book_.isPresent()) {
                 // не передаю сюда connection, так как на одну программу выдается один обьект Connection
-                update(book_.get());
+                update(book_.get(), logger);
                 conn.commit();
             }else{
                 conn.rollback();
@@ -92,14 +139,14 @@ public class BookImplementation extends AbstractDao<Book, Integer> {
             try {
                 connection.rollback();
             }catch (SQLException e1){
-                System.out.println("rollback не работает " + e1.getMessage());
+                logger.error("rollback не работает " + e1.getMessage());
             }
             throw new CanNotMakeExecution("Проблема при обновлении книги " +e.getMessage());
         }finally {
             try{
                 conn.setAutoCommit(true);
             }catch (SQLException e){
-                System.out.println("Проблема при настройке AutoCommit " +e.getMessage());
+                logger.error("Проблема при настройке AutoCommit " +e.getMessage());
             }
         }
 
@@ -110,7 +157,7 @@ public class BookImplementation extends AbstractDao<Book, Integer> {
     }
 
     @Override
-    protected Book mapRow(ResultSet resultSet) throws CanNotMakeExecution {
+    protected Book mapRow(ResultSet resultSet, Logger logger) throws CanNotMakeExecution {
         Book book = new Book();
         try {
             // b.book_id, b.title, g.genre_name, a.name, a.paternal, a.surname, a.author_id, b.year, b.status, b.price, b.last_date_purchase, b.admission_date
@@ -133,7 +180,7 @@ public class BookImplementation extends AbstractDao<Book, Integer> {
     }
 
     @Override
-    protected Integer getId(Book book) throws CanNotMakeExecution {
+    protected Integer getId(Book book, Logger logger) throws CanNotMakeExecution {
         // в логике данного приложения, Book всегда содержит id, поэтому отдельный BookDTO не создавался
         // по логике приложения, идти в бд за id е нужно, но уже должно быть в book Object
         return book.getId();
@@ -141,7 +188,7 @@ public class BookImplementation extends AbstractDao<Book, Integer> {
 
 
     @Override
-    protected Book insert(Book book) throws CanNotMakeExecution {
+    protected Book insert(Book book, Logger logger) throws CanNotMakeExecution {
         // здесь такая функция не требуется, не реализуется
         // на и не используется нигде, метод save переписан
         return null;
@@ -158,7 +205,7 @@ public class BookImplementation extends AbstractDao<Book, Integer> {
     }
 
     @Override
-    protected Book update(Book book_) throws CanNotMakeExecution {
+    protected Book update(Book book_, Logger logger) throws CanNotMakeExecution {
 
         String sql = "UPDATE books SET status ='I', admission_date = ? WHERE books.book_id = ?";
 
@@ -198,6 +245,27 @@ public class BookImplementation extends AbstractDao<Book, Integer> {
     }
 
 
+    public List<Book> updateBooksLastPurchase(List<Book> book_) throws CanNotMakeExecution {
+        String sql = "UPDATE books SET last_date_purchase = ? WHERE books.book_id = ?";
+        try (PreparedStatement pr = getConnection().prepareStatement(sql)){
+            for (Book book: book_){
+                book.setLastPurchaseDate(LocalDate.now());
+                pr.setObject(1, book.getLastPurchaseDate());
+                pr.setObject(2, book.getId());
+                pr.addBatch();
+            }
+
+            int[] result = pr.executeBatch();
+            if (result.length == book_.size()){
+                return book_;
+            }
+            throw new CanNotMakeExecution("Проблема при обновлении даты покупки книги");
+
+        }
+        catch (SQLException e) {
+            throw new CanNotMakeExecution("Пробелма при обновлении даты " + e.getMessage());
+        }
+    }
 }
 
 ///usr/lib/jvm/java-21-openjdk-amd64/bin/java   -cp "new_out/application:new_out/custom_annotations:new_out/processing_annotations:\

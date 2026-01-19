@@ -30,6 +30,11 @@ public class RequestResult {
         this.book = book;
     }
 
+    @Override
+    public String toString() {
+        return "RequestResult [book=" + book + ", id=" + id + "]";
+    }
+
 
 
 

@@ -18,8 +18,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Inject
 public class BookShopFacade {
@@ -65,10 +65,10 @@ public class BookShopFacade {
 
             connection.setAutoCommit(false);
 
-            customerDao.save(order.getCustomer());
-            orderDao.save(order);
-            obDao.addOrderBooks(order.getBooks(), order.getId());
-            requestDao.insertMany(book_ids,order.getId() );
+            customerDao.save(order.getCustomer(), logger);
+            orderDao.save(order, logger);
+            obDao.addOrderBooks(order.getBooks(), order.getId(), logger);
+            requestDao.insertMany(book_ids,order.getId() , logger);
             connection.commit();
         }
         catch (SQLException e){
@@ -83,6 +83,7 @@ public class BookShopFacade {
 
         }
         catch (Exception e1){
+            logger.error("Проблема в BookShopFacade createOrder: " + e1.getMessage());
             throw new CanNotMakeExecution("Проблема создания заказа CAnNotMakeException or others : " + e1.getMessage());
         }
         finally {
@@ -103,7 +104,7 @@ public class BookShopFacade {
     public boolean removeOrder(Order order,Logger logger){
         try {
                 order.setStatus(OrderStatus.CANCELLED);
-                orderDao.save(order);
+                orderDao.save(order, logger);
                 return true;
 
 
@@ -121,7 +122,7 @@ public class BookShopFacade {
 
     public void saveOrder(Order order,Logger logger){
         try {
-            orderDao.save(order);
+            orderDao.save(order, logger);
 
         }catch (CanNotMakeExecution e){
             logger.error("Проблема при сохранении заказа" + e.getMessage());
@@ -135,37 +136,59 @@ public class BookShopFacade {
 
     public List<Order> getSortedOrders(OrderSorting sortingType,Logger logger){
         try {
-            List<Order> orders = orderDao.getOrders();
-            if (orders == null || orders.size() ==0 ){
-                return null;
-            }
-            fillOrdersWithOBooks(orders);
+            Optional<List<Order>> orders_;
+            List<Order> orders;
 
             return switch (sortingType) {
-                case DONE -> orders.stream()
-                        .filter(p -> p.getStatus() == OrderStatus.DONE)
-                        .toList();
-                case CANCELLED -> orders.stream()
-                        .filter(p -> p.getStatus() == OrderStatus.CANCELLED)
-                        .toList();
-                case NEW -> orders.stream()
-                        .filter(p -> p.getStatus() == OrderStatus.NEW)
-                        .toList();
-                case PRICE_UP -> orders.stream()
-                        .sorted(Comparator.comparing(Order::getTotalCost))
-                        .toList();
-                case PRICE_DOWN -> orders.stream()
-                        .sorted(Comparator.comparing(Order::getTotalCost).reversed())
-                        .toList();
-                case DATE_UP -> orders.stream()
-                        .filter(p -> p.getStatus()== OrderStatus.DONE)
-                        .sorted(Comparator.comparing(Order::getCompletionDate))
-                        .toList();
-                case DATE_DOWN -> orders.stream()
-                        .filter(p -> p.getStatus()== OrderStatus.DONE)
-                        .sorted(Comparator.comparing(Order::getCompletionDate).reversed())
-                        .toList();
-                default -> orders.stream().toList();
+                case DONE ->{
+                    orders_ = orderDao.getOrdersSorted("status_D", "", logger);
+                    if (orders_.isEmpty()){ yield  null;}
+                    orders = orders_.get();
+                    fillOrdersWithOBooks(orders,false, logger);
+                    yield orders;
+                }
+                case CANCELLED -> {
+                    orders_ = orderDao.getOrdersSorted("status_C", "", logger);
+                    if (orders_.isEmpty()){ yield  null;}
+                    orders = orders_.get();
+                    fillOrdersWithOBooks(orders,false, logger);
+                    yield orders;
+                }
+                case NEW -> {
+                    orders_ = orderDao.getOrdersSorted("status_N", "", logger);
+                    if (orders_.isEmpty()){ yield  null;}
+                    orders = orders_.get();
+                    fillOrdersWithOBooks(orders,false, logger);
+                    yield orders;
+                }
+                case PRICE_UP -> {
+                    orders_ = orderDao.getOrdersSorted("total_cost", "ASC", logger);
+                    if (orders_.isEmpty()){ yield  null;}
+                    orders = orders_.get();
+                    fillOrdersWithOBooks(orders,false, logger);
+                    yield orders;
+                }
+                case PRICE_DOWN -> {
+                    orders_ = orderDao.getOrdersSorted("total_cost", "DESC", logger);
+                    if (orders_.isEmpty()){ yield  null;}
+                    orders = orders_.get();
+                    fillOrdersWithOBooks(orders,false, logger);
+                    yield orders;
+                }
+                case DATE_UP -> {
+                    orders_ = orderDao.getOrdersSorted("completion_date", "ASC", logger);
+                    if (orders_.isEmpty()){ yield  null;}
+                    orders = orders_.get();
+                    fillOrdersWithOBooks(orders,false, logger);
+                    yield orders;
+                }
+                case DATE_DOWN -> {
+                    orders_ = orderDao.getOrdersSorted("completion_date", "DESC", logger);
+                    if (orders_.isEmpty()){ yield  null;}
+                    orders = orders_.get();
+                    fillOrdersWithOBooks(orders,false, logger);
+                    yield orders;
+                }
             };
         }
         catch (CanNotMakeExecution e){
@@ -180,39 +203,45 @@ public class BookShopFacade {
 
     public List<Order> getDoneOrdersInDiapazon(LocalDate start, LocalDate end, OrderSorting sortingType,Logger logger){
         try {
-            List<Order> orders = orderDao.getOrders();
-            fillOrdersWithOBooks(orders);
+            Optional<List<Order>> orders_;
+            List<Order> orders = orderDao.getOrders(logger);
+            fillOrdersWithOBooks(orders,false, logger);
+
             if (sortingType == OrderSorting.PRICE_UP) {
-                return orders.stream()
-                        .filter(p -> p.getStatus() == OrderStatus.DONE)
-                        .filter(p -> p.getCompletionDate().isAfter(start) && p.getCompletionDate().isBefore(end))
-                        .sorted(Comparator.comparing(Order::getTotalCost))
-                        .toList();
+                orders_ = orderDao.getSortedDoneOrders(start, end, "total_cost", "ASC", logger);
+                if (orders_.isEmpty()) {return null;}
+                orders = orders_.get();
+                fillOrdersWithOBooks(orders,true, logger);
+                return orders;
+
             }
             else if (sortingType == OrderSorting.PRICE_DOWN) {
-                return orders.stream()
-                        .filter(p -> p.getStatus() == OrderStatus.DONE)
-                        .filter(p -> p.getCompletionDate().isAfter(start) && p.getCompletionDate().isBefore(end))
-                        .sorted(Comparator.comparing(Order::getTotalCost).reversed())
-                        .toList();
+                orders_ = orderDao.getSortedDoneOrders(start, end, "total_cost", "DESC", logger);
+                if (orders_.isEmpty()) {return null;}
+                orders = orders_.get();
+                fillOrdersWithOBooks(orders,true, logger);
+                return orders;
+
             } else if (sortingType == OrderSorting.DATE_UP) {
-                return orders.stream()
-                        .filter(p -> p.getStatus() == OrderStatus.DONE)
-                        .filter(p -> p.getCompletionDate().isAfter(start) && p.getCompletionDate().isBefore(end))
-                        .sorted(Comparator.comparing(Order::getCompletionDate))
-                        .toList();
+                orders_ = orderDao.getSortedDoneOrders(start, end, "completion_date", "ASC", logger);
+                if (orders_.isEmpty()) {return null;}
+                orders = orders_.get();
+                fillOrdersWithOBooks(orders,false, logger);
+                return orders;
+
             } else if (sortingType == OrderSorting.DATE_DOWN) {
-                return orders.stream()
-                        .filter(p -> p.getStatus() == OrderStatus.DONE)
-                        .filter(p -> p.getCompletionDate().isAfter(start) && p.getCompletionDate().isBefore(end))
-                        .sorted(Comparator.comparing(Order::getCompletionDate))
-                        .toList();
+                orders_ = orderDao.getSortedDoneOrders(start, end, "completion_date", "DESC", logger);
+                if (orders_.isEmpty()) {return null;}
+                orders = orders_.get();
+                fillOrdersWithOBooks(orders,false, logger);
+                return orders;
             }
             else {
-                return orders.stream()
-                        .filter(p -> p.getStatus() == OrderStatus.DONE)
-                        .filter(p -> p.getCompletionDate().isAfter(start) && p.getCompletionDate().isBefore(end))
-                        .toList();
+                orders_ = orderDao.getSortedDoneOrders(start, end, "order_id", "ASC", logger);
+                if (orders_.isEmpty()) {return null;}
+                orders = orders_.get();
+                fillOrdersWithOBooks(orders,false, logger);
+                return orders;
             }
         }catch(CanNotMakeExecution e){
                 logger.error("Проблема при получении заказов SQl type: " + e.getMessage());
@@ -227,12 +256,12 @@ public class BookShopFacade {
 
     public Integer getOrdersAmountInDiapazon(LocalDate start, LocalDate end,Logger logger){
         try{
-            List<Order> orders = orderDao.getOrders();
-            fillOrdersWithOBooks(orders);
-            return orders.stream()
-                    .filter(p -> p.getStatus() == OrderStatus.DONE)
-                    .filter(p -> p.getCompletionDate().isAfter(start) && p.getCompletionDate().isBefore(end))
-                    .toList().size();
+            Optional<List<Order> >orders_ = orderDao.getOrdersInDiapazon(start, end, logger);
+            if (orders_.isEmpty()) {
+                return 0;
+            }
+            List<Order> orders = orders_.get();
+            return orders.size();
         } catch (CanNotMakeExecution e){
             logger.error("Проблема при получении заказов SQl type: " + e.getMessage());
             return null;
@@ -248,15 +277,14 @@ public class BookShopFacade {
     public Double getIncomeInDiapazon(LocalDate start, LocalDate end,Logger logger){
         double amount = 0;
         try {
-            List<Order> orders = orderDao.getOrders();
-            fillOrdersWithOBooks(orders);
+            Optional<List<Order> >orders_ = orderDao.getOrdersInDiapazon(start, end, logger);
+            if (orders_.isEmpty()) {
+                return 0D;
+            }
+            List<Order> orders = orders_.get();
+            fillOrdersWithOBooks(orders, false, logger);
             for (Order order: orders){
-                if (order.getStatus() == OrderStatus.DONE){
-
-                    if (order.getCompletionDate().isBefore(end) && order.getCompletionDate().isAfter(start)){
                         amount += order.getTotalCost();
-                    }
-                }
             }
 
             return amount;
@@ -274,10 +302,10 @@ public class BookShopFacade {
 
     public Order getOrderById(int id,Logger logger){
         try{
-            List<Order> orders=  orderDao.getOrders();
+            List<Order> orders=  orderDao.getOrders(logger);
             for (Order o : orders){
                 if (o.getId() == id ){
-                    fillOrderWithBooks(o);
+                    fillOrderWithBooks(o, logger);
                     return o;
                 }
             }
@@ -294,19 +322,24 @@ public class BookShopFacade {
 
     }
 
-    private void fillOrdersWithOBooks(List<Order> orders){
+    private void fillOrdersWithOBooks(List<Order> orders, boolean condition, Logger logger){
         // ошибка перейдет в другую функцию, где идет обработка и логирование
         for (Order order : orders){
-            List<Book> books = obDao.getOrdersBook(order.getId());
+            List<Book> books = obDao.getOrdersBook(order.getId(), logger);
             for (Book book : books){
-                order.addBook(book);
+                if (condition){
+                    order.addBook(book, true);
+                }else {
+                    order.addBook(book);
+                }
+
             }
         }
     }
 
-    private void fillOrderWithBooks(Order order){
+    private void fillOrderWithBooks(Order order, Logger logger){
         // ошибка перейдет в другую функцию, где идет обработка и логиро
-        List<Book> books = obDao.getOrdersBook(order.getId());
+        List<Book> books = obDao.getOrdersBook(order.getId(), logger);
         for (Book book : books){
             order.addBook(book);
         }

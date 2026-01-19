@@ -1,6 +1,4 @@
 package com.example.application.controllers;
-
-import com.example.application.dao.BookImplementation;
 import com.example.application.model.*;
 
 import com.example.application.model.Book;
@@ -41,11 +39,6 @@ public class BookStoreController {
     OrderFileService orderFileService;
     @Inject
     SettingController settingController;
-//    @Inject
-//    BookStoreSystem bookStoreSystem;
-
-    @Inject
-    BookImplementation bookDb;
 
     private final String FILENAME = "bookstore_system.dat";
     private static final Logger logger = LogManager.getLogger(BookStoreController.class.getName());
@@ -58,41 +51,6 @@ public class BookStoreController {
         orderComponent = consoleFactory.createOrderMenu();
         requestComponent = consoleFactory.createRequestMenu();
         settingsComponent = consoleFactory.createSettingMenu();
-
-
-
-////        this.bookStoreSystem = loadOrCreateSystem();
-//        Warehouse warehouse = bookStoreSystem.getWarehouse();
-//        BookShop bookshop = bookStoreSystem.getBookshop();
-//
-//        InjectAnnotationProcessor di = InjectAnnotationProcessor.getInstance();
-//        di.registerSingleton(Warehouse.class, warehouse);
-//        di.registerSingleton(BookShop.class, bookshop);
-
-        // функция возвращает новый экзмепляр, а также сохраняет его у себя в di контейнере
-//        di.getInstance(BookRepository.class);
-//
-//
-//
-//        di.getInstance(OrderRepository.class);
-//        di.getInstance(RequestRepository.class);
-
-        // так было до второго задания
-//        ConfigurationAnnotationProcessor processor = new ConfigurationAnnotationProcessor();
-//        processor.loadProperties(pr);
-
-
-//        di.getInstance(BookService.class);
-//       di.getInstance(BookShopFacade.class);
-//        di.getInstance(SettingsService.class);
-
-//        bookController = di.getInstance(BookController.class);
-//        orderController = di.getInstance(OrderController.class);
-//        requestController = di.getInstance(RequestController.class);
-//
-//        orderFileService = di.getInstance(OrderFileService.class);
-//
-//        settingController = di.getInstance(SettingController.class);
 
     }
 
@@ -124,7 +82,6 @@ public class BookStoreController {
                 }
                 case "5": {
                     System.out.println("Пока");
-//                    saveSystem();
                     return;
                 }
                 default:{break;}
@@ -141,32 +98,43 @@ public class BookStoreController {
 
             switch (choice){
                 case "1": {
+                    logger.info("Выбрана команда пользователем изменения месяцев для залежавшихся книг");
                     settingsComponent.display("Введите количество месяц, превышение которого ведет к причислению книгу к залежавшейся");
                     choice = settingsComponent.input();
                     success = settingController.changeNumberOfMonth(choice);
 
                     if (success != null) settingsComponent.display(success);
                     else settingsComponent.display("Все изменено успешно");
+                    logger.info("Закончено команда пользователем изменения месяцев для залежавшихся книг");
+
 
                     break;
                 }
                 case "2": {
+                    logger.info("Выбрана команда пользователем получения длительности залежавшихся книг");
                     int numberOfMonth = settingController.getNumberOfMonth();
                     settingsComponent.display("Книга считается залежавшейся, если срок его пролеживания более: " + numberOfMonth);
+                    logger.info("Закончена команда пользователем получения длительности залежавшихся книг");
+
                     break;
                 }
                 case "3": {
+                    logger.info("Выбрана команда пользователем редактирования функции");
                     settingsComponent.display("Введите true/false для функции");
                     choice = settingsComponent.input();
                     success = settingController.setWarehouseFunction(choice);
                     if (success != null) settingsComponent.display(success);
                     else settingsComponent.display("Все прошло успешно");
+                    logger.info("Закончена команда пользователем редактирования функции");
 
                     break;
                 }
                 case "4": {
+                    logger.info("Выбрана команда пользователем получения значения функции ");
                     String warehouseFunction = settingController.getWarehouseOption();
                     settingsComponent.display(warehouseFunction);
+                    logger.info("Закончена команда пользователем получения значения функции ");
+
                     break;
                 }
                 case "5": {
@@ -189,7 +157,7 @@ public class BookStoreController {
             choice = bookComponent.input();
             switch(choice){
                 case "1": {
-                    logger.info("Выбрана команда пользователем номер 1 в отсеке книг");
+                    logger.info("Выбрана команда пользователем получения всех книг");
                     books_ = bookController.displayAllBooks(logger);
                     if (books_.isEmpty()){
                         bookComponent.display("Книг нет");
@@ -198,11 +166,12 @@ public class BookStoreController {
                             bookComponent.display(book.getDescription());
                         }
                     }
-                    logger.info("Обработка команды номер 1 в отсеке книг завершена");
+                    logger.info("Закончена команда пользователем получения всех книг");
+
                     break;
                 }
                 case "2":{
-                    logger.info("Выбрана команда пользователем номер 2 в отсеке книг");
+                    logger.info("Выбрана команда пользователем получение залежавшихся книг");
                     bookComponent.display(bookController.getForDisplayType("Lbook"));
                     choice = bookComponent.input();
                     // если введено не то, то тогда получаем выбор NONE
@@ -216,21 +185,23 @@ public class BookStoreController {
                     for (Book book : books) {
                         bookComponent.display(book.getDescription());
                     }
-                    logger.info("Обработка команды номер 2 в отсеке книг завершена");
+                    logger.info("Закончена команда пользователем получение залежавшихся книг");
+
                     break;
                 }
                 case "3":{
-                    logger.info("Выбрана команда пользователем номер 3 в отсеке книг");
+                    logger.info("Выбрана команда пользователем получения описания книги");
                     bookComponent.display("Введите название книги");
                     choice = bookComponent.input();
                     // Если не найдена книга,  то возвращается Не найдено
                     String description  = bookController.displayBookDescription(choice, logger);
                     orderComponent.display(description);
-                    logger.info("Обработка команды номер 3 в отсеке книг завершена");
+                    logger.info("Закончена команда пользователем получения описания книги");
+
                     break;
                 }
                 case"4":{
-                    logger.info("Выбрана команда пользователем номер 4 в отсеке книг");
+                    logger.info("Выбрана команда пользователем получение сортированных книг");
                     bookComponent.display(bookController.getForDisplayType("book"));
                     choice = bookComponent.input();
                     // если введено не из диапазона, то статус ALL
@@ -238,37 +209,39 @@ public class BookStoreController {
                     for (Book book : books) {
                         bookComponent.display(book.getDescription());
                     }
-                    logger.info("Обработка команды номер 4 в отсеке книг завершена");
+                    logger.info("Закончена команда пользователем получение сортированных книг");
+
                     break;
                 }
                 case "5" :{
-                    logger.info("Выбрана команда пользователем номер 5 в отсеке книг");
+                    logger.info("Выбрана команда пользователем: проверка книги на наличие");
                     bookComponent.display("Введите название книги");
                     choice = bookComponent.input();
                     orderComponent.display(bookController.checkBook(choice, logger));
-                    logger.info("Обработка команды номер 5 в отсеке книг завершена");
+                    logger.info("Закончена команда пользователем: проверка книги на наличие");
+
                     break;
                 }
                 case "6" :{
-                    logger.info("Выбрана команда пользователем номер 6 в отсеке книг");
+                    logger.info("Выбрана команда пользователем: экспорта книги");
                     bookComponent.display("Функция выключена");
 //                    choice = bookComponent.input();
 //                    // если есть ошибка, то возвращается текст, а не пустая строка
 //                    String success = bookController.exportBook(choice);
 //                    if (!success.isEmpty()) bookComponent.display(success);
-                    logger.info("Обработка команды номер 6 в отсеке книг завершена");
+                    logger.info("Обработка команды номер экспорта в отсеке книг завершена");
 
                     break;
                 }
                 case "7" :{
-                    logger.info("Выбрана команда пользователем номер 7 в отсеке книг");
+                    logger.info("Выбрана команда пользователем: импорта книги");
 //                    bookComponent.display("Введите название файла, находящегося в данном каталоге");
 //                    choice = bookComponent.input();
 //                    String success = bookController.importBook(choice);
 //                    // если есть ошибка, то возвращается текст, а не пустая строка
 //                    if (!success.isEmpty()) bookComponent.display(success);
                     bookComponent.display("Функция выключена");
-                    logger.info("Обработка команды номер 7 в отсеке книг завершена");
+                    logger.info("Обработка команды импорта в отсеке книг завершена");
                     break;
                 }
 
@@ -296,7 +269,7 @@ public class BookStoreController {
             choice = orderComponent.input();
             switch(choice){
                 case "1": {
-                    logger.info("Выбрана команда пользователем номер 1 в отсеке заказов");
+                    logger.info("Выбрана команда пользователем: создание заказа");
                     order = createOrder();
                     ArrayList<Integer> done = orderController.createOrder(order, logger);
                     if (done == null) {
@@ -309,11 +282,11 @@ public class BookStoreController {
                         }
                     }
                     orderComponent.display("Ваш заказ добавлен в историю со статусом " + order.getStatus());
-                    logger.info("Обработка команды номер 1 в отсеке заказов завершена");
+                    logger.info("Обработка команды номер создания  в отсеке заказов завершена");
                     break;
                 }
                 case "2":{
-                        logger.info("Выбрана команда пользователем номер 2 в отсеке заказов");
+                        logger.info("Выбрана команда пользователем: удаление заказа");
                         orderComponent.display("Какой id заказа, который вы хотите удалить?");
                         choice = orderComponent.input();
                         order = orderController.getOrderById(choice, logger);
@@ -330,11 +303,11 @@ public class BookStoreController {
                             requestComponent.display("Заказ для удаления не был найден. Создайте заказ");
                         }
 
-                        logger.info("Обработка команды номер 2 в отсеке заказов завершена");
+                        logger.info("Обработка команды удаления в отсеке заказов завершена");
                         break;
                 }
                 case "3":{
-                    logger.info("Выбрана команда пользователем номер 3 в отсеке заказов");
+                    logger.info("Выбрана команда пользователем : получение деталей заказа");
                     orderComponent.display("Какой id заказа, про который вы хотите узнать?");
                     choice = orderComponent.input();
                     order = orderController.getOrderById(choice, logger);
@@ -345,11 +318,11 @@ public class BookStoreController {
                     
                     String details = orderController.getOrderDetails(order);
                     orderComponent.display(details);
-                    logger.info("Обработка команды номер 3 в отсеке заказов завершена");
+                    logger.info("Обработка команды получения деталей в отсеке заказов завершена");
                     break;
                 }
                 case"4":{
-                    logger.info("Выбрана команда пользователем номер 4 в отсеке заказов");
+                    logger.info("Выбрана команда пользователем: получение списка заказов");
                     orderComponent.display(orderController.getOrderTypes());
                     choice = orderComponent.input();
                     // если веден индекс вне диапазона, выдается DATE_UP
@@ -361,11 +334,11 @@ public class BookStoreController {
                     for (Order o: orders){
                         orderComponent.display(o.toString());
                     }
-                    logger.info("Обработка команды номер 4 в отсеке заказов завершена");
+                    logger.info("Обработка команды получения списка в отсеке заказов завершена");
                     break;
                 }
                 case "5" :{
-                    logger.info("Выбрана команда пользователем номер 5 в отсеке заказов");
+                    logger.info("Выбрана команда пользователем6 получение заказов за период");
                     orderComponent.display("Введите дату начала в формате год-месяц-день");
                     String first = orderComponent.input();
                     orderComponent.display("Введите дату конца в формате год-месяц-день");
@@ -382,47 +355,47 @@ public class BookStoreController {
                     for (Order o: orders){
                         orderComponent.display(o.toString());
                     }
-                    logger.info("Обработка команды номер 5 в отсеке заказов завершена");
+                    logger.info("Обработка команды получения списка за период в отсеке заказов завершена");
                     break;
                 }
                 case "6" :{
-                    logger.info("Выбрана команда пользователем номер 6 в отсеке заказов");
+                    logger.info("Выбрана команда пользователем получение количества заказов за период");
                     orderComponent.display("Введите дату начала в формате год-месяц-день");
                     String first = orderComponent.input();
                     orderComponent.display("Введите дату конца в формате год-месяц-день");
                     String second = orderComponent.input();
                     int amount = orderController.displayOrderAmountInDiapazon(first, second, logger);
                     if (amount != -1) orderComponent.display("Количество заказов " + amount);
-                    logger.info("Обработка команды номер 6 в отсеке заказов завершена");
+                    logger.info("Обработка команды получения количества за период в отсеке заказов завершена");
                     break;
                 }
                 case "7" :{
-                    logger.info("Выбрана команда пользователем номер 7 в отсеке заказов");
+                    logger.info("Выбрана команда пользователем: вывод заказов за период");
                     orderComponent.display("Введите дату начала в формате год-месяц-день");
                     String first =orderComponent.input();
                     orderComponent.display("Введите дату конца в формате год-месяц-день");
                     String second =orderComponent.input();
                     double income =  orderController.displayIncomeInDiapazon(first, second, logger);
                     if (income != -1) orderComponent.display("Размер прибыли " + income);
-                    logger.info("Обработка команды номер 7 в отсеке заказов завершена");
+                    logger.info("Обработка команды вывода списка за период в отсеке заказов завершена");
                     break;
                 }
                 case "8" :{
-                    logger.info("Выбрана команда пользователем номер 8 в отсеке заказов");
+                    logger.info("Выбрана команда пользователем импорта заказов");
                     orderComponent.display("В данный момент недоступно");
 //                    choice = orderComponent.input();
 //                    String success = orderFileService.importOrder(choice);
 //                    if (success != null) orderComponent.display(success);
-                    logger.info("Обработка команды номер 8 в отсеке заказов завершена");
+                    logger.info("Обработка команды импорта в отсеке заказов завершена");
                     break;
                 }
                 case "9" :{
-                    logger.info("Выбрана команда пользователем номер 9 в отсеке заказов");
+                    logger.info("Выбрана команда пользователем экспорта заказов");
                     orderComponent.display("В данный момент недоступно");
 //                    choice = orderComponent.input();
 //                    String success = orderFileService.exportOrder(choice);
 //                    if (success != null) orderComponent.display(success);
-                    logger.info("Обработка команды номер 9 в отсеке заказов завершена");
+                    logger.info("Обработка команды экспорта в отсеке заказов завершена");
                     break;
                 }
                 case "10" :{
@@ -438,7 +411,7 @@ public class BookStoreController {
 
     void handleRequestSection(){
         String choice;
-        List<List<Object>> requests;
+        List<RequestResult> requests;
         Boolean toChangeLastPurchase;
         List<Order> orders;
         Book book;
@@ -448,20 +421,20 @@ public class BookStoreController {
             choice = requestComponent.input();
             switch(choice){
                 case "1": {
-                    logger.info("Выбрана команда пользователем номер 1 в отсеке запросов");
+                    logger.info("Выбрана команда пользователем: Получение всех запросов");
                     requests = requestController.getAllRequests(requestController.getRequestTypes(), logger);
                     if (requests == null){
                         requestComponent.display("Запрос не было найдено");
                         break;
                     }
-                    for (List<Object> request : requests){
+                    for (RequestResult request : requests){
                         requestComponent.display(request.toString());
                     }
-                    logger.info("Обработка команды номер 1 в отсеке запросов завершена");
+                    logger.info("Обработка команды получения списка в отсеке запросов завершена");
                     break;
                 }
                 case "2":{
-                        logger.info("Выбрана команда пользователем номер 2 в отсеке запросов");
+                        logger.info("Выбрана команда пользователем: завоза книги");
                         requestComponent.display("Введите наименование книги");
 
                         String name =  requestComponent.input();
@@ -489,26 +462,26 @@ public class BookStoreController {
                         }
 
 
-                    logger.info("Обработка команды номер 2 в отсеке запросов завершена");
+                    logger.info("Обработка команды заквоза книги в отсеке запросов завершена");
                     break;
                 }
 
                 case "3" :{
-                    logger.info("Выбрана команда пользователем номер 3 в отсеке запросов");
+                    logger.info("Выбрана команда пользователем: импорт");
                     requestComponent.display("В данный момент не доступно");
 //                    choice = requestComponent.input();
 //                    String success = requestController.importRequest(choice);
 //                    if (success!=null) requestComponent.display(success);
-                    logger.info("Обработка команды номер 3 в отсеке запросов завершена");
+                    logger.info("Обработка команды импорта в отсеке запросов завершена");
                     break;
                 }
                 case "4" :{
-                    logger.info("Выбрана команда пользователем номер 4 в отсеке запросов");
+                    logger.info("Выбрана команда пользователем экспорта");
                     requestComponent.display("В данный момент недоступно");
 //                    choice = requestComponent.input();
 //                    String success = requestController.exportRequest(choice);
 //                    if (success!=null) requestComponent.display(success);
-                    logger.info("Обработка команды номер 4 в отсеке запросов завершена");
+                    logger.info("Обработка команды экспорта в отсеке запросов завершена");
                     break;
 
                 }

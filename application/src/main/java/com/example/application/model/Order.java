@@ -30,6 +30,9 @@ public class Order implements Comparable<Order>, Serializable {
         status = OrderStatus.NEW;
     }
 
+    public void setTotalCost(double totalCost) {
+        this.totalCost = totalCost;
+    }
 
     public void setId(int id){
         this.id = id;
@@ -57,6 +60,10 @@ public class Order implements Comparable<Order>, Serializable {
         this.books.add(book);
         totalCost += book.getPrice();
 
+    }
+
+    public void addBook(Book book, boolean condition){
+        this.books.add(book);
     }
 
     public void delBook(Book book){

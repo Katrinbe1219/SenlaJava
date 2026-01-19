@@ -70,10 +70,10 @@ public class BookController {
 
     LongLiedBookSorting getLongLiedBookType(String type){
         return switch (type){
-            case "1" -> LongLiedBookSorting.DATE_UP;
+            case "7" -> LongLiedBookSorting.DATE_UP;
 
-            case "2" -> LongLiedBookSorting.DATE_DOWN;
-            case "3" -> LongLiedBookSorting.PRICE_UP;
+            case "6" -> LongLiedBookSorting.DATE_DOWN;
+            case "5" -> LongLiedBookSorting.PRICE_UP;
             case "4" -> LongLiedBookSorting.PRICE_DOWN;
             default -> LongLiedBookSorting.NONE;
         };

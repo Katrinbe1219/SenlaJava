@@ -1,6 +1,7 @@
 package com.example.application.controllers;
 
 import com.example.application.model.Order;
+import com.example.application.model.RequestResult;
 import com.example.application.model.types.RequestSorting;
 import com.example.application.services.BookService;
 import com.example.custom_applications.Inject;
@@ -15,7 +16,7 @@ public class RequestController {
 
 
 
-    List<List<Object>> getAllRequests(String type, Logger logger){
+    List<RequestResult> getAllRequests(String type, Logger logger){
         RequestSorting sorting = getRequestSorting(type);
         return bookService.getSortedRequests(sorting, logger);
     }
