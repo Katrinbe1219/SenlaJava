@@ -1,6 +1,8 @@
 package com.example.application.controllers;
 
+import com.example.application.model.Book;
 import com.example.application.model.Order;
+import com.example.application.model.Request;
 import com.example.application.model.RequestResult;
 import com.example.application.model.types.RequestSorting;
 import com.example.application.services.BookService;
@@ -21,8 +23,8 @@ public class RequestController {
         return bookService.getSortedRequests(sorting, logger);
     }
 
-    void deleteRequestByBook(Integer book_id, Logger logger){
-        bookService.cancellRequestsByBook(book_id, logger);
+    void deleteRequestByBook(Book book, Logger logger){
+        bookService.cancellRequestsByBook(book, logger);
     }
 
     void deleteRequestByOrder(Order order, Logger logger){

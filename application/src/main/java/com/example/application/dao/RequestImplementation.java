@@ -20,8 +20,8 @@ public class RequestImplementation extends AbstractDao<Request, Integer>{
     protected Request mapRow(ResultSet resultSet, Logger logger) throws CanNotMakeExecution {
         Request request = new Request();
         try {
-            request.setBook(resultSet.getInt("book_id"));
-            request.setOrder(resultSet.getInt("order_id"));
+//            request.setBook(resultSet.getInt("book_id"));
+//            request.setOrder(resultSet.getInt("order_id"));
             request.setId(resultSet.getInt("request_id"));
             return request;
         }
@@ -64,10 +64,10 @@ public class RequestImplementation extends AbstractDao<Request, Integer>{
         try (Statement st = getConnection().createStatement()){
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
-                results.add(new RequestResult(
-                        rs.getString("title"),
-                        rs.getInt("amount")
-                ));
+//                results.add(new RequestResult(
+//                        rs.getString("title"),
+//                        //rs.getInt("amount")
+//                ));
             }
             return results;
         }
@@ -141,16 +141,16 @@ public class RequestImplementation extends AbstractDao<Request, Integer>{
             ResultSet rs = st.executeQuery(sql);
 
             if (rs.next()){
-                result.add(new RequestResult(
-                        rs.getString("title"),
-                        rs.getInt("request_id")
-                ));
+//                result.add(new RequestResult(
+//                        rs.getString("title"),
+//                        rs.getInt("request_id")
+//                ));
 
                 while(rs.next()){
-                    result.add(new RequestResult(
-                            rs.getString("title"),
-                            rs.getInt("request_id")
-                    ));
+//                    result.add(new RequestResult(
+//                            rs.getString("title"),
+//                            rs.getInt("request_id")
+//                    ));
                 }
             }
 

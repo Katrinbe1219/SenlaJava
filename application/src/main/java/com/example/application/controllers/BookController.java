@@ -17,7 +17,7 @@ public class BookController {
 
 
 
-    public Optional<List<Book>> displayAllBooks(Logger logger){
+    public List<Book> displayAllBooks(Logger logger){
         return  bookService.getAllBooks(logger);
 
     }
@@ -70,10 +70,10 @@ public class BookController {
 
     LongLiedBookSorting getLongLiedBookType(String type){
         return switch (type){
-            case "7" -> LongLiedBookSorting.DATE_UP;
+            case "1" -> LongLiedBookSorting.DATE_UP;
 
-            case "6" -> LongLiedBookSorting.DATE_DOWN;
-            case "5" -> LongLiedBookSorting.PRICE_UP;
+            case "2" -> LongLiedBookSorting.DATE_DOWN;
+            case "3" -> LongLiedBookSorting.PRICE_UP;
             case "4" -> LongLiedBookSorting.PRICE_DOWN;
             default -> LongLiedBookSorting.NONE;
         };
@@ -89,7 +89,7 @@ public class BookController {
                 "6. Дата (по возрастанию)\n7. Дата (по убыванию)\n8.Без фильтра";
     }
 
-    Optional<Book> getBookByTitle(String name, Logger logger){
+    Book getBookByTitle(String name, Logger logger){
         return bookService.getBookByTitle(name, logger);
     }
 
@@ -97,8 +97,8 @@ public class BookController {
         return bookService.receiveBook(name, logger);
     }
 
-    public void setLastPurchase(List<Book> books){
-        bookService.setLastPurchase(books);
+    public void setLastPurchase(List<Book> books, Logger logger){
+        bookService.setLastPurchase(books, logger);
     }
 
 //    public String importBook(String fileName){

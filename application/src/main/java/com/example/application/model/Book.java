@@ -2,6 +2,8 @@ package com.example.application.model;
 
 
 
+import com.example.application.model.converters.BookStatusConverter;
+import com.example.application.model.converters.BookTypesConverter;
 import com.example.application.model.types.BookStatus;
 import com.example.application.model.types.BookTypes;
 import jakarta.persistence.*;
@@ -10,23 +12,42 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Comparator;
 
-@Entity
-@Table(name = "books")
+@Entity(name = "books")
 public class Book implements Comparable<Book>, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="book_id")
     int id;
 
+    @Convert(converter = BookStatusConverter.class)
+    @Column(name="status")
+    BookStatus status;
+
+
+    @Column(name = "title")
     String title;
+
+    // книги почти всегда получаем для описания, поэтому
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id")
     Author author;
+
+    @Column(name="year")
     int year;
-    BookStatus status;
+
+
+    @Column(name="price")
     double price;
+
+    @Convert(converter = BookTypesConverter.class)
+    @Column(name="genre_id")
     BookTypes genre;
+
+    @Column(name="last_date_purchase")
     LocalDate lastPurchaseDate;
+
+    @Column(name="admission_date")
     LocalDate admissionDate;
 
     public Book(int id, String title, Author author, int year, BookStatus status, double price, BookTypes type) {

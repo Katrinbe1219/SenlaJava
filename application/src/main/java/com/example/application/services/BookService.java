@@ -4,6 +4,8 @@ import com.example.application.dao.BookImplementation;
 import com.example.application.dao.RequestImplementation;
 import com.example.application.errors.CanNotMakeExecution;
 import com.example.application.exceptions.BookCanBotBeCreated;
+import com.example.application.hibernate.BookHibImpl;
+import com.example.application.hibernate.RequestHibImpl;
 import com.example.application.model.Order;
 import com.example.application.model.Request;
 import com.example.application.model.RequestResult;
@@ -22,31 +24,28 @@ import java.util.*;
 public class BookService {
 
     @Inject
-    private RequestImplementation requestDao;
+    BookHibImpl bookHibImpl;
 
     @Inject
-    private BookImplementation bookDao;
-
-    @Inject
-    Connection connection;
+    RequestHibImpl requestHibImpl;
 
 
-    public Optional<List<Book>> getAllBooks(Logger logger){
+    public List<Book> getAllBooks(Logger logger){
         try {
-            return bookDao.findAll(logger);
+            return bookHibImpl.findAll(logger);
         } catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
-            return Optional.empty();
+            return null;
         }catch (Exception e) {
             logger.error("Проблема не SQLExecution: " + e.getMessage());
-            return Optional.empty();
+            return null;
         }
 
     }
 
     public boolean receiveBook(String title,Logger logger){
         try {
-            bookDao.save(title, logger);
+            bookHibImpl.save(logger, title);
             return true;
         } catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
@@ -57,24 +56,24 @@ public class BookService {
         }
     }
 
-    public Optional<Book> getBookByTitle(String title, Logger logger){
+    public Book getBookByTitle(String title, Logger logger){
         try {
-            return bookDao.getByTitle(title, logger);
+            return bookHibImpl.getBookByTitle(logger, title, null);
         }catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
-            return Optional.empty();
+            return null;
         } catch (Exception e) {
             logger.error("Проблема не SQLExecution: " + e.getMessage());
-            return Optional.empty();
+            return null;
         }
 
     }
 
-    public boolean checkBook (String book, Logger logger){
+    public boolean checkBook (String title, Logger logger){
         try {
-            Optional<Book> book_  = bookDao.getByTitle(book, logger);
-            if (book_.isEmpty()) return false;
-            return book_.get().getStatus() == BookStatus.IN_STOCK;
+            Book book  = bookHibImpl.getBookByTitle(logger, title, null);
+            if (book == null) return false;
+            return book.getStatus() == BookStatus.IN_STOCK;
         }catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
             return false;
@@ -88,70 +87,44 @@ public class BookService {
 
     public List<Book> getSortedBooks(BookSorting sortingType, Logger logger){
         try {
-            List<Book> sortedBooks = null;
-            Optional<List<Book> >books_;
+            List<Book> sortedBooks;
 
             switch (sortingType) {
                 case ALPHABETICAL_UP:
-                    books_ = bookDao.getSortedBooks("title", "ASC", logger);
-                    if (books_.isPresent()){
-                        sortedBooks = books_.get();
-                    }
+                    sortedBooks= bookHibImpl.getSortedBooks("title", false, logger);
+                    break;
 
-                    break;
                 case ALPHABETICAL_DOWN:
-                    books_ = bookDao.getSortedBooks("title", "DESC", logger);
-                    if (books_.isPresent()){
-                        sortedBooks = books_.get();
-                    }
+                    sortedBooks= bookHibImpl.getSortedBooks("title", true, logger);
                     break;
+
                 case INSTOCK:
-                    books_ = bookDao.getSortedBooks("status", "I", logger);
-                    if (books_.isPresent()){
-                        sortedBooks = books_.get();
-                    }
+                    sortedBooks= bookHibImpl.getSortedBooks("status", "I", logger);
                     break;
 
                 case DATE_UP:
-                    books_ = bookDao.getSortedBooks("admission_date", "ASC", logger);
-                    if (books_.isPresent()){
-                        sortedBooks = books_.get();
-                    }
+
+                    sortedBooks= bookHibImpl.getSortedBooks("admissionDate", false, logger);
                     break;
 
                 case DATE_DOWN:
-                    books_ = bookDao.getSortedBooks("admission_date", "DESC", logger);
-                    if (books_.isPresent()){
-                        sortedBooks = books_.get();
-                    }
+                    sortedBooks= bookHibImpl.getSortedBooks("admissionDate", true, logger);
                     break;
 
                 case PRICE_UP:
-                    books_ = bookDao.getSortedBooks("price", "ASC", logger);
-                    if (books_.isPresent()){
-                        sortedBooks = books_.get();
-                    }
+                    sortedBooks= bookHibImpl.getSortedBooks("price", false, logger);
                     break;
 
                 case PRICE_DOWN:
-                    books_ = bookDao.getSortedBooks("price", "DESC", logger);
-                    if (books_.isPresent()){
-                        sortedBooks = books_.get();
-                    }
+                    sortedBooks= bookHibImpl.getSortedBooks("price", true, logger);
                     break;
 
                 case ALL:
-                    books_ = bookDao.getSortedBooks("book_id", "ASC", logger);
-                    if (books_.isPresent()){
-                        sortedBooks = books_.get();
-                    }
+                    sortedBooks= bookHibImpl.findAll(logger);
                     break;
 
                 default:
-                    books_ = bookDao.getSortedBooks("book_id", "ASC", logger);
-                    if (books_.isPresent()){
-                        sortedBooks = books_.get();
-                    }
+                    sortedBooks= bookHibImpl.findAll(logger);
                     break;
             }
 
@@ -169,9 +142,9 @@ public class BookService {
 
     public String getBookDescription(String bookName,Logger logger){
         try {
-            Optional<Book> book_  = bookDao.getByTitle(bookName, logger);
-            if (book_.isEmpty())  return "Такой книги не нашлось";
-            return book_.get().getDescription();
+            Book book  = bookHibImpl.getBookByTitle(logger, bookName, null);
+            if (book == null)  return "Такой книги не нашлось";
+            return book.getDescription();
         }catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
             return "Ошибка на сервере";
@@ -183,38 +156,28 @@ public class BookService {
 
     }
 
-    public void setLastPurchase(List<Book> books){
-        bookDao.updateBooksLastPurchase(books);
+    public void setLastPurchase(List<Book> books, Logger logger){
+        bookHibImpl.updateBooksLastPurchase(books, logger);
     }
 
     public List<Book> getLongLiedBooks(LongLiedBookSorting sortingType, int numberOfMonth, Logger logger){
         try {
             return switch(sortingType) {
-                case PRICE_DOWN -> {
-                    Optional<List<Book>> sortedBooks = bookDao.getLongLiedBooks(numberOfMonth, "price", "ASC", logger);
-                   yield sortedBooks.orElse(null) ;
-                }
+                case PRICE_DOWN -> bookHibImpl.getLongLiedBooks(numberOfMonth, "price", true, logger);
+
+                case DATE_UP -> bookHibImpl.getLongLiedBooks(numberOfMonth, "lastPurchaseDate", true, logger);
 
 
-                case DATE_UP -> {
-                    Optional<List<Book>> sortedBooks = bookDao.getLongLiedBooks(numberOfMonth, "last_date_purchase", "DESC", logger);
-                    yield sortedBooks.orElse(null) ;
-                }
+                case DATE_DOWN ->  bookHibImpl.getLongLiedBooks(numberOfMonth, "lastPurchaseDate", false, logger);
 
-                case DATE_DOWN -> {
-                    Optional<List<Book>> sortedBooks = bookDao.getLongLiedBooks(numberOfMonth, "last_date_purchase", "ASC", logger);
-                    yield sortedBooks.orElse(null) ;
-                }
 
-                case PRICE_UP -> {
-                    Optional<List<Book>> sortedBooks = bookDao.getLongLiedBooks(numberOfMonth, "price", "DESC", logger);
-                    yield sortedBooks.orElse(null) ;
-                }
 
-                case NONE -> {
-                    Optional<List<Book>> sortedBooks = bookDao.getLongLiedBooks(numberOfMonth, "book_id", "DESC", logger);
-                    yield sortedBooks.orElse(null) ;
-                }
+                case PRICE_UP ->  bookHibImpl.getLongLiedBooks(numberOfMonth, "price", false, logger);
+
+
+                case NONE ->  bookHibImpl.getLongLiedBooks(numberOfMonth, "id", true, logger);
+
+
             };
         }catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
@@ -228,8 +191,8 @@ public class BookService {
 
     Book getBookById(Integer id, Logger logger){
         try {
-            Optional<List<Book>> books = bookDao.findAll(logger);
-            for (Book book : books.get()) {
+            List<Book> books = bookHibImpl.findAll(logger);
+            for (Book book : books) {
                 if (book.getId() == id){
                     return book;
                 }
@@ -246,9 +209,9 @@ public class BookService {
     }
 
 
-    public void cancellRequestsByBook(Integer book_id, Logger logger){
+    public void cancellRequestsByBook(Book book, Logger logger){
         try {
-            requestDao.deleteManyByBook(book_id, logger);
+            requestHibImpl.deleteManyByBook(book, logger);
         }catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
 
@@ -265,7 +228,7 @@ public class BookService {
 
     public void cancellOrderRequests(Order order, Logger logger){
         try {
-            requestDao.deleteManyByOrder(order.getId(), logger);
+            requestHibImpl.deleteManyByOrder(order, logger);
         }catch (CanNotMakeExecution e) {
             logger.error("Проблема CanNotMakeExecution: " + e.getMessage());
 
@@ -284,16 +247,16 @@ public class BookService {
             List<RequestResult> requests = null;
             switch(sortingType){
                 case RequestSorting.ALPHABETICAL_UP -> {
-                    requests = requestDao.getRequestsSorted("b.title", "ASC", logger);
+                    requests = requestHibImpl.getRequestsSorted("b.title", "ASC", logger);
                 }
                 case RequestSorting.ALPHABETICAL_DOWN -> {
-                    requests = requestDao.getRequestsSorted("b.title", "DESC", logger);
+                    requests = requestHibImpl.getRequestsSorted("b.title", "DESC", logger);
                 }
                 case RequestSorting.AMOUNT_UP -> {
-                    requests = requestDao.getRequestsSorted("amount", "ASC", logger);
+                    requests = requestHibImpl.getRequestsSorted("amount", "ASC", logger);
                 }
                 case RequestSorting.AMOUNT_DOWN -> {
-                    requests = requestDao.getRequestsSorted("amount", "DESC", logger);
+                    requests = requestHibImpl.getRequestsSorted("amount", "DESC", logger);
                 }
             }
 
@@ -307,42 +270,6 @@ public class BookService {
             return null;
         }
     }
-
-    private void sortRequestsByParameter(List<List<Object>> groupedRequests, int index, boolean asc){
-        Comparator<List<Object>> comparator = Comparator.comparing(
-                list -> (Comparable)list.get(index)
-        );
-        if (!asc){
-            comparator = comparator.reversed();
-        }
-
-        groupedRequests.sort(comparator);
-    }
-
-
-    private Request getRequestById(int id, Logger logger){
-        Optional<List<Request>> req_ = requestDao.findAll(logger);
-        if (req_.isEmpty()) {return null;}
-
-        List<Request> requests = req_.get();
-        for (Request request: requests){
-            if (request.getId() == id){
-                return request;
-            }
-        }
-
-        return null;
-    }
-
-//    private Order getOrderById(int id){
-//        List<Order> orders = orderDao.getOrders();
-//        for (Order order: orders){
-//            if (order.getId() == id){
-//                return order;
-//            }
-//        }
-//        return null;
-//    }
 
 
 

@@ -3,19 +3,19 @@ package com.example.application.model;
 
 public class RequestResult {
     private String book;
-    int id;
+    Long id;
 
 
-    public RequestResult(String book, int id){
+    public RequestResult(String book, Long id){
         this.book = book;
         this.id = id;
     }
 
-    public void setId(int id){
+    public void setId(Long id){
         this.id = id;
     }
 
-    public Integer getId(){
+    public Long getId(){
         return id;
     }
 
@@ -32,7 +32,7 @@ public class RequestResult {
 
     @Override
     public String toString() {
-        return "RequestResult [book=" + book + ", id=" + id + "]";
+        return "RequestResult: [book=" + book + ", amount=" + id + "]";
     }
 
 

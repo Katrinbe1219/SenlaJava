@@ -109,13 +109,8 @@ public class OrderController {
         return bookshop.createOrder(order, logger);
     }
 
-    public Boolean changeOrderStatus(Order order, String bookTitle,Logger logger){
-        if (order.getStatus() == OrderStatus.NEW){
-            order.checkUpdateByBook(bookTitle);
-            bookshop.saveOrder(order, logger);
-            return order.getStatus() == OrderStatus.DONE;
-        }
-        return false;
+    public void changeOrderStatus(List<Order> orders, String bookTitle,Logger logger){
+        bookshop.updateOrders(orders, logger);
     }
 
 

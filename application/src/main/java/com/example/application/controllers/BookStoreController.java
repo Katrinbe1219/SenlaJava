@@ -1,9 +1,11 @@
 package com.example.application.controllers;
+import com.example.application.hibernate.BookHibImpl;
 import com.example.application.model.*;
 
 import com.example.application.model.Book;
 import com.example.application.model.Customer;
 import com.example.application.model.Order;
+import com.example.application.model.types.OrderStatus;
 import com.example.application.services.OrderFileService;
 import com.example.application.views.ConsoleUIFactory;
 import com.example.application.views.UIComponent;
@@ -28,6 +30,9 @@ public class BookStoreController {
     UIComponent requestComponent;
     UIComponent settingsComponent;
     UIFactory consoleFactory;
+
+    @Inject
+    BookHibImpl bookHibImpl;
 
     @Inject
     BookController bookController;
@@ -157,12 +162,13 @@ public class BookStoreController {
             choice = bookComponent.input();
             switch(choice){
                 case "1": {
+
                     logger.info("Выбрана команда пользователем получения всех книг");
-                    books_ = bookController.displayAllBooks(logger);
-                    if (books_.isEmpty()){
+                    books = bookController.displayAllBooks(logger);
+                    if (books == null){
                         bookComponent.display("Книг нет");
                     }else{
-                        for (Book book : books_.get()) {
+                        for (Book book : books) {
                             bookComponent.display(book.getDescription());
                         }
                     }
@@ -172,7 +178,7 @@ public class BookStoreController {
                 }
                 case "2":{
                     logger.info("Выбрана команда пользователем получение залежавшихся книг");
-                    bookComponent.display(bookController.getForDisplayType("Lbook"));
+                    bookComponent.display(bookController.getForDisplayType("Lbooks"));
                     choice = bookComponent.input();
                     // если введено не то, то тогда получаем выбор NONE
                     int numberOfMonth = settingController.getNumberOfMonth();
@@ -273,7 +279,7 @@ public class BookStoreController {
                     order = createOrder();
                     ArrayList<Integer> done = orderController.createOrder(order, logger);
                     if (done == null) {
-                        bookController.setLastPurchase(order.getBooks());
+                        bookController.setLastPurchase(order.getBooks(), logger);
 
 
                     }else {
@@ -445,18 +451,27 @@ public class BookStoreController {
                             break;
                         }
                         orders = orderController.getAllOrders("6", logger);
+
+                        List<Order> toChange = new  ArrayList<>();
+                        List<Book> toChangeBooks = new ArrayList<>();
                         for (Order o: orders){
-                            toChangeLastPurchase = orderController.changeOrderStatus(o, name, logger);
-                            if (toChangeLastPurchase){
-                                bookController.setLastPurchase(o.getBooks());
-                            }
+
+                                if (o.checkUpdateByBook(name) == OrderStatus.DONE){
+                                    toChange.add(o);
+                                    toChangeBooks.addAll(o.getBooks());
+                                }
+                        }
+
+                        if (!toChange.isEmpty()){
+                            orderController.changeOrderStatus(toChange, name, logger);
+                            bookController.setLastPurchase(toChangeBooks, logger);
                         }
 
                         String warehouseFunction = settingController.getWarehouseOption();
                         if (warehouseFunction.equals("true")){
-                            Optional<Book> book_ = bookController.getBookByTitle(name, logger);
-                            if (book_.isPresent()){
-                                requestController.deleteRequestByBook(book_.get().getId(), logger);
+                            book = bookController.getBookByTitle(name, logger);
+                            if (book != null){
+                                requestController.deleteRequestByBook(book, logger);
                             }
 
                         }
@@ -510,12 +525,11 @@ public class BookStoreController {
         Customer customer = new Customer(name, surname, email);
         order.setCustomer(customer);
 
-        Optional<List<Book>> books_ = bookController.displayAllBooks(logger);
-        if (books_.isEmpty()){
+        List<Book> books = bookController.displayAllBooks(logger);
+        if (books == null){
             orderComponent.display("Книг нет, заказ невозможен");
             return null;
         }
-        List<Book> books = books_.get();
         orderComponent.display("Выберите книги, отправив индекс, начиная с 0\nПри окончании введите -1");
         for (int i=0; i<books.size(); i++){
             orderComponent.display(i + " " + books.get(i).getTitle());
