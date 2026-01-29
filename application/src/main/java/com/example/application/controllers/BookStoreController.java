@@ -31,8 +31,6 @@ public class BookStoreController {
     UIComponent settingsComponent;
     UIFactory consoleFactory;
 
-    @Inject
-    BookHibImpl bookHibImpl;
 
     @Inject
     BookController bookController;
