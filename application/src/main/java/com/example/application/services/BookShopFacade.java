@@ -17,6 +17,7 @@ import com.example.custom_applications.Inject;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.stereotype.Service;
 
 
 import java.sql.Connection;
@@ -27,13 +28,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-@Inject
+@Service
 public class BookShopFacade {
 
-    @Inject
     private RequestHibImpl requestHibImpl;
-    @Inject
+
     private OrderHibImplementation orderHibImpl;
+
+    public BookShopFacade(RequestHibImpl requestHibImpl, OrderHibImplementation orderHibImpl) {
+        this.requestHibImpl = requestHibImpl;
+        this.orderHibImpl = orderHibImpl;
+    }
 
 
     // ПРЕДПОЛАГАЕТСЯ, что здесь существует маленькая база данных, ничтожное количество заказов =>

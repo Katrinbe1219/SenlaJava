@@ -5,18 +5,21 @@ import com.example.application.model.Book;
 import com.example.application.model.types.BookStatus;
 import com.example.custom_applications.Inject;
 import jakarta.persistence.criteria.*;
+import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.hibernate.query.criteria.JpaCriteriaQuery;
 import org.hibernate.query.criteria.JpaRoot;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Inject
+@Repository
+@Transactional
 public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
 
     public BookHibImpl() {

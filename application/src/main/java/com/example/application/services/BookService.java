@@ -14,20 +14,25 @@ import com.example.application.model.Book;
 
 import org.apache.logging.log4j.Logger;
 import com.example.custom_applications.Inject;
+import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
 import java.util.*;
 
 
 // service for warehouse instead of previous one
-@Inject
+@Service
 public class BookService {
 
-    @Inject
     BookHibImpl bookHibImpl;
 
-    @Inject
     RequestHibImpl requestHibImpl;
+
+    public BookService(BookHibImpl bookHibImpl, RequestHibImpl requestHibImpl) {
+        this.bookHibImpl = bookHibImpl;
+        this.requestHibImpl = requestHibImpl;
+
+    }
 
 
     public List<Book> getAllBooks(Logger logger){

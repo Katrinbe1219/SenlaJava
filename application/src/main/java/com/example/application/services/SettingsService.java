@@ -5,17 +5,23 @@ import com.example.custom_applications.Inject;
 import com.example.custom_applications.ConfigurableClass;
 import com.example.custom_applications.ConfigurationProperty;
 import com.example.application.exceptions.NumberCanNotBeChanged;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import java.io.FileOutputStream;
 import java.util.Properties;
 
-@Inject
-@ConfigurableClass
+
+@Component
+
 public class SettingsService {
 
-    @ConfigurationProperty(propertyName = "numberOfMonth", type = "int")
+    //@ConfigurationProperty(propertyName = "numberOfMonth", type = "int")
+    @Value("${numberOfMonth}")
     private int numberOfMonth;
 
-    @ConfigurationProperty(propertyName = "warehouseFunction", type = "String")
+    //@ConfigurationProperty(propertyName = "warehouseFunction", type = "String")
+    @Value("${warehouseFunction}")
     private String isFunction;
 
     private static final String CONFIG_FILE = "config.properties";
@@ -31,7 +37,6 @@ public class SettingsService {
             int number = parseInt(month);
 
             this.numberOfMonth = number;
-            System.out.println("Hekllo" + numberOfMonth);
             saveChanges();
 
            return "";
