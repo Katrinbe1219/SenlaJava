@@ -1,1 +1,7 @@
 #added empty gitigore
+.gradle
+.idea
+application
+custom_annotations
+new_out
+processing_annotations
