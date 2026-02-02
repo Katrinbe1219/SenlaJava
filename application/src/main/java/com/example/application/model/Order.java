@@ -1,7 +1,10 @@
 package com.example.application.model;
 
+import com.example.application.model.converters.BookTypesConverter;
+import com.example.application.model.converters.ConverterOrderStatus;
 import com.example.application.model.types.BookStatus;
 import com.example.application.model.types.OrderStatus;
+import jakarta.persistence.*;
 
 
 import java.io.Serializable;
@@ -10,12 +13,35 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+@Entity(name="orders")
 public class Order implements Comparable<Order>, Serializable {
+
+    @Convert(converter = ConverterOrderStatus.class)
+    @Column(name = "status")
     OrderStatus status;
+
+    // CAscade Persist опасно ставить, так как без заказа покупатель существует
+    @ManyToOne(fetch = FetchType.LAZY) // LAZY - покупатель не загружается авто при загрузке order
+   @JoinColumn(name = "customer_id")
     Customer customer;
-    ArrayList<Book> books;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "order_books",
+            joinColumns = @JoinColumn(name="order_id"),
+            inverseJoinColumns = @JoinColumn(name="book_id")
+    )
+    List<Book> books;
+
+    @Transient
     double totalCost;
+
+    @Column(name="completion_date")
     LocalDate completionDate;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "order_id")
     int id;
 
     public Order(int id){
@@ -75,7 +101,7 @@ public class Order implements Comparable<Order>, Serializable {
         return this.totalCost;
     }
 
-    public ArrayList<Book> getBooks(){
+    public List<Book> getBooks(){
         return this.books;
     }
 
@@ -121,8 +147,11 @@ public class Order implements Comparable<Order>, Serializable {
         return "ID: "+ this.id + "\n"
                 + "Customer: " + getCustomer().toString() + "\n" +
                  "Status: " + status + "\n" +
+
                 "Books: " + booksInfo +
-                "Price: " + this.totalCost + "\n";
+
+                "\n\nTOTAL PRICE: " + this.totalCost + "\n" +
+                "Completion Date " + this.completionDate + "\n";
     }
 
 
@@ -178,5 +207,12 @@ public class Order implements Comparable<Order>, Serializable {
         }
 
         return res.toString();
+    }
+
+    public void countTotalCost(){
+        this.totalCost = 0;
+        for (Book book : this.books){
+            this.totalCost += book.getPrice();
+        }
     }
 }

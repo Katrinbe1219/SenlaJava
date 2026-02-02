@@ -2,6 +2,9 @@ package com.example.application;
 
 import com.example.application.controllers.*;
 import com.example.application.dao.*;
+import com.example.application.hibernate.BookHibImpl;
+import com.example.application.hibernate.OrderHibImplementation;
+import com.example.application.hibernate.RequestHibImpl;
 import com.example.application.model.BookShop;
 import com.example.application.model.Warehouse;
 import com.example.application.repositories.BookRepository;
@@ -56,11 +59,11 @@ public class Test3 {
         try{
             JDBCConnection idbc_ = di.getInstance(JDBCConnection.class);
             di.registerSingleton(Connection.class, idbc_.getConnection());
-            di.getInstance(BookImplementation.class);
-            di.getInstance(OrderBooksImplementation.class);
-            di.getInstance(OrderImplementation.class);
-            di.getInstance(CustomerImplemenation.class);
-            di.getInstance(RequestImplementation.class);
+
+            di.getInstance(BookHibImpl.class);
+            di.getInstance(RequestHibImpl.class);
+            di.getInstance(OrderHibImplementation.class);
+
 
             di.getInstance(BookRepository.class);
             di.getInstance(OrderRepository.class);
