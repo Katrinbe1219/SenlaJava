@@ -13,14 +13,11 @@ import java.util.Properties;
 
 
 @Component
-
 public class SettingsService {
 
-    //@ConfigurationProperty(propertyName = "numberOfMonth", type = "int")
     @Value("${numberOfMonth}")
     private int numberOfMonth;
 
-    //@ConfigurationProperty(propertyName = "warehouseFunction", type = "String")
     @Value("${warehouseFunction}")
     private String isFunction;
 
