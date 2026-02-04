@@ -15,6 +15,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.hibernate.query.criteria.JpaCriteriaQuery;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @Repository
 @Transactional
+@DependsOn("liquibase")
 public class OrderHibImplementation extends HibernateAbstractDao<Order, Integer, Logger>{
     public OrderHibImplementation() {
         super(Order.class);

@@ -12,6 +12,7 @@ import org.hibernate.Transaction;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.hibernate.query.criteria.JpaCriteriaQuery;
 import org.hibernate.query.criteria.JpaRoot;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @Repository
 @Transactional
+@DependsOn("liquibase")
 public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
 
     public BookHibImpl() {

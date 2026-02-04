@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.2.xsd">
+
+    <changeSet id="create-tables-init-schema" author="java_senla">
+        <!--GENRES-->
+        <createTable tableName="genres">
+            <column name="genre_id" type="serial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="genre_name" type="VARCHAR(50)">
+                <constraints  nullable="false"/>
+            </column>
+
+        </createTable>
+
+
+        <!--AUTHORS-->
+        <createTable tableName="authors">
+            <column name="author_id" type="serial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints  nullable="false"/>
+            </column>
+            <column name="paternal" type="VARCHAR(50)">
+                <constraints  nullable="false"/>
+            </column>
+            <column name="surname" type="VARCHAR(50)">
+                <constraints  nullable="false"/>
+            </column>
+
+        </createTable>
+
+
+        <!--BOOKS-->
+        <createTable tableName="books">
+            <column name="book_id" type="serial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(100)">
+                <constraints  nullable="false"/>
+            </column>
+            <column name="genre_id" type="INT">
+                <constraints  nullable="false"/>
+            </column>
+            <column name="author_id" type="INT">
+                <constraints  nullable="false"/>
+            </column>
+            <column name="year" type="INT">
+                <constraints  nullable="false"/>
+            </column>
+            <column name="status" type="CHAR(1)">
+                <constraints  nullable="false"/>
+            </column>
+            <column name="price" type="BIGINT">
+                <constraints  nullable="false"/>
+            </column>
+            <column name="last_date_purchase" type="date">
+            </column>
+            <column name="admission_date" type="date">
+            </column>
+
+        </createTable>
+
+<!--        <addCheckConstraint-->
+<!--        tableName="books"-->
+<!--        constraintName="chk_book_status_valid"-->
+<!--        condition="status IN ('I', 'O')"/>-->
+        <sql>
+            ALTER TABLE books ADD CONSTRAINT chk_book_status_valid
+                CHECK (status IN ( 'I', 'O'));
+        </sql>
+
+        <addForeignKeyConstraint
+            baseTableName="books"
+            baseColumnNames="author_id"
+            referencedTableName="authors"
+            referencedColumnNames="author_id"
+            constraintName="fk_author_id"
+            onDelete="CASCADE"
+        />
+
+        <addForeignKeyConstraint
+                baseTableName="books"
+                baseColumnNames="genre_id"
+                referencedTableName="genres"
+                referencedColumnNames="genre_id"
+                constraintName="fk_genre_id"
+                onDelete="CASCADE"
+        />
+
+        <!--AUTHORS-->
+        <createTable tableName="customers">
+            <column name="customer_id" type="serial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints  nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(75)">
+                <constraints  nullable="false"/>
+            </column>
+            <column name="surname" type="VARCHAR(50)">
+                <constraints  nullable="false"/>
+            </column>
+
+        </createTable>
+
+        <!--orderS-->
+        <createTable tableName="orders">
+            <column name="order_id" type="serial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customer_id" type="int">
+                <constraints  nullable="false"/>
+            </column>
+            <column name="completion_date" type="date">
+            </column>
+            <column name="status" type="Char(1)">
+                <constraints  nullable="false"/>
+            </column>
+
+        </createTable>
+
+<!--        <addCheckConstraint-->
+<!--        tableName="orders"-->
+<!--        constraintName="chk_order_status_valid"-->
+<!--        condition="status IN ('N', 'D', 'C')"-->
+<!--        />-->
+        <sql>
+            ALTER TABLE orders ADD CONSTRAINT chk_order_status_valid
+                CHECK (status IN ('N', 'D', 'C'));
+        </sql>
+
+        <addForeignKeyConstraint
+            baseTableName="orders"
+            baseColumnNames="customer_id"
+            referencedColumnNames="customer_id"
+            referencedTableName="customers"
+            constraintName="fk_order_customer_id"
+            onDelete="CASCADE"
+        />
+
+        <!--REQUESTS-->
+        <createTable tableName="requests">
+            <column name="request_id" type="serial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="book_id" type="int">
+                <constraints  nullable="false"/>
+            </column>
+            <column name="order_id" type="int">
+                <constraints  nullable="false"/>
+            </column>
+
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseColumnNames="book_id"
+            baseTableName="requests"
+            referencedTableName="books"
+            referencedColumnNames="book_id"
+            constraintName="fk_requests_book_id"
+            onDelete="CASCADE"
+        />
+
+        <addForeignKeyConstraint
+        baseTableName="requests"
+        baseColumnNames="order_id"
+        referencedColumnNames="order_id"
+        referencedTableName="orders"
+        constraintName="fk_requests_order_id"
+        onDelete="CASCADE"
+        />
+    </changeSet>
+</databaseChangeLog>

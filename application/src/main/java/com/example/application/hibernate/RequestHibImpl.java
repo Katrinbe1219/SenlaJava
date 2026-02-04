@@ -11,12 +11,14 @@ import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 @Transactional
+@DependsOn("liquibase")
 public class RequestHibImpl extends HibernateAbstractDao<Request, Integer, Logger> {
     public RequestHibImpl() {
         super(Request.class);
