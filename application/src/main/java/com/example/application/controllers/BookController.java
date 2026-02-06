@@ -4,27 +4,40 @@ import com.example.application.model.Book;
 import com.example.application.model.types.BookSorting;
 import com.example.application.model.types.LongLiedBookSorting;
 import com.example.application.services.BookService;
-import com.example.custom_applications.Inject;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
-@Service
+@RestController
+@RequestMapping("/books")
 public class BookController {
     private BookService bookService;
+    private static final Logger logger = LogManager.getLogger();
 
     public BookController(BookService bookService) {
         this.bookService = bookService;
     }
 
+    @GetMapping
+    public String displayAllBooks(){
+        List<Book> result =   bookService.getAllBooks(logger);
+        System.out.println(result);
+        return "books";
 
+    }
 
     public List<Book> displayAllBooks(Logger logger){
         return  bookService.getAllBooks(logger);
 
     }
+
+
 
     public List<Book> displaySortedBooks(String type,Logger logger){
         BookSorting sorting= getBookType(type);

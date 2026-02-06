@@ -2,11 +2,9 @@ package com.example.application.controllers;
 
 import com.example.application.model.Book;
 import com.example.application.model.Order;
-import com.example.application.model.Request;
 import com.example.application.model.RequestResult;
 import com.example.application.model.types.RequestSorting;
 import com.example.application.services.BookService;
-import com.example.custom_applications.Inject;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 

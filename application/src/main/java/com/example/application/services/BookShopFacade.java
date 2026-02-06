@@ -1,9 +1,5 @@
 package com.example.application.services;
 
-import com.example.application.dao.CustomerImplemenation;
-import com.example.application.dao.OrderBooksImplementation;
-import com.example.application.dao.OrderImplementation;
-import com.example.application.dao.RequestImplementation;
 import com.example.application.errors.CanNotMakeExecution;
 import com.example.application.hibernate.HibernateUtils;
 import com.example.application.hibernate.OrderHibImplementation;
@@ -13,20 +9,16 @@ import com.example.application.model.Order;
 import com.example.application.model.types.BookStatus;
 import com.example.application.model.types.OrderSorting;
 import com.example.application.model.types.OrderStatus;
-import com.example.custom_applications.Inject;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Service;
 
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BookShopFacade {

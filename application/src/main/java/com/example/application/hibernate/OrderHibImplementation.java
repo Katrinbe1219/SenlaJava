@@ -5,7 +5,6 @@ import com.example.application.model.Book;
 import com.example.application.model.Customer;
 import com.example.application.model.Order;
 import com.example.application.model.types.OrderStatus;
-import com.example.custom_applications.Inject;
 import jakarta.persistence.criteria.Fetch;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;

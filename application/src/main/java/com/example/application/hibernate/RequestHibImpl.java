@@ -6,7 +6,6 @@ import com.example.application.model.Order;
 import com.example.application.model.Request;
 import com.example.application.model.RequestResult;
 
-import com.example.custom_applications.Inject;
 import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;

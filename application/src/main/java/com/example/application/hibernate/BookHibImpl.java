@@ -3,7 +3,6 @@ package com.example.application.hibernate;
 import com.example.application.errors.CanNotMakeExecution;
 import com.example.application.model.Book;
 import com.example.application.model.types.BookStatus;
-import com.example.custom_applications.Inject;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.Logger;

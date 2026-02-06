@@ -1,7 +1,6 @@
 package  com.example.application.controllers;
 
 import com.example.application.services.SettingsService;
-import com.example.custom_applications.Inject;
 import org.springframework.stereotype.Service;
 
 @Service

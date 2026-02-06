@@ -1,22 +1,17 @@
 package com.example.application.services;
 
-import com.example.application.dao.BookImplementation;
-import com.example.application.dao.RequestImplementation;
 import com.example.application.errors.CanNotMakeExecution;
 import com.example.application.exceptions.BookCanBotBeCreated;
 import com.example.application.hibernate.BookHibImpl;
 import com.example.application.hibernate.RequestHibImpl;
 import com.example.application.model.Order;
-import com.example.application.model.Request;
 import com.example.application.model.RequestResult;
 import com.example.application.model.types.*;
 import com.example.application.model.Book;
 
 import org.apache.logging.log4j.Logger;
-import com.example.custom_applications.Inject;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
 import java.util.*;
 
 
@@ -47,6 +42,7 @@ public class BookService {
         }
 
     }
+
 
     public boolean receiveBook(String title,Logger logger){
         try {
