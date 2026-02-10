@@ -7,13 +7,16 @@ import com.example.application.model.Request;
 import com.example.application.model.RequestResult;
 
 import com.example.custom_applications.Inject;
+import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Inject
+@Repository
+@Transactional
 public class RequestHibImpl extends HibernateAbstractDao<Request, Integer, Logger> {
     public RequestHibImpl() {
         super(Request.class);

@@ -6,20 +6,21 @@ import com.example.application.model.types.OrderStatus;
 import com.example.application.services.BookShopFacade;
 import com.example.custom_applications.Inject;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Inject
+@Service
 public class OrderController {
-    @Inject
+
     private BookShopFacade bookshop;
 
-//    public OrderController(BookShopFacade bookshop) {
-//        this.bookshop = bookshop;
-//    }
+    public OrderController(BookShopFacade bookshop) {
+        this.bookshop = bookshop;
+    }
 
     String getOrderTypes(){
         return "1. Цена (по возрастанию)\n2. Цена (по убыванию)" +

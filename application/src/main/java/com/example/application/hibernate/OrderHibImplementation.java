@@ -9,16 +9,19 @@ import com.example.custom_applications.Inject;
 import jakarta.persistence.criteria.Fetch;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.hibernate.query.criteria.JpaCriteriaQuery;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Inject
+@Repository
+@Transactional
 public class OrderHibImplementation extends HibernateAbstractDao<Order, Integer, Logger>{
     public OrderHibImplementation() {
         super(Order.class);

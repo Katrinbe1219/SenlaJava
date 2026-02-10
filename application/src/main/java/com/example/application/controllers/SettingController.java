@@ -2,11 +2,15 @@ package  com.example.application.controllers;
 
 import com.example.application.services.SettingsService;
 import com.example.custom_applications.Inject;
+import org.springframework.stereotype.Service;
 
-@Inject
+@Service
 public class SettingController {
-    @Inject
     private SettingsService settingsService;
+
+    public SettingController(SettingsService settingsService) {
+        this.settingsService = settingsService;
+    }
 
 
 

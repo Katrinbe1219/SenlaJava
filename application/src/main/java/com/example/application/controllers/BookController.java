@@ -6,14 +6,18 @@ import com.example.application.model.types.LongLiedBookSorting;
 import com.example.application.services.BookService;
 import com.example.custom_applications.Inject;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-@Inject
+@Service
 public class BookController {
-    @Inject
     private BookService bookService;
+
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
+    }
 
 
 

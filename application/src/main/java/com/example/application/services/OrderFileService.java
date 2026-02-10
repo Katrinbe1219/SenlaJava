@@ -8,6 +8,8 @@ import com.example.application.model.types.OrderStatus;
 import com.example.application.repositories.BookRepository;
 import com.example.application.repositories.OrderRepository;
 import com.example.custom_applications.Inject;
+import org.springframework.stereotype.Service;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -15,11 +17,11 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 //ID;Name;Surname;Email;TotalCost;Status;CompletionDate;Books
-@Inject
+
 public class OrderFileService {
-    @Inject
+
     private OrderRepository orderRepository;
-    @Inject
+
     private BookRepository bookRepository;
 
 //    public OrderFileService(OrderRepository orderRepository, BookRepository bookRepository) {

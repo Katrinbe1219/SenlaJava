@@ -8,13 +8,18 @@ import com.example.application.model.types.RequestSorting;
 import com.example.application.services.BookService;
 import com.example.custom_applications.Inject;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Inject
+@Service
 public class RequestController {
-    @Inject
+
     private BookService bookService;
+
+    public RequestController(BookService bookService) {
+        this.bookService = bookService;
+    }
 
 
 

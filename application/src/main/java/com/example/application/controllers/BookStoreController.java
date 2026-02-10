@@ -1,16 +1,14 @@
 package com.example.application.controllers;
-import com.example.application.hibernate.BookHibImpl;
 import com.example.application.model.*;
 
 import com.example.application.model.Book;
 import com.example.application.model.Customer;
 import com.example.application.model.Order;
 import com.example.application.model.types.OrderStatus;
-import com.example.application.services.OrderFileService;
+
 import com.example.application.views.ConsoleUIFactory;
 import com.example.application.views.UIComponent;
 import com.example.application.views.UIFactory;
-import com.example.custom_applications.Inject;
 
 
 import java.util.ArrayList;
@@ -19,9 +17,11 @@ import java.util.Optional;
 import java.util.Scanner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Component;
 
 
-@Inject
+
+@Component
 public class BookStoreController {
     UIComponent menuComponent;
 
@@ -32,22 +32,21 @@ public class BookStoreController {
     UIFactory consoleFactory;
 
 
-    @Inject
+
     BookController bookController;
-    @Inject
+
     OrderController orderController;
-    @Inject
+
     RequestController requestController;
-    @Inject
-    OrderFileService orderFileService;
-    @Inject
+
+
     SettingController settingController;
 
     private final String FILENAME = "bookstore_system.dat";
     private static final Logger logger = LogManager.getLogger(BookStoreController.class.getName());
 
 
-    public BookStoreController() throws Exception {
+    public BookStoreController(BookController bc, OrderController oc,RequestController rc, SettingController sc ) throws Exception {
         consoleFactory = new ConsoleUIFactory();
         menuComponent = consoleFactory.createMainMenu();
         bookComponent = consoleFactory.createBookMenu();
@@ -55,7 +54,13 @@ public class BookStoreController {
         requestComponent = consoleFactory.createRequestMenu();
         settingsComponent = consoleFactory.createSettingMenu();
 
+        this.bookController = bc;
+        this.orderController = oc;
+        this.requestController = rc;
+        this.settingController = sc;
+
     }
+
 
     public void run(){
         Scanner input_  = new Scanner(System.in);
@@ -573,6 +578,9 @@ public class BookStoreController {
 
 
     }
+
+
+
 
 
 //    private void saveSystem(){

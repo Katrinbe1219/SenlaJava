@@ -3,10 +3,12 @@ package com.example.application.repositories;
 import com.example.application.model.Book;
 import com.example.application.model.Warehouse;
 import com.example.custom_applications.Inject;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
 @Inject
+
 public class BookRepository {
     @Inject
     Warehouse warehouse;
