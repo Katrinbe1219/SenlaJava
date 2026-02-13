@@ -1,5 +1,7 @@
 package com.example.application;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRegistration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.WebApplicationInitializer;
@@ -7,12 +9,9 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
-
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "com.example")
+@ComponentScan(basePackages = "com.example.application.controllers")
 public class WebConfig implements WebApplicationInitializer {
 
     @Override

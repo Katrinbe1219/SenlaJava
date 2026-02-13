@@ -29,7 +29,6 @@ public class LiquibaseConfiguration {
     public DataSource dataSource() {
         DriverManagerDataSource datasource = new DriverManagerDataSource();
         datasource.setDriverClassName("org.postgresql.Driver");
-        System.out.println(url + " " + this.user + " " + password );
         datasource.setUrl(url);
         datasource.setUsername(user);
         datasource.setPassword(password);

@@ -12,8 +12,21 @@ public class BookDTO {
     double price;
     BookTypes genre;
     AuthorDTO author;
-    LocalDate lastPurchaseDate;
-    LocalDate admissionDate;
+    String lastPurchaseDate;
+    String admissionDate;
+
+    public BookDTO() {}
+
+    public BookDTO(BookStatus status, String title, int year, double price, BookTypes genre, AuthorDTO author, LocalDate lastPurchaseDate, LocalDate admissionDate) {
+        this.status = status;
+        this.title = title;
+        this.year = year;
+        this.price = price;
+        this.genre = genre;
+        this.author = author;
+        this.lastPurchaseDate = String.valueOf(lastPurchaseDate);
+        this.admissionDate = String.valueOf(admissionDate);
+    }
 
     public BookStatus getStatus() {
         return this.status;
@@ -60,17 +73,18 @@ public class BookDTO {
     }
 
     public void setLastPurchaseDate(LocalDate date){
-        this.lastPurchaseDate = date;
+        this.lastPurchaseDate = String.valueOf(date);
     }
-    public LocalDate getLastPurchaseDate(){
+    public String getLastPurchaseDate(){
         return this.lastPurchaseDate;
     }
 
-    public LocalDate getAdmissionDate(){
+    public String getAdmissionDate(){
         return this.admissionDate;
     }
     public void setAdmissionDate(LocalDate admissionDate){
-        this.admissionDate = admissionDate;
+
+        this.admissionDate = String.valueOf(admissionDate);
     }
 
 

@@ -1,7 +1,6 @@
 package com.example.application.services;
 
 import com.example.application.errors.CanNotMakeExecution;
-import com.example.application.hibernate.HibernateUtils;
 import com.example.application.hibernate.OrderHibImplementation;
 import com.example.application.hibernate.RequestHibImpl;
 import com.example.application.model.Book;
@@ -9,10 +8,14 @@ import com.example.application.model.Order;
 import com.example.application.model.types.BookStatus;
 import com.example.application.model.types.OrderSorting;
 import com.example.application.model.types.OrderStatus;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 
 import java.time.LocalDate;
@@ -23,6 +26,7 @@ import java.util.List;
 @Service
 public class BookShopFacade {
 
+
     private RequestHibImpl requestHibImpl;
 
     private OrderHibImplementation orderHibImpl;
@@ -30,6 +34,7 @@ public class BookShopFacade {
     public BookShopFacade(RequestHibImpl requestHibImpl, OrderHibImplementation orderHibImpl) {
         this.requestHibImpl = requestHibImpl;
         this.orderHibImpl = orderHibImpl;
+
     }
 
 
@@ -56,25 +61,20 @@ public class BookShopFacade {
 
         }
 
-        Session session = HibernateUtils.getCurrentSession();
-        Transaction tx = session.beginTransaction();
-
         try {
 
-            orderHibImpl.save(order, logger, session, tx);
-            requestHibImpl.insertMany(books, order, logger, session);
-            tx.commit();
+            orderHibImpl.save(order, logger);
+            requestHibImpl.insertMany(books, order, logger);
+
 
         }
 
         catch (Exception e1){
-            tx.rollback();
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             logger.error("Проблема в BookShopFacade createOrder: " + e1.getMessage());
             throw new CanNotMakeExecution("Проблема создания заказа CAnNotMakeException or others : " + e1.getMessage());
         }
-        finally {
-                session.close();
-        }
+
 
         if (order.getStatus() == OrderStatus.DONE){ return null;}
         else {return new_ids;}
@@ -235,12 +235,12 @@ public class BookShopFacade {
 
     }
 
-    public Double getIncomeInDiapazon(LocalDate start, LocalDate end,Logger logger){
+    public double getIncomeInDiapazon(LocalDate start, LocalDate end,Logger logger){
         double amount = 0;
         try {
             List<Order>  orders = orderHibImpl.getOrdersInDiapazon(start, end, logger);
             if (orders.isEmpty()) {
-                return 0D;
+                return 0;
             }
 
             for (Order order: orders){
@@ -252,10 +252,10 @@ public class BookShopFacade {
 
         } catch (CanNotMakeExecution e){
             logger.error("Проблема при получении заказов SQl type: " + e.getMessage());
-            return null;
+            return 0;
         }catch (Exception e){
             logger.error("Проблема при получении заказов nonSQl type: " + e.getMessage());
-            return null;
+            return 0;
         }
     }
 

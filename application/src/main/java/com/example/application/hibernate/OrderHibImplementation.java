@@ -16,6 +16,7 @@ import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.hibernate.query.criteria.JpaCriteriaQuery;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,13 +29,14 @@ public class OrderHibImplementation extends HibernateAbstractDao<Order, Integer,
         super(Order.class);
     }
 
+    @Transactional
     public void update(List<Order> order, Logger logger) throws CanNotMakeExecution {
-        Session session = HibernateUtils.getCurrentSession();
-        Transaction tx = session.beginTransaction();
+        Session session = getSessionFactory().getCurrentSession();
+
 
         int batchSize = 10;
         int i =0;
-        System.out.println("here");
+
         try{
 
             for (Order o : order) {
@@ -44,31 +46,20 @@ public class OrderHibImplementation extends HibernateAbstractDao<Order, Integer,
                     session.clear();
                 }
             }
-            session.flush();
-            session.clear();
-
-
-            tx.commit();
-
 
         }
         catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             logger.error("OrderHibIMpl update: " + e.getMessage());
             throw new CanNotMakeExecution("\nOrderHibIMpl update: " + e.getMessage());
-        }finally {
-            session.close();
         }
     }
 
-    public void save(Order order, Logger logger, Session session, Transaction tx) throws CanNotMakeExecution{
+    @Transactional
+    public void save(Order order, Logger logger) throws CanNotMakeExecution{
 
-        boolean foreign =true;
+        Session  session = getSessionFactory().getCurrentSession();
 
-        if (session == null){
-            foreign = false;
-            session = HibernateUtils.getCurrentSession();
-            tx = session.beginTransaction();
-        }
 
         try {
             Customer customer = checkCustomer(order.getCustomer(), logger, session);
@@ -83,20 +74,17 @@ public class OrderHibImplementation extends HibernateAbstractDao<Order, Integer,
 
             session.persist(order);
 
-            if (!foreign){
-                // если транзакция была передана, значит коммит находится в исходной функции
-                tx.commit();
-                session.close();
-            }
+
 
 
         }
         catch (Exception e) {
-            tx.rollback();
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             logger.error("OrderHibIMpl save: " + e.getMessage());
             throw new CanNotMakeExecution("OrderHibIMpl save: " + e.getMessage());
         }
     }
+
 
     private Customer checkCustomer(Customer customer, Logger logger, Session session) throws CanNotMakeExecution {
         String hql = "SELECT c FROM customers c WHERE c.name = :name AND c.surname = :surname AND c.email = :email";
@@ -108,7 +96,7 @@ public class OrderHibImplementation extends HibernateAbstractDao<Order, Integer,
     }
 
     public Order getId(Order order, Logger logger) throws CanNotMakeExecution {
-        Session session = HibernateUtils.getCurrentSession();
+        Session session = getSessionFactory().getCurrentSession();
         try {
             String hql = "SELECT o FROM orders o " +
                     "WHERE o.id = :id";
@@ -118,13 +106,13 @@ public class OrderHibImplementation extends HibernateAbstractDao<Order, Integer,
         catch (Exception e) {
             logger.error("OrderHibIMpl getId: " + e.getMessage());
             throw new CanNotMakeExecution("\nOrderHibIMpl getId: " + e.getMessage());
-        }finally {
-            session.close();
         }
     }
 
+
+    @Transactional
     public List<Order> getOrdersSorted(OrderStatus status, Logger logger) throws CanNotMakeExecution {
-        Session session = HibernateUtils.getCurrentSession();
+        Session session = getSessionFactory().getCurrentSession();
         try {
             String hql = """
                 SELECT DISTINCT o FROM orders o
@@ -145,13 +133,13 @@ public class OrderHibImplementation extends HibernateAbstractDao<Order, Integer,
         catch(Exception e){
             logger.error("OrderHibIMpl getOrdersSorted: " + e.getMessage());
             throw new CanNotMakeExecution("\nOrderHibIMpl getOrdersSorted: " + e.getMessage());
-        }finally {
-            session.close();
         }
     }
 
+
+    @Transactional
     public List<Order> getOrdersSorted(String field, boolean descCondition, Logger logger) throws CanNotMakeExecution {
-        Session session = HibernateUtils.getCurrentSession();
+        Session session = getSessionFactory().getCurrentSession();
         try {
             // рассуждения о totalCost - полной сумме заказа, которая до этого получалась через GROUP BY
             // чтобы не получить n+1
@@ -180,14 +168,14 @@ public class OrderHibImplementation extends HibernateAbstractDao<Order, Integer,
         }catch(Exception e){
             logger.error("OrderHibIMpl getOrdersSorted: " + e.getMessage());
             throw new CanNotMakeExecution("\nOrderHibIMpl getOrdersSorted: " + e.getMessage());
-        } finally {
-            session.close();
         }
     }
 
 
+
+    @Transactional
     public List<Order> getSortedDoneOrders(LocalDate start, LocalDate end, boolean descCondition, Logger logger)throws CanNotMakeExecution{
-        Session session = HibernateUtils.getCurrentSession();
+        Session session = getSessionFactory().getCurrentSession();
         try {
 
             String hql;
@@ -221,13 +209,13 @@ public class OrderHibImplementation extends HibernateAbstractDao<Order, Integer,
         catch(Exception e){
             logger.error("OrderHibIMpl getSortedDoneOrders: " + e.getMessage());
             throw new CanNotMakeExecution("OrderHibIMpl getSortedDoneOrders: " + e.getMessage());
-        } finally {
-            session.close();
         }
     }
 
+
+    @Transactional
     public List<Order> getSortedDoneOrders(LocalDate start, LocalDate end,  Logger logger)throws CanNotMakeExecution{
-        Session session = HibernateUtils.getCurrentSession();
+        Session session = getSessionFactory().getCurrentSession();
         try {
             // Чтобы не получить N+1, totalCost рассчитывается в коде и сортировка по цене также произойдет в нем
 
@@ -251,14 +239,14 @@ public class OrderHibImplementation extends HibernateAbstractDao<Order, Integer,
         catch(Exception e){
             logger.error("OrderHibIMpl getSortedDoneOrders: " + e.getMessage());
             throw new CanNotMakeExecution("OrderHibIMpl getSortedDoneOrders: " + e.getMessage());
-        } finally {
-            session.close();
         }
     }
 
+
+    @Transactional
     public List<Order> getOrdersInDiapazon(LocalDate start, LocalDate end,  Logger logger) throws CanNotMakeExecution{
         // функция используется не для вывода, только для подсчета totalCost и amount, поэтому не подгружаю author, customer
-        Session session = HibernateUtils.getCurrentSession();
+        Session session = getSessionFactory().getCurrentSession();
         try {
 
             String hql =  """
@@ -278,14 +266,15 @@ public class OrderHibImplementation extends HibernateAbstractDao<Order, Integer,
         catch(Exception e){
             logger.error("OrderHibIMpl getOrdersInDiapazon: " + e.getMessage());
             throw new CanNotMakeExecution("OrderHibIMpl getOrdersInDiapazon: " + e.getMessage());
-        } finally {
-            session.close();
         }
     }
 
+
+    @Transactional
     public Order getById(int id, Logger logger) throws CanNotMakeExecution{
 
-        Session session = HibernateUtils.getCurrentSession();try {
+        Session session = getSessionFactory().getCurrentSession();
+        try {
 
             String hql = "SELECT o FROM orders o " +
                     "LEFT JOIN FETCH o.books b " +
@@ -298,8 +287,6 @@ public class OrderHibImplementation extends HibernateAbstractDao<Order, Integer,
         catch (Exception e) {
             logger.error("OrderHibIMpl getById: " + e.getMessage());
             throw new CanNotMakeExecution("OrderHibIMpl getById: " + e.getMessage());
-        } finally {
-            session.close();
         }
     }
 

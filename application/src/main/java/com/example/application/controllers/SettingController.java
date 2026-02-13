@@ -1,9 +1,11 @@
 package  com.example.application.controllers;
 
 import com.example.application.services.SettingsService;
-import org.springframework.stereotype.Service;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
-@Service
+@RestController
+@RequestMapping("/settings")
 public class SettingController {
     private SettingsService settingsService;
 
@@ -12,20 +14,24 @@ public class SettingController {
     }
 
 
-
+    @GetMapping(value="/month", produces = MediaType.APPLICATION_JSON_VALUE)
     public int getNumberOfMonth(){
         return settingsService.getNumberOfMonth();
     }
 
-    public String changeNumberOfMonth(String number){
+    @PatchMapping(value="/change-number", produces = "text/plain; charset=UTF-8")
+    public String changeNumberOfMonth(@RequestParam("number") int number){
+        //curl -X PATCH "http://localhost:8080/senla/settings/change-number?number=10"
         return settingsService.changeNumberOfMonth(number);
     }
 
+    @GetMapping(value = "/warehouse", produces="text/plain")
     public String getWarehouseOption(){
         return settingsService.getWarehouseOption();
     }
 
-    public String setWarehouseFunction(String func){
+    @PatchMapping(value="/change-warehouse", produces = "text/plain; charset=UTF-8")
+    public String setWarehouseFunction(@RequestParam("func") String func){
         return settingsService.setWarehouseFunction(func);
     }
 

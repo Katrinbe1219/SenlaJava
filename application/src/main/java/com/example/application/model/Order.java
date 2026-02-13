@@ -25,7 +25,7 @@ public class Order implements Comparable<Order>, Serializable {
    @JoinColumn(name = "customer_id")
     Customer customer;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {})
     @JoinTable(
             name = "order_books",
             joinColumns = @JoinColumn(name="order_id"),

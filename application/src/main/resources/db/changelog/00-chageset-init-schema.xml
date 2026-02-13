@@ -176,5 +176,35 @@
         constraintName="fk_requests_order_id"
         onDelete="CASCADE"
         />
+
+        <createTable tableName="order_books">
+            <column name="order_book_id" type="serial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="book_id" type="int">
+                <constraints  nullable="false"/>
+            </column>
+
+            <column name="order_id" type="int">
+                <constraints  nullable="false"/>
+            </column>
+
+        </createTable>
+        <addForeignKeyConstraint
+                baseTableName="order_books"
+                baseColumnNames="order_id"
+                referencedColumnNames="order_id"
+                referencedTableName="orders"
+                constraintName="fk_requests_order_order_books_id"
+                onDelete="CASCADE"
+        />
+        <addForeignKeyConstraint
+                baseTableName="order_books"
+                baseColumnNames="book_id"
+                referencedColumnNames="book_id"
+                referencedTableName="books"
+                constraintName="fk_requests_book_order_books_id"
+                onDelete="CASCADE"
+        />
     </changeSet>
 </databaseChangeLog>

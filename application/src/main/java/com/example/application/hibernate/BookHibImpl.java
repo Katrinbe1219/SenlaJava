@@ -1,8 +1,11 @@
 package com.example.application.hibernate;
 
+import com.example.application.dto.BookDTO;
 import com.example.application.errors.CanNotMakeExecution;
 import com.example.application.model.Book;
 import com.example.application.model.types.BookStatus;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceUnit;
 import jakarta.persistence.criteria.*;
 import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.Logger;
@@ -11,15 +14,15 @@ import org.hibernate.Transaction;
 import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.hibernate.query.criteria.JpaCriteriaQuery;
 import org.hibernate.query.criteria.JpaRoot;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Repository;
-
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-@Transactional
 @DependsOn("liquibase")
 public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
 
@@ -27,19 +30,23 @@ public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
         super(Book.class);
     }
 
+
+
     // изменения в книгах могут быть только при завозе, то есть передается наименование, нужен ее поиск и затем изменение статуса и даты завоза
+    @Transactional
     public Book save (Logger logger, String title)throws CanNotMakeExecution {
-        Session session = HibernateUtils.getCurrentSession();
-        Transaction tx = session.beginTransaction();
+        Session session =  getSessionFactory().getCurrentSession();
+
 
         try {
-            // если такой книги не будет, merge создаст новую
+            // если такой книги не будет, merge создаст
+            // Transactional передается и этой функции, так как по умолчанию Propogation.REQUIRED
             Book book = getBookByTitle(logger, title, session) ;
 
             if (book != null) {
                 book.setStatus(BookStatus.IN_STOCK);
                 Book updated = session.merge(book);
-                tx.commit();
+
                 return updated;
             }
 
@@ -47,18 +54,17 @@ public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
 
         }
         catch (Exception e){
-            tx.rollback();
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             logger.error("Проблема в BookHIbIMpl save : " + e.getMessage());
             throw new  CanNotMakeExecution("\nBookHIbIMpl save : " + e.getMessage());
-        }finally {
-            session.close();
         }
 
     }
 
+    @Transactional
     public Book getBookByTitle(Logger logger, String title, Session session)throws CanNotMakeExecution {
         if (session == null){
-            session = HibernateUtils.getCurrentSession();
+            session = getSessionFactory().getCurrentSession();
         }
 
         try {
@@ -68,7 +74,6 @@ public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
 
             cquery.select(root).where(builder.equal(root.get("title"), title));
             Book result = session.createQuery(cquery).uniqueResult();
-            System.out.println("result + " + result.getId());
             return result;
 
         } catch (Exception e){
@@ -81,9 +86,11 @@ public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
 
     }
 
+    @Transactional
     public List<Book> getSortedBooks (String field, boolean descCondition, Logger logger){
 
-        try (Session session = HibernateUtils.getCurrentSession();){
+        try {
+            Session session = getSessionFactory().getCurrentSession();
             HibernateCriteriaBuilder builder = session.getCriteriaBuilder();
             JpaCriteriaQuery<Book> cq = builder.createQuery(Book.class);
             JpaRoot <Book> root = cq.from(Book.class);
@@ -106,9 +113,34 @@ public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
         }
     }
 
-    public List<Book> getSortedBooks (String field, String status, Logger logger){
-        Session session = HibernateUtils.getCurrentSession();
+
+    @Transactional
+    public List<Book> getBookByTitles(List<String> titles, Logger logger){
+        Session session = getSessionFactory().getCurrentSession();
+
+
         try {
+            HibernateCriteriaBuilder builder = session.getCriteriaBuilder();
+            JpaCriteriaQuery<Book>  query = builder.createQuery(Book.class);
+            JpaRoot<Book> books = query.from(Book.class);
+            query.where(books.get("title").in(titles));
+
+            return session.createQuery(query).list();
+
+        }
+        catch (Exception e){
+
+            logger.error("Проблема в BookHIbIMpl getSortedBooks boolean : " + e.getMessage());
+            throw new  CanNotMakeExecution("BookHIbIMpl getSortedBooks boolean : " + e.getMessage());
+        }
+
+    }
+
+    @Transactional
+    public List<Book> getSortedBooks (String field, String status, Logger logger){
+        Session session = getSessionFactory().getCurrentSession();
+        try {
+
             HibernateCriteriaBuilder builder = session.getCriteriaBuilder();
             JpaCriteriaQuery<Book> cq = builder.createQuery(Book.class);
             JpaRoot <Book> root = cq.from(Book.class);
@@ -124,13 +156,14 @@ public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
 
             logger.error("Проблема в BookHIbIMpl getSortedBooks boolean : " + e.getMessage());
             throw new  CanNotMakeExecution("BookHIbIMpl getSortedBooks boolean : " + e.getMessage());
-        }finally {
-            session.close();
         }
     }
 
+
+    @Transactional
     public List<Book> getLongLiedBooks (Integer numberOfMonth, String field, boolean descCondition, Logger logger) throws CanNotMakeExecution {
-        try(Session session = HibernateUtils.getCurrentSession();) {
+        Session session = getSessionFactory().getCurrentSession();
+        try {
 
             HibernateCriteriaBuilder builder = session.getCriteriaBuilder();
             JpaCriteriaQuery <Book> cq = builder.createQuery(Book.class);
@@ -152,9 +185,10 @@ public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
         }
     }
 
+    @Transactional
     public List<Book> updateBooksLastPurchase(List<Book> book_, Logger logger) throws CanNotMakeExecution {
-        Session session = HibernateUtils.getCurrentSession();
-        Transaction tx = session.beginTransaction();
+        Session session = getSessionFactory().getCurrentSession();
+
         try {
 
             CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -168,17 +202,15 @@ public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
 
             session.createQuery(update).executeUpdate();
 
-            tx.commit();
+
             return book_;
 
 
         }
         catch (Exception e){
-            tx.rollback();
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             logger.error("Проблема в BookHIbIMpl updateBooksLastPurchase : " + e.getMessage());
             throw new  CanNotMakeExecution("\nBookHIbIMpl updateBooksLastPurchase : " + e.getMessage());
-        }finally {
-            session.close();
         }
     }
 
@@ -186,7 +218,7 @@ public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
         return switch (type){
             case "I" -> BookStatus.IN_STOCK;
             case "O" -> BookStatus.OUT_OF_STOCK;
-            default -> throw new CanNotMakeExecution("\nBookHIbIMpl getBookStatus нет такого статуса ");
+            default -> throw new CanNotMakeExecution("\nBookHIbIMpl getBookStatus нет такого статуса " + type);
         };
     }
 
@@ -197,4 +229,6 @@ public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
         }
         return ids;
     }
+
+
 }

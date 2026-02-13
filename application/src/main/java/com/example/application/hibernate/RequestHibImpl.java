@@ -6,12 +6,15 @@ import com.example.application.model.Order;
 import com.example.application.model.Request;
 import com.example.application.model.RequestResult;
 
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.List;
 
@@ -23,11 +26,12 @@ public class RequestHibImpl extends HibernateAbstractDao<Request, Integer, Logge
         super(Request.class);
     }
 
-    public void insertMany(List<Book> books, Order order, Logger logger, Session session) throws CanNotMakeExecution {
 
-        if (session == null){
-            session = HibernateUtils.getCurrentSession();
-        }
+    @Transactional
+    public void insertMany(List<Book> books, Order order, Logger logger) throws CanNotMakeExecution {
+
+        Session session = getSessionFactory().getCurrentSession();
+
 
         try{
             int batchSize = 10;
@@ -41,7 +45,7 @@ public class RequestHibImpl extends HibernateAbstractDao<Request, Integer, Logge
                 }
 
             }
-            session.flush();
+
 
         } catch (Exception e) {
             logger.error("requestHibIMpl insertMany: " + e.getMessage());
@@ -49,9 +53,11 @@ public class RequestHibImpl extends HibernateAbstractDao<Request, Integer, Logge
         }
     }
 
-    public List<RequestResult> getRequestsSorted(String field, String descCondition, Logger logger) throws CanNotMakeExecution {
 
-        try(Session session = HibernateUtils.getCurrentSession()) {
+    @Transactional
+    public List<RequestResult> getRequestsSorted(String field, String descCondition, Logger logger) throws CanNotMakeExecution {
+        Session session = getSessionFactory().getCurrentSession();
+        try {
 
             String hql = "SELECT b.title, COUNT(r.id) AS amount " +
                     "FROM requests r INNER JOIN r.book b GROUP BY b.title ORDER BY "
@@ -66,36 +72,36 @@ public class RequestHibImpl extends HibernateAbstractDao<Request, Integer, Logge
         }
     }
 
+    @Transactional
     public void deleteManyByBook(Book book, Logger logger) throws  CanNotMakeExecution{
-        Session session = HibernateUtils.getCurrentSession();
+        Session session = getSessionFactory().getCurrentSession();
         try  {
-            Transaction tx = session.beginTransaction();
+
             String hql= "DELETE FROM requests r WHERE r.book = :book";
             session.createMutationQuery(hql).setParameter("book", book).executeUpdate();
 
-            tx.commit();
+
 
         }catch (Exception e){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             logger.error("RequestHibImpl deleteManyByBook: " + e.getMessage());
             throw new CanNotMakeExecution("\nRequestHibImpl deleteManyByBook: " + e.getMessage());
-        }finally {
-            session.close();
         }
     }
 
+    @Transactional
     public void deleteManyByOrder(Order order, Logger logger) throws  CanNotMakeExecution{
-        Session session = HibernateUtils.getCurrentSession();
+        Session session = getSessionFactory().getCurrentSession();
         try {
-            Transaction tx = session.beginTransaction();
+
             String hql= "DELETE FROM requests r WHERE r.order = :order";
             session.createQuery(hql).setParameter("order", order).executeUpdate();
-            tx.commit();
+
         }
         catch (Exception e){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             logger.error("RequestHibImpl deleteManyByOrder: " + e.getMessage());
             throw new CanNotMakeExecution("\nRequestHibImpl deleteManyByOrder: " + e.getMessage());
-        }finally {
-            session.close();
         }
     }
 
