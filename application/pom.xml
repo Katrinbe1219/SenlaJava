@@ -162,28 +162,28 @@
                 </plugin>
 
                 <!--Плагин копирует war в tomcat-->
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-antrun-plugin</artifactId>
-                    <version>3.1.0</version>
-                    <executions>
-                        <execution>
-                            <id>deploy-to-tomcat</id>
-                            <phase>install</phase>
-                            <goals>
-                                <goal>run</goal>
-                            </goals>
-                            <configuration>
-                                <target>
-                                    <copy file="${project.build.directory}/${project.build.finalName}.war"
-                                          tofile="/opt/tomcat/tomcat11/apache-tomcat-11.0.18/webapps/${project.build.finalName}.war"
-                                          verbose="true"/>
-                                    <echo message="WAR файл скопирован в Tomcat!"/>
-                                </target>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
+<!--                <plugin>-->
+<!--                    <groupId>org.apache.maven.plugins</groupId>-->
+<!--                    <artifactId>maven-antrun-plugin</artifactId>-->
+<!--                    <version>3.1.0</version>-->
+<!--                    <executions>-->
+<!--                        <execution>-->
+<!--                            <id>deploy-to-tomcat</id>-->
+<!--                            <phase>install</phase>-->
+<!--                            <goals>-->
+<!--                                <goal>run</goal>-->
+<!--                            </goals>-->
+<!--                            <configuration>-->
+<!--                                <target>-->
+<!--                                    <copy file="${project.build.directory}/${project.build.finalName}.war"-->
+<!--                                          tofile="/opt/tomcat/tomcat11/apache-tomcat-11.0.18/webapps/${project.build.finalName}.war"-->
+<!--                                          verbose="true"/>-->
+<!--                                    <echo message="WAR файл скопирован в Tomcat!"/>-->
+<!--                                </target>-->
+<!--                            </configuration>-->
+<!--                        </execution>-->
+<!--                    </executions>-->
+<!--                </plugin>-->
 
 
 
@@ -192,7 +192,7 @@
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>2.2</version>
                 <configuration>
-                    <url>http://localhost:8080/manager/text</url>
+                    <url>http://senla_db:8080/manager/text</url>
 
                     <path>/senla</path>
                     <username>deploy</username>
