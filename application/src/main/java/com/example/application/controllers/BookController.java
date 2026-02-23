@@ -1,6 +1,7 @@
 package com.example.application.controllers;
 
 import com.example.application.dto.BookDTO;
+import com.example.application.dto.StrinResponse;
 import com.example.application.model.Book;
 import com.example.application.model.types.BookSorting;
 import com.example.application.model.types.LongLiedBookSorting;
@@ -48,24 +49,24 @@ public class BookController {
 
 
 
-    @GetMapping(value = "check", produces = "text/plain; charset=UTF-8")
-    public String checkBook(@RequestParam("book") String book){
+    @GetMapping(value = "check")
+    public StrinResponse checkBook(@RequestParam("book") String book){
         boolean checking = bookService.checkBook(book, logger);
         if (checking) {
-            return "Книга в наличии";
+            return new StrinResponse("Книга в наличии");
         }else{
-            return "Книга не в наличии";
+            return new StrinResponse("Книга не в наличии");
         }
     }
 
 
     @GetMapping(value = "/description", produces = "text/plain; charset=UTF-8")
-    public String displayBookDescription(@RequestParam("book") String bookName){
+    public StrinResponse displayBookDescription(@RequestParam("book") String bookName){
         String description = bookService.getBookDescription(bookName, logger);
         if (description == null) {
-            return "Не было найдено";
+            return new StrinResponse("Найдено не было");
         }else{
-            return description;
+            return new StrinResponse(description);
         }
     }
 
