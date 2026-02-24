@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -51,8 +52,8 @@ public class OrderController {
         };
     }
 
-    @PostMapping(value = "/create", produces = "text/plain")
-    public StrinResponse createOrder(@RequestBody OrderCreateDto order) {
+    @PostMapping(value = "/create")
+    public CreatedOrderDTO createOrder(@RequestBody OrderCreateDto order) {
         Order orderObject = new Order();
         orderObject.setCustomer(toCustomer(order.getCustomer()));
 
@@ -61,14 +62,12 @@ public class OrderController {
             orderObject.addBook(book);
         }
 
-        ArrayList<Integer> done = bookshop.createOrder(orderObject, logger);
-        if (done == null) {
+        CreatedOrderDTO done = bookshop.createOrder(orderObject, logger);
+        if (done.getStatus() == OrderStatus.DONE) {
             bookService.setLastPurchase(orderObject.getBooks(), logger);
-            return new StrinResponse("Order created successfully");
-
-        }else {
-            return new StrinResponse("Order was created with requests " + done.toString());
         }
+
+        return done;
 
     }
 

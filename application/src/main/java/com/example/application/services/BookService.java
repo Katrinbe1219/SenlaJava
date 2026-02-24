@@ -74,9 +74,9 @@ public class BookService {
 
     }
 
-    public boolean checkBook (String title, Logger logger){
+    public boolean checkBook (Integer title, Logger logger){
         try {
-            Book book  = bookHibImpl.getBookByTitle(logger, title, null);
+            Book book  = bookHibImpl.getBookById(logger, title);
             if (book == null) return false;
             return book.getStatus() == BookStatus.IN_STOCK;
         }catch (CanNotMakeExecution e) {
@@ -157,9 +157,9 @@ public class BookService {
         }
 
     }
-    public String getBookDescription(String bookName,Logger logger){
+    public String getBookDescription(Integer bookName,Logger logger){
         try {
-            Book book  = bookHibImpl.getBookByTitle(logger, bookName, null);
+            Book book  = bookHibImpl.getBookById(logger, bookName);
             if (book == null)  return "Такой книги не нашлось";
             return book.getDescription();
         }catch (CanNotMakeExecution e) {

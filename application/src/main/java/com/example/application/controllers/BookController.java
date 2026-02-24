@@ -49,8 +49,8 @@ public class BookController {
 
 
 
-    @GetMapping(value = "check")
-    public StrinResponse checkBook(@RequestParam("book") String book){
+    @GetMapping(value = "/check/{id}")
+    public StrinResponse checkBook(@PathVariable("id") Integer book){
         boolean checking = bookService.checkBook(book, logger);
         if (checking) {
             return new StrinResponse("Книга в наличии");
@@ -60,8 +60,8 @@ public class BookController {
     }
 
 
-    @GetMapping(value = "/description", produces = "text/plain; charset=UTF-8")
-    public StrinResponse displayBookDescription(@RequestParam("book") String bookName){
+    @GetMapping(value = "/description/{id}")
+    public StrinResponse displayBookDescription(@PathVariable("id") Integer bookName){
         String description = bookService.getBookDescription(bookName, logger);
         if (description == null) {
             return new StrinResponse("Найдено не было");
