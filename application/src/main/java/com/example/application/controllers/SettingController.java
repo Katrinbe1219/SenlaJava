@@ -1,10 +1,12 @@
 package  com.example.application.controllers;
 
+import com.example.application.dto.StrinResponse;
 import com.example.application.services.SettingsService;
-import com.example.custom_applications.Inject;
-import org.springframework.stereotype.Service;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
-@Service
+@RestController
+@RequestMapping("/settings")
 public class SettingController {
     private SettingsService settingsService;
 
@@ -13,21 +15,26 @@ public class SettingController {
     }
 
 
+    @GetMapping(value="/month")
+    public StrinResponse getNumberOfMonth(){
 
-    public int getNumberOfMonth(){
-        return settingsService.getNumberOfMonth();
+        return new StrinResponse("Число месяцев: " +String.valueOf(settingsService.getNumberOfMonth()));
     }
 
-    public String changeNumberOfMonth(String number){
-        return settingsService.changeNumberOfMonth(number);
+    @PatchMapping(value="/change-number")
+    public StrinResponse changeNumberOfMonth(@RequestParam("number") int number){
+        //curl -X PATCH "http://localhost:8080/senla/settings/change-number?number=10"
+        return new StrinResponse("Изменения: " +settingsService.changeNumberOfMonth(number));
     }
 
-    public String getWarehouseOption(){
-        return settingsService.getWarehouseOption();
+    @GetMapping(value = "/warehouse")
+    public StrinResponse getWarehouseOption(){
+        return  new StrinResponse("Значение: " + settingsService.getWarehouseOption());
     }
 
-    public String setWarehouseFunction(String func){
-        return settingsService.setWarehouseFunction(func);
+    @PatchMapping(value="/change-warehouse")
+    public StrinResponse setWarehouseFunction(@RequestParam("func") String func){
+        return new StrinResponse( "Изменения: " + settingsService.setWarehouseFunction(func));
     }
 
 

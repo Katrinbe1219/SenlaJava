@@ -5,8 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import java.util.Comparator;
 
 @Entity
@@ -22,6 +22,18 @@ public class Author implements Comparable<Author>{
 
     @Column(name="paternal")
     String paternal;
+
+    public String getName(){
+        return name;
+    }
+
+    public String getSurname(){
+        return surname;
+    }
+
+    public String getPaternal(){
+        return paternal;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

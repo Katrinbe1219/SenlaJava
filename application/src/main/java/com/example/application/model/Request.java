@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 @Entity(name = "requests")
+@Table(name = "requests")
 public class Request implements Comparable<Request>, Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)

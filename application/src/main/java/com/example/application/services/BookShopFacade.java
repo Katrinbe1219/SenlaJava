@@ -1,35 +1,37 @@
 package com.example.application.services;
 
-import com.example.application.dao.CustomerImplemenation;
-import com.example.application.dao.OrderBooksImplementation;
-import com.example.application.dao.OrderImplementation;
-import com.example.application.dao.RequestImplementation;
+import com.example.application.dto.AuthorDTO;
+import com.example.application.dto.BookDTO;
+import com.example.application.dto.CreatedOrderDTO;
+import com.example.application.dto.ReceiveRequest;
 import com.example.application.errors.CanNotMakeExecution;
-import com.example.application.hibernate.HibernateUtils;
 import com.example.application.hibernate.OrderHibImplementation;
 import com.example.application.hibernate.RequestHibImpl;
+import com.example.application.model.Author;
 import com.example.application.model.Book;
 import com.example.application.model.Order;
+import com.example.application.model.Request;
 import com.example.application.model.types.BookStatus;
 import com.example.application.model.types.OrderSorting;
 import com.example.application.model.types.OrderStatus;
-import com.example.custom_applications.Inject;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.transaction.Transactional;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BookShopFacade {
+
 
     private RequestHibImpl requestHibImpl;
 
@@ -38,6 +40,7 @@ public class BookShopFacade {
     public BookShopFacade(RequestHibImpl requestHibImpl, OrderHibImplementation orderHibImpl) {
         this.requestHibImpl = requestHibImpl;
         this.orderHibImpl = orderHibImpl;
+
     }
 
 
@@ -46,9 +49,10 @@ public class BookShopFacade {
     // тем более что одно connection, значит данная программа не предназначена для каких-то параллельных запросов для огромного числа пользователей
 
 
-    public ArrayList<Integer> createOrder(Order order, Logger logger) throws CanNotMakeExecution {
+    public CreatedOrderDTO createOrder(Order order, Logger logger) throws CanNotMakeExecution {
         boolean checking = false;
-        ArrayList<Integer> new_ids = new ArrayList<>();
+        List<ReceiveRequest> reqs;
+
         ArrayList<Book> books = new ArrayList<>();
 
         for(Book book: order.getBooks()){
@@ -64,29 +68,40 @@ public class BookShopFacade {
 
         }
 
-        Session session = HibernateUtils.getCurrentSession();
-        Transaction tx = session.beginTransaction();
-
         try {
 
-            orderHibImpl.save(order, logger, session, tx);
-            requestHibImpl.insertMany(books, order, logger, session);
-            tx.commit();
+            orderHibImpl.save(order, logger);
+            reqs = requestHibImpl.insertMany(books, order, logger);
+
 
         }
 
         catch (Exception e1){
-            tx.rollback();
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             logger.error("Проблема в BookShopFacade createOrder: " + e1.getMessage());
             throw new CanNotMakeExecution("Проблема создания заказа CAnNotMakeException or others : " + e1.getMessage());
         }
-        finally {
-                session.close();
-        }
 
-        if (order.getStatus() == OrderStatus.DONE){ return null;}
-        else {return new_ids;}
+        CreatedOrderDTO createdOrderDTO = new CreatedOrderDTO();
+        createdOrderDTO.setStatus(order.getStatus());
+        createdOrderDTO.setBooks(books.stream().map(this::toBookDTO).toList());
+        createdOrderDTO.setReqs(reqs);
+        return createdOrderDTO;
 
+    }
+
+    private BookDTO toBookDTO(Book old){
+        return new BookDTO(old.getStatus(),
+                old.getTitle(),
+                old.getYear(),
+                old.getPrice(),
+                old.getGenre(),
+                toAuthorDTO(old.getAuthor()),
+                old.getLastPurchaseDate(),
+                old.getAdmissionDate());
+    }
+    private AuthorDTO toAuthorDTO(Author old){
+        return new AuthorDTO(old.getName(), old.getSurname(), old.getPaternal());
     }
 
 
@@ -243,12 +258,12 @@ public class BookShopFacade {
 
     }
 
-    public Double getIncomeInDiapazon(LocalDate start, LocalDate end,Logger logger){
+    public double getIncomeInDiapazon(LocalDate start, LocalDate end,Logger logger){
         double amount = 0;
         try {
             List<Order>  orders = orderHibImpl.getOrdersInDiapazon(start, end, logger);
             if (orders.isEmpty()) {
-                return 0D;
+                return 0;
             }
 
             for (Order order: orders){
@@ -260,10 +275,10 @@ public class BookShopFacade {
 
         } catch (CanNotMakeExecution e){
             logger.error("Проблема при получении заказов SQl type: " + e.getMessage());
-            return null;
+            return 0;
         }catch (Exception e){
             logger.error("Проблема при получении заказов nonSQl type: " + e.getMessage());
-            return null;
+            return 0;
         }
     }
 

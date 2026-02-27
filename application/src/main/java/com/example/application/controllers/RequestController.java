@@ -1,21 +1,21 @@
 package com.example.application.controllers;
 
-import com.example.application.model.Book;
-import com.example.application.model.Order;
-import com.example.application.model.Request;
+
 import com.example.application.model.RequestResult;
 import com.example.application.model.types.RequestSorting;
 import com.example.application.services.BookService;
-import com.example.custom_applications.Inject;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Service
+@RestController
+@RequestMapping("/requests")
 public class RequestController {
 
     private BookService bookService;
+    private static  final Logger logger = LogManager.getLogger(RequestController.class.getName());
 
     public RequestController(BookService bookService) {
         this.bookService = bookService;
@@ -23,18 +23,13 @@ public class RequestController {
 
 
 
-    List<RequestResult> getAllRequests(String type, Logger logger){
+    @GetMapping
+    List<RequestResult> getAllRequests(@RequestParam("type") String type){
         RequestSorting sorting = getRequestSorting(type);
         return bookService.getSortedRequests(sorting, logger);
     }
 
-    void deleteRequestByBook(Book book, Logger logger){
-        bookService.cancellRequestsByBook(book, logger);
-    }
 
-    void deleteRequestByOrder(Order order, Logger logger){
-        bookService.cancellOrderRequests(order, logger);
-    }
 
     private RequestSorting getRequestSorting(String type){
         return switch (type){
@@ -51,12 +46,5 @@ public class RequestController {
                 "3. По количеству (по возрастанию)\n4. По количеству (по убыванию)\n";
     }
 
-//    public String importRequest(String filename){
-//        return "";
-//        //return bookService.importRequest(filename);
-//    }
-//
-//    public String exportRequest(String id){
-//        return bookService.exportRequest(id);
-//    }
+
 }
