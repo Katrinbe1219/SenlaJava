@@ -35,7 +35,7 @@ services:
       POSTGRES_PASSWORD: postgres
     volumes:
       - pgdata:/var/liv/postgresql/data
-      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - ./init-db/ddl.sql:/docker-entrypoint-initdb.d/ddl.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U java senla -d java_senla_db"]
       interval: 5s

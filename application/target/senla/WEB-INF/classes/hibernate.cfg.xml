@@ -1,0 +1,24 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+<!--        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>-->
+<!--        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>-->
+<!--        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/db_java_senla</property>-->
+<!--        <property name="hibernate.connection.username">java_senla</property>-->
+<!--        <property name="hibernate.connection.password">postgres</property>-->
+        <property name="hibernate.show_sql">true</property>
+            <property name="hibernate.jdbc.batch_size">10 </property>
+            <property name="hibernate.order_inserts">true</property>
+            <property name="hibernate.order_updates">true</property>
+
+
+        <mapping class="com.example.application.model.Book"/>
+        <mapping class="com.example.application.model.Author"/>
+        <mapping class="com.example.application.model.Order"/>
+        <mapping class="com.example.application.model.Customer"/>
+        <mapping class="com.example.application.model.Request"/>
+
+    </session-factory>
+</hibernate-configuration>

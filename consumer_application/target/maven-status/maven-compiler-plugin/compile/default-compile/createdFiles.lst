@@ -1,0 +1,8 @@
+org/example/consumer_application/SendingInformation.class
+org/example/consumer_application/jdbc/TransactionsTable.class
+org/example/consumer_application/jdbc/Account.class
+org/example/consumer_application/jdbc/HibernateImpl.class
+org/example/consumer_application/MessageReceiver.class
+org/example/consumer_application/KafkaConfiguration.class
+org/example/consumer_application/jdbc/DbConfiguration.class
+org/example/consumer_application/Main.class

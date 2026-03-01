@@ -1,0 +1,8 @@
+/home/katrinbe/learning/senla/consumer_application/src/main/java/org/example/consumer_application/jdbc/DbConfiguration.java
+/home/katrinbe/learning/senla/consumer_application/src/main/java/org/example/consumer_application/jdbc/TransactionsTable.java
+/home/katrinbe/learning/senla/consumer_application/src/main/java/org/example/consumer_application/Main.java
+/home/katrinbe/learning/senla/consumer_application/src/main/java/org/example/consumer_application/jdbc/HibernateImpl.java
+/home/katrinbe/learning/senla/consumer_application/src/main/java/org/example/consumer_application/SendingInformation.java
+/home/katrinbe/learning/senla/consumer_application/src/main/java/org/example/consumer_application/KafkaConfiguration.java
+/home/katrinbe/learning/senla/consumer_application/src/main/java/org/example/consumer_application/jdbc/Account.java
+/home/katrinbe/learning/senla/consumer_application/src/main/java/org/example/consumer_application/MessageReceiver.java

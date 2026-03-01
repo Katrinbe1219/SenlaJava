@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import java.util.UUID;
 public class KafkaConfiguration {
 
     @Bean
-    public ProducerFactory<String, String> producerFactory(){
+    public ProducerFactory<String, SendingInformation> producerFactory(){
         //Integer - ип ключа с которым будут отправляться сообщения
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(
@@ -39,23 +40,23 @@ public class KafkaConfiguration {
         configProps.put(ProducerConfig.ACKS_CONFIG, "all");
         // для exactly once нужно фиксировать смещение самому
         configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-
+//        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         configProps.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "tr-1" + UUID.randomUUID());
 
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 
     @Bean
-    public KafkaTemplate<String, String> kafkaTemplate(){
+    public KafkaTemplate<String, SendingInformation> kafkaTemplate(){
         // главный компонент для отправки сообщений
         return new KafkaTemplate<>(producerFactory());
     }
 
     // менеджер транзакций для использования @Transactional
     @Bean
-    public KafkaTransactionManager<String, String> transactionManager(
-            ProducerFactory<String, String> producerFactory
+    public KafkaTransactionManager<String, SendingInformation> transactionManager(
+            ProducerFactory<String, SendingInformation> producerFactory
     ){
         return new KafkaTransactionManager<>(producerFactory);
     }
@@ -75,6 +76,8 @@ public class KafkaConfiguration {
                 .replicas(3)
                 .build();
     }
+
+
 
 
 

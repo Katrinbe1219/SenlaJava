@@ -1,0 +1,7 @@
+org/example/application/MessageSender.class
+org/example/application/SendingInformation.class
+org/example/application/hibernate/HIbernateImpl.class
+org/example/application/Main.class
+org/example/application/hibernate/AccountEntity.class
+org/example/application/KafkaConfiguration.class
+org/example/application/hibernate/ConfigurationHibernate.class
