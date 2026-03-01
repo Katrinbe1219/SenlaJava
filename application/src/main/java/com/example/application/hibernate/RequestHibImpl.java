@@ -1,5 +1,6 @@
 package com.example.application.hibernate;
 
+import com.example.application.dto.ReceiveRequest;
 import com.example.application.errors.CanNotMakeExecution;
 import com.example.application.model.Book;
 import com.example.application.model.Order;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -28,16 +30,19 @@ public class RequestHibImpl extends HibernateAbstractDao<Request, Integer, Logge
 
 
     @Transactional
-    public void insertMany(List<Book> books, Order order, Logger logger) throws CanNotMakeExecution {
+    public List<ReceiveRequest> insertMany(List<Book> books, Order order, Logger logger) throws CanNotMakeExecution {
 
         Session session = getSessionFactory().getCurrentSession();
-
+        List<ReceiveRequest> requests = new ArrayList<>();
 
         try{
             int batchSize = 10;
             int i;
             for (i = 0; i< books.size(); i++){
-                session.persist(new Request(books.get(i), order));
+                ReceiveRequest request = new ReceiveRequest();
+                request.setBookName(books.get(i).getTitle());
+                requests.add(request);
+                session.persist( new Request(books.get(i), order));
 
                 if ((i+1)%batchSize ==0){
                     session.flush();
@@ -45,6 +50,8 @@ public class RequestHibImpl extends HibernateAbstractDao<Request, Integer, Logge
                 }
 
             }
+
+            return requests;
 
 
         } catch (Exception e) {

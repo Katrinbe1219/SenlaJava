@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
+import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -51,8 +52,8 @@ public class OrderController {
         };
     }
 
-    @PostMapping(value = "/create", produces = "text/plain")
-    public String createOrder(@RequestBody OrderCreateDto order) {
+    @PostMapping(value = "/create")
+    public CreatedOrderDTO createOrder(@RequestBody OrderCreateDto order) {
         Order orderObject = new Order();
         orderObject.setCustomer(toCustomer(order.getCustomer()));
 
@@ -61,15 +62,12 @@ public class OrderController {
             orderObject.addBook(book);
         }
 
-        ArrayList<Integer> done = bookshop.createOrder(orderObject, logger);
-        if (done == null) {
+        CreatedOrderDTO done = bookshop.createOrder(orderObject, logger);
+        if (done.getStatus() == OrderStatus.DONE) {
             bookService.setLastPurchase(orderObject.getBooks(), logger);
-            return "Order created successfully";
-
-
-        }else {
-            return "Order was created with requests " + done.toString();
         }
+
+        return done;
 
     }
 
@@ -92,17 +90,18 @@ public class OrderController {
     }
 
     @DeleteMapping("/delete/{orderId}")
-    public String deleteOrder(@PathVariable int orderId){
+    public StrinResponse deleteOrder(@PathVariable("orderId") int orderId) throws Exception{
         Order order = bookshop.getOrderById(orderId, logger);
-        if (order == null) return "Нет такого заказ";
+        if (order == null) throw new Exception("Такого нет заказа");
+
 
         Boolean result = bookshop.removeOrder(order, logger);
         if (result){
             bookService.cancellOrderRequests(order, logger);
             logger.info("Обработка команды удаления в отсеке заказов завершена");
-            return "Удалено";
+            return new StrinResponse("Удалено");
         }
-        return "Ошибка";
+        throw new Exception("Такого нет заказа");
     }
 
     @GetMapping("/diapazon")
@@ -130,23 +129,23 @@ public class OrderController {
 
 
     @GetMapping(value = "/amount", produces= MediaType.APPLICATION_JSON_VALUE)
-    int displayOrderAmountInDiapazon(@RequestParam("firstDate") String firstDate,
+    StrinResponse displayOrderAmountInDiapazon(@RequestParam("firstDate") String firstDate,
                                      @RequestParam("secondDate") String secondDate){
         try {
             LocalDate first = LocalDate.parse(firstDate);
             LocalDate second = LocalDate.parse(secondDate);
             Integer orders = bookshop.getOrdersAmountInDiapazon(first,second, logger);
 
-            return orders;
+            return new StrinResponse("Количество заказов: " + String.valueOf(orders));
         } catch (DateTimeParseException e) {
             System.out.println(e.getMessage());
-            return -1;
+            return new StrinResponse("Нет заказов");
         }
 
     }
 
     @GetMapping(value = "/income", produces= MediaType.APPLICATION_JSON_VALUE)
-    double displayIncomeInDiapazon(
+    StrinResponse displayIncomeInDiapazon(
             @RequestParam("firstDate") String firstDate,
             @RequestParam("secondDate") String secondDate){
         try {
@@ -155,10 +154,10 @@ public class OrderController {
             double orders = bookshop.getIncomeInDiapazon(first, second, logger);
 
 
-            return orders;
+            return new StrinResponse("Доход: " + String.valueOf(orders));
         } catch (DateTimeParseException e) {
             System.out.println(e.getMessage());
-            return -1;
+            return new StrinResponse("Нет дохода");
         }
 
 

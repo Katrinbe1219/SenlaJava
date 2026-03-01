@@ -87,6 +87,25 @@ public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
     }
 
     @Transactional
+    public Book getBookById(Logger logger, Integer id) throws CanNotMakeExecution{
+
+        try {
+            Session session = getSessionFactory().getCurrentSession();
+            HibernateCriteriaBuilder builder = session.getCriteriaBuilder();
+            JpaCriteriaQuery query = session.getCriteriaBuilder().createQuery(Book.class);
+            JpaRoot<Book> root = query.from(Book.class);
+            root.fetch("author", JoinType.LEFT);
+            query.select(root).where(builder.equal(root.get("id"),id ));
+            return (Book) session.createQuery(query).uniqueResult();
+        }
+        catch (Exception e){
+            logger.error("Проблема в BookHIbIMpl getBookByTitle : " + e.getMessage());
+            throw new  CanNotMakeExecution("\nBookHIbIMpl getBookByTitle :" + e.getMessage());
+
+        }
+
+    }
+    @Transactional
     public List<Book> getSortedBooks (String field, boolean descCondition, Logger logger){
 
         try {
@@ -123,6 +142,7 @@ public class BookHibImpl extends  HibernateAbstractDao<Book, Integer, Logger>{
             HibernateCriteriaBuilder builder = session.getCriteriaBuilder();
             JpaCriteriaQuery<Book>  query = builder.createQuery(Book.class);
             JpaRoot<Book> books = query.from(Book.class);
+            books.fetch("author", JoinType.LEFT);
             query.where(books.get("title").in(titles));
 
             return session.createQuery(query).list();

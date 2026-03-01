@@ -1,10 +1,16 @@
 package com.example.application.services;
 
+import com.example.application.dto.AuthorDTO;
+import com.example.application.dto.BookDTO;
+import com.example.application.dto.CreatedOrderDTO;
+import com.example.application.dto.ReceiveRequest;
 import com.example.application.errors.CanNotMakeExecution;
 import com.example.application.hibernate.OrderHibImplementation;
 import com.example.application.hibernate.RequestHibImpl;
+import com.example.application.model.Author;
 import com.example.application.model.Book;
 import com.example.application.model.Order;
+import com.example.application.model.Request;
 import com.example.application.model.types.BookStatus;
 import com.example.application.model.types.OrderSorting;
 import com.example.application.model.types.OrderStatus;
@@ -43,9 +49,10 @@ public class BookShopFacade {
     // тем более что одно connection, значит данная программа не предназначена для каких-то параллельных запросов для огромного числа пользователей
 
 
-    public ArrayList<Integer> createOrder(Order order, Logger logger) throws CanNotMakeExecution {
+    public CreatedOrderDTO createOrder(Order order, Logger logger) throws CanNotMakeExecution {
         boolean checking = false;
-        ArrayList<Integer> new_ids = new ArrayList<>();
+        List<ReceiveRequest> reqs;
+
         ArrayList<Book> books = new ArrayList<>();
 
         for(Book book: order.getBooks()){
@@ -64,7 +71,7 @@ public class BookShopFacade {
         try {
 
             orderHibImpl.save(order, logger);
-            requestHibImpl.insertMany(books, order, logger);
+            reqs = requestHibImpl.insertMany(books, order, logger);
 
 
         }
@@ -75,10 +82,26 @@ public class BookShopFacade {
             throw new CanNotMakeExecution("Проблема создания заказа CAnNotMakeException or others : " + e1.getMessage());
         }
 
+        CreatedOrderDTO createdOrderDTO = new CreatedOrderDTO();
+        createdOrderDTO.setStatus(order.getStatus());
+        createdOrderDTO.setBooks(books.stream().map(this::toBookDTO).toList());
+        createdOrderDTO.setReqs(reqs);
+        return createdOrderDTO;
 
-        if (order.getStatus() == OrderStatus.DONE){ return null;}
-        else {return new_ids;}
+    }
 
+    private BookDTO toBookDTO(Book old){
+        return new BookDTO(old.getStatus(),
+                old.getTitle(),
+                old.getYear(),
+                old.getPrice(),
+                old.getGenre(),
+                toAuthorDTO(old.getAuthor()),
+                old.getLastPurchaseDate(),
+                old.getAdmissionDate());
+    }
+    private AuthorDTO toAuthorDTO(Author old){
+        return new AuthorDTO(old.getName(), old.getSurname(), old.getPaternal());
     }
 
 
