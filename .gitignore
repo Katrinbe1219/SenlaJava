@@ -4,3 +4,5 @@
 custom_annotations/.gradle
 processing_annotations/.gradle
 new_out
+consumer_application
+init-db.sql

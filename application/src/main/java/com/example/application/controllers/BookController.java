@@ -1,62 +1,76 @@
 package com.example.application.controllers;
 
+import com.example.application.dto.BookDTO;
+import com.example.application.dto.StrinResponse;
 import com.example.application.model.Book;
 import com.example.application.model.types.BookSorting;
 import com.example.application.model.types.LongLiedBookSorting;
 import com.example.application.services.BookService;
-import com.example.custom_applications.Inject;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
-@Service
+@RestController
+@RequestMapping("/books")
 public class BookController {
     private BookService bookService;
+    private static final Logger logger = LogManager.getLogger();
 
     public BookController(BookService bookService) {
         this.bookService = bookService;
     }
 
-
-
-    public List<Book> displayAllBooks(Logger logger){
-        return  bookService.getAllBooks(logger);
+    @GetMapping
+    public  List<BookDTO> displayAllBooks(){
+        List<BookDTO> result =   bookService.getAllBooks(logger);
+        return result;
 
     }
 
-    public List<Book> displaySortedBooks(String type,Logger logger){
+
+
+
+    @GetMapping("/sorted")
+    public List<BookDTO> displaySortedBooks(@RequestParam("type")  String type){
         BookSorting sorting= getBookType(type);
         return bookService.getSortedBooks(sorting,logger);
-
-
     }
 
-    public List<Book> displayLongLiedBooks(String type, int numberOfMonth, Logger logger){
+
+
+
+    @GetMapping("/longLied")
+    public List<BookDTO> displayLongLiedBooks(@RequestParam("type") String type, @RequestParam("numberOfMonth")  int numberOfMonth){
         LongLiedBookSorting sorting= getLongLiedBookType(type);
         return bookService.getLongLiedBooks(sorting, numberOfMonth, logger);
-
-
     }
 
-    public String checkBook(String book, Logger logger){
+
+
+    @GetMapping(value = "/check/{id}")
+    public StrinResponse checkBook(@PathVariable("id") Integer book){
         boolean checking = bookService.checkBook(book, logger);
         if (checking) {
-            return "Книга в наличии";
+            return new StrinResponse("Книга в наличии");
         }else{
-            return "Книга не в наличии";
+            return new StrinResponse("Книга не в наличии");
         }
     }
 
-    public String displayBookDescription(String bookName,Logger logger){
+
+    @GetMapping(value = "/description/{id}")
+    public StrinResponse displayBookDescription(@PathVariable("id") Integer bookName){
         String description = bookService.getBookDescription(bookName, logger);
         if (description == null) {
-            return "Не было найдено";
+            return new StrinResponse("Найдено не было");
         }else{
-            return description;
+            return new StrinResponse(description);
         }
     }
+
+
 
     BookSorting getBookType(String type){
         return switch (type) {
@@ -84,33 +98,5 @@ public class BookController {
 
     }
 
-    String getForDisplayType(String type){
-        if (type.equals("Lbooks") ){
-            return "1. Дата (возрастание)\n2.Дата (убывание)\n3.Цена (по возрастанию)\n4.Цена (по убыванию) 5. Без фильтра";
-        }
-        return "1. По алфавиту (по возрастанию)\n2. По алфавиту (по убыванию)\n" +
-                "3. В наличии\n4. Цена (по возрастанию)\n5. Цена (по убыванию)\n" +
-                "6. Дата (по возрастанию)\n7. Дата (по убыванию)\n8.Без фильтра";
-    }
-
-    Book getBookByTitle(String name, Logger logger){
-        return bookService.getBookByTitle(name, logger);
-    }
-
-    public boolean receiveBook (String name,Logger logger){
-        return bookService.receiveBook(name, logger);
-    }
-
-    public void setLastPurchase(List<Book> books, Logger logger){
-        bookService.setLastPurchase(books, logger);
-    }
-
-//    public String importBook(String fileName){
-//        return bookService.importNewBook(fileName);
-//    }
-
-//    public String exportBook(String fileName){
-//        return bookService.exportBook(fileName);
-//    }
 
 }
