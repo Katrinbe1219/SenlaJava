@@ -38,7 +38,7 @@ public class KafkaConfiguration {
 
         props.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, 10240);  // 10KB
         props.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, 5000); // 5 секунд
-        props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 500);
+        //props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 500);
         props.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, 1048576);
 
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");

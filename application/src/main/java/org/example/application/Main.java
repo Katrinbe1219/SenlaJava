@@ -7,7 +7,7 @@ public class Main {
     public static void main(String[] args) {
 
             AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(KafkaConfiguration.class);
-            MessageSender sender = (MessageSender) context.getBean("messageSender");
+            //MessageSender sender = (MessageSender) context.getBean("messageSender");
 
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

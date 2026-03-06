@@ -43,7 +43,7 @@ public class MessageSender {
     @Scheduled(fixedDelay = 200) // fixedRate подойдет для нескольких потоков
     @Transactional
     public void sendMessage(){
-        String message = "# " + counter.incrementAndGet() + " Message";
+        //String message = "# " + counter.incrementAndGet() + " Message";
 
         kafkaTemplate.executeInTransaction(operations -> {
             try {
@@ -58,8 +58,8 @@ public class MessageSender {
                 logger.info("Message  " + result.getRecordMetadata() + " was sent");
                 return true; // успех - коммит
             }catch(TimeoutException | InterruptedException | ExecutionException e){
-                logger.error("Error while sending message: " + message + " ; exception: " + e);
-                throw new RuntimeException("Отправка не выполнилась ща 5 секунд: "+ e);
+                logger.error("Error while sending message exception: " + e);
+                throw new RuntimeException("Отправка не выполнилась за 5 секунд: "+ e);
                 // вызовет откат транзакции
             }
         });
@@ -69,11 +69,8 @@ public class MessageSender {
     @PostConstruct
     public void checkDatabase(){
         try {
-            System.out.println("before");
+
             List<AccountEntity> list = repo.findAll();
-            System.out.println("here");
-            System.out.println("kl " + list + " ");
-            System.out.println("asd " + list.size());
 
             if (list.isEmpty()){
                 int balance;
@@ -107,7 +104,7 @@ public class MessageSender {
 
         int transfer = ThreadLocalRandom.current().nextInt(0,10000);
 
-        return new SendingInformation(firstIndex,secondIndex,transfer);
+        return new SendingInformation(firstIndex,secondIndex,transfer,counter.incrementAndGet());
     }
 
 }

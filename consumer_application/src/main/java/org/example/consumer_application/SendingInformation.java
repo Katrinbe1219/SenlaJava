@@ -4,25 +4,14 @@ public class SendingInformation {
     private int receiver_id;
     private int sender_id;
     private  int balance;
+    private int  numOfMessage;
 
     public SendingInformation(){}
-
-    public SendingInformation(int receiver_id, int sender_id, int balance) {
+    public SendingInformation(int receiver_id, int sender_id, int balance, int numOfMessage) {
         this.receiver_id = receiver_id;
         this.sender_id = sender_id;
         this.balance = balance;
-    }
-
-    public int getReceiverId() {
-        return receiver_id;
-    }
-
-    public int getSenderId(){
-        return sender_id;
-    }
-
-    public int getBalance() {
-        return balance;
+        this.numOfMessage = numOfMessage;
     }
 
     public void setReceiver_id(int receiver_id) {
@@ -37,7 +26,25 @@ public class SendingInformation {
         this.balance = balance;
     }
 
+    public int getReceiver_id() {
+        return receiver_id;
+    }
 
+    public int getSender_id() {
+        return sender_id;
+    }
+
+    public int getBalance() {
+        return balance;
+    }
+
+    public void setNumOfMessage(int numOfMessage) {
+        this.numOfMessage = numOfMessage;
+    }
+
+    public int getNumOfMessage() {
+        return numOfMessage;
+    }
 
 
 }

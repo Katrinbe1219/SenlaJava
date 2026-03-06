@@ -20,6 +20,7 @@ public class MessageReceiver {
 
     private HibernateImpl repo;
     public MessageReceiver(HibernateImpl repo) {
+
         this.repo = repo;
     }
 
@@ -30,16 +31,20 @@ public class MessageReceiver {
     public void receiverMessage(List<ConsumerRecord<String, SendingInformation>> records) throws Exception{
 
         System.out.println("Я в receiveMessage " + records.size());
+        System.out.println("Я в receiveMessage " + records.get(0).value().getNumOfMessage());
         for (ConsumerRecord<String, SendingInformation> record : records) {
             String key = record.key();
             SendingInformation message = record.value();
             int partition = record.partition();
             long offset = record.offset();
-            System.out.println("Я в receiveMessage " + message);
+
             String basicInfo = "partition=" + partition +
                     ", offset=" + offset + ", key=" + key + ", message=" + message;
 
             logger.info("Starting of preprocessing: " + basicInfo);
+            logger.debug("Starting of preprocessing: " + basicInfo);
+            logger.error("Starting of preprocessing: " + basicInfo);
+            logger.trace("Starting of preprocessing: " + basicInfo);
             try{
                 prepocessInfo(message);
                 logger.info("End of successfully processing: " + basicInfo);
@@ -50,26 +55,17 @@ public class MessageReceiver {
 
                 // сообщение будет перечитано, но в данный момент не проходит по каким-то условиям
             }
-
-
         }
-
-
-
-
     }
 
 
 
     private void prepocessInfo(SendingInformation record) throws Exception{
 
-        Account firstAccount = repo.getAccount(record.getSenderId());
-        Account secondAccount = repo.getAccount(record.getReceiverId());
+        Account firstAccount = repo.getAccount(record.getSender_id());
+        Account secondAccount = repo.getAccount(record.getReceiver_id());
 
         if (firstAccount == null || secondAccount == null) {
-//            repo.insertTransaction(new TransactionsTable(
-//                    firstAccount, secondAccount, record.getBalance(), 'N'
-//            ));
             logger.debug("Таких аккаунтов не существует");
         }
 
