@@ -8,6 +8,7 @@ import com.example.application.model.types.LongLiedBookSorting;
 import com.example.application.services.BookService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class BookController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('get_models')")
     public  List<BookDTO> displayAllBooks(){
         List<BookDTO> result =   bookService.getAllBooks(logger);
         return result;
@@ -33,6 +35,7 @@ public class BookController {
 
 
     @GetMapping("/sorted")
+    @PreAuthorize("hasAuthority('get_models')")
     public List<BookDTO> displaySortedBooks(@RequestParam("type")  String type){
         BookSorting sorting= getBookType(type);
         return bookService.getSortedBooks(sorting,logger);
@@ -42,6 +45,7 @@ public class BookController {
 
 
     @GetMapping("/longLied")
+    @PreAuthorize("hasAuthority('get_models')")
     public List<BookDTO> displayLongLiedBooks(@RequestParam("type") String type, @RequestParam("numberOfMonth")  int numberOfMonth){
         LongLiedBookSorting sorting= getLongLiedBookType(type);
         return bookService.getLongLiedBooks(sorting, numberOfMonth, logger);
@@ -50,6 +54,7 @@ public class BookController {
 
 
     @GetMapping(value = "/check/{id}")
+    @PreAuthorize("hasAuthority('get_models')")
     public StrinResponse checkBook(@PathVariable("id") Integer book){
         boolean checking = bookService.checkBook(book, logger);
         if (checking) {
@@ -61,6 +66,7 @@ public class BookController {
 
 
     @GetMapping(value = "/description/{id}")
+    @PreAuthorize("hasAuthority('get_models')")
     public StrinResponse displayBookDescription(@PathVariable("id") Integer bookName){
         String description = bookService.getBookDescription(bookName, logger);
         if (description == null) {

@@ -12,6 +12,7 @@ import com.example.application.services.BookShopFacade;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,6 +54,7 @@ public class OrderController {
     }
 
     @PostMapping(value = "/create")
+    @PreAuthorize("hasAuthority('create_models')")
     public CreatedOrderDTO createOrder(@RequestBody OrderCreateDto order) {
         Order orderObject = new Order();
         orderObject.setCustomer(toCustomer(order.getCustomer()));
@@ -73,6 +75,7 @@ public class OrderController {
 
 
     @GetMapping
+    @PreAuthorize("hasAuthority('get_models')")
     List<OrderDTO> getAllOrders(@RequestParam("type") String type){
         OrderSorting sorting = getOrderSorting(type);
         List<Order> orders = bookshop.getSortedOrders(sorting, logger);
@@ -80,6 +83,7 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}")
+    @PreAuthorize("hasAuthority('get_models')")
     OrderDTO getOrder(@PathVariable("orderId") int orderId){
         try {
             return toOrderDTO(bookshop.getOrderById(orderId, logger));
@@ -90,6 +94,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/delete/{orderId}")
+    @PreAuthorize("hasAuthority('delete_models')")
     public StrinResponse deleteOrder(@PathVariable("orderId") int orderId) throws Exception{
         Order order = bookshop.getOrderById(orderId, logger);
         if (order == null) throw new Exception("Такого нет заказа");
@@ -105,6 +110,7 @@ public class OrderController {
     }
 
     @GetMapping("/diapazon")
+    @PreAuthorize("hasAuthority('get_settings')")
     List<OrderDTO> displayOrdersInDiapazon(@RequestParam("firstDate") String firstDate,
                                         @RequestParam("secondDate") String secondDate,
                                         @RequestParam("type") String type){

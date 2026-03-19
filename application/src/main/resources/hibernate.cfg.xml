@@ -19,6 +19,9 @@
         <mapping class="com.example.application.model.Order"/>
         <mapping class="com.example.application.model.Customer"/>
         <mapping class="com.example.application.model.Request"/>
+        <mapping class="com.example.application.model.User"/>
+        <mapping class="com.example.application.model.Role"/>
+        <mapping class="com.example.application.model.Privilege"/>
 
     </session-factory>
 </hibernate-configuration>

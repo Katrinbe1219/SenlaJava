@@ -48,46 +48,4 @@ public class AppConfig implements WebMvcConfigurer {
         return factory;
     }
 
-//    @Bean
-//    public LocalContainerEntityManagerFactoryBean entityManagerFactory(
-//            DataSource dataSource
-//    ){
-//        LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
-//        emf.setDataSource(dataSource);
-//
-//        emf.setPackagesToScan("com.example.application");
-//
-//        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-//        vendorAdapter.setGenerateDdl(true);
-//        vendorAdapter.setShowSql(true);
-//        emf.setJpaVendorAdapter(vendorAdapter);
-//
-//        Properties props = new Properties();
-//        props.put("hibernate.show_sql", "true");
-//        props.put("hibernate.format_sql", "true");
-//        props.put("hibernate.hbm2ddl.auto", "none");
-//        props.put("hibernate.ddl-auto", "none");
-//        props.put("hibernate.connection.handling_mode", "DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION");
-//        props.put("hibernate.connection.acquisition_mode", "IMMEDIATE");
-//        props.put("hibernate.connection.release_mode", "AFTER_TRANSACTION");
-//        props.put("hibernate.connection.provider_class",
-//                "org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl");
-//        emf.setJpaProperties(props);
-//        return emf;
-//    }
-//
-//
-//
-//    @Bean
-//    public PlatformTransactionManager transactionManager(
-//            EntityManagerFactory entityManagerFactory,
-//            DataSource dataSource
-//    ){
-//        JpaTransactionManager manager = new JpaTransactionManager();
-//        manager.setEntityManagerFactory(entityManagerFactory);
-//        manager.setDataSource(dataSource);
-//
-//        return manager;
-//
-//    }
 }
