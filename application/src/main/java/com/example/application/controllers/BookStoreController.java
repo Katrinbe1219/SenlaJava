@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/")
+
 public class BookStoreController {
 
     private BookService bookService;
@@ -34,7 +35,7 @@ public class BookStoreController {
 
     @PatchMapping(value = "/receive", produces = "text/plain; charset=UTF-8" )
     public String receiveBook(@RequestBody ReceiveRequest book) {
-        System.out.println("book " + book.getBookName());
+
         Boolean checking = bookService.receiveBook(book.getBookName(), logger);
         if (!checking) return "Ошибка";
 

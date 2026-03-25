@@ -31,13 +31,11 @@ public class SettingsService {
     }
 
     public String changeNumberOfMonth(int month){
-        try {
+
             this.numberOfMonth = month;
 
            return "set";
-        } catch ( NumberCanNotBeChanged e) {
-            return e.getMessage();
-        }
+
 
     }
 

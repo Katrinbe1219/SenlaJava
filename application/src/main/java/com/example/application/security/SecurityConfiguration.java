@@ -5,8 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -19,6 +22,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfiguration {
 
     private com.example.application.security.UserDetailsService userDetailsService;
@@ -34,8 +38,9 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        CustomLoginFilter customLoginFilter = new CustomLoginFilter(authenticationManager(http), jwtService);
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   AuthenticationManager manager) throws Exception {
+        CustomLoginFilter customLoginFilter = new CustomLoginFilter(manager, jwtService);
         CustomAccessDeniedHandler customAccessDeniedHandler = new CustomAccessDeniedHandler();
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -63,12 +68,14 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        
-        AuthenticationManagerBuilder builder = http
-                .getSharedObject(AuthenticationManagerBuilder.class);
-        builder.userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder());
-        return builder.build();
+    public AuthenticationManager authenticationManager(
+            UserDetailsService userDetailsService,
+            PasswordEncoder passwordEncoder) {
+
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+
+        provider.setUserDetailsService(userDetailsService);
+                provider.setPasswordEncoder(passwordEncoder);
+        return new ProviderManager(provider);
     }
 }

@@ -50,6 +50,13 @@ public class Order implements Comparable<Order>, Serializable {
         totalCost = 0;
         status = OrderStatus.NEW;
     }
+    public Order(int id, Customer c){
+        this.customer = c;
+        this.id = id;
+        books = new ArrayList<>();
+        totalCost = 0;
+        status = OrderStatus.NEW;
+    }
     public Order(){
         books = new ArrayList<>();
         totalCost = 0;

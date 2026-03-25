@@ -16,6 +16,12 @@ public class GlobalExceptionController {
         return new ResponseEntity<>("Error: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<String> handleDeniedAccess(AccessDeniedException ex){
+        return new ResponseEntity<>("Access denied: " + ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<String> handleExceptions(Exception ex){
@@ -23,9 +29,5 @@ public class GlobalExceptionController {
 
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ResponseEntity<String> handleDeniedAccess(AccessDeniedException ex){
-        return new ResponseEntity<>("Access denied: " + ex.getMessage(), HttpStatus.FORBIDDEN);
-    }
+
 }
