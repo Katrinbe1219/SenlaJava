@@ -39,7 +39,7 @@ public class SecurityConfiguration {
         CustomAccessDeniedHandler customAccessDeniedHandler = new CustomAccessDeniedHandler();
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeRequests(auth -> auth
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/books/**","/orders/**","/requests/**").hasAnyRole("USER_WATCHER", "ADMIN", "USER_FULL")
                         .requestMatchers("/receive/**","/settings/**").hasRole("ADMIN")
