@@ -64,6 +64,7 @@ public class MessageReceiver {
 
         if (firstAccount == null || secondAccount == null) {
             logger.debug("Таких аккаунтов не существует");
+            return;
         }
 
         if (firstAccount.getBalance() - record.getBalance() < 0){
@@ -71,6 +72,7 @@ public class MessageReceiver {
                     firstAccount, secondAccount, record.getBalance(), 'N'
             ));
             logger.debug("У отправителя не хватает средств");
+            return;
         }
 
         firstAccount.decreaseBalance(record.getBalance());
