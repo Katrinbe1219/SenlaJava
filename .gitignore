@@ -4,7 +4,5 @@ Task_4/META-INF
 #added empty gitigore
 .gradle
 .idea
-application
-custom_annotations
-new_out
-processing_annotations
+application/target
+consumer_application/target
