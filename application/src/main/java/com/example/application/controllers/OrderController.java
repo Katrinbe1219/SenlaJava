@@ -1,10 +1,7 @@
 package com.example.application.controllers;
 
 import com.example.application.dto.*;
-import com.example.application.model.Author;
-import com.example.application.model.Book;
-import com.example.application.model.Customer;
-import com.example.application.model.Order;
+import com.example.application.model.*;
 import com.example.application.model.types.OrderSorting;
 import com.example.application.model.types.OrderStatus;
 import com.example.application.services.BookService;
@@ -13,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
@@ -97,8 +95,12 @@ public class OrderController {
     @PreAuthorize("hasAuthority('delete_models')")
     public StrinResponse deleteOrder(@PathVariable("orderId") int orderId) throws Exception{
         Order order = bookshop.getOrderById(orderId, logger);
-        if (order == null) throw new Exception("Такого нет заказа");
 
+        if (order == null) throw new Exception("Does not exist");
+        UserSecured user = (UserSecured) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!order.getCustomer().getName().equals(user.getUsername())) {
+            throw new Exception("It is not your order");
+        }
 
         Boolean result = bookshop.removeOrder(order, logger);
         if (result){
