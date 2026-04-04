@@ -8,6 +8,7 @@ import com.example.application.security.SecurityConfiguration;
 import com.example.application.services.BookService;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -70,7 +71,8 @@ public class RequestControllerTest {
 
     @Test
     @WithMockUser(username="user", authorities = {"ROLE_USER_WATCHER", "get_models"})
-    void getAllReqPositive() throws Exception {
+    @DisplayName("getAllReqIfRoleIs")
+    void getAllReqIfRoleIs() throws Exception {
         when(bookService.getSortedRequests(any(RequestSorting.class), any(Logger.class)))
                 .thenReturn(getRequests());
         mockMvc.perform(get("/requests")
@@ -81,7 +83,8 @@ public class RequestControllerTest {
 
     @Test
     @WithMockUser(username="user", authorities = { "get_models"})
-    void getAllReqNegative() throws Exception {
+    @DisplayName("getAllReqIfRoleIsNot")
+    void getAllReqIfRoleIsNot() throws Exception {
         // не хватает роли
         when(bookService.getSortedRequests(any(RequestSorting.class), any(Logger.class)))
                 .thenReturn(getRequests());

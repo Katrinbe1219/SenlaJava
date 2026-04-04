@@ -5,6 +5,7 @@ import com.example.application.errors.GlobalExceptionController;
 import com.example.application.security.SecurityConfiguration;
 import com.example.application.services.SettingsService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -58,7 +59,8 @@ public class SettingControllerTest {
 
     @Test
     @WithMockUser(username = "admin", authorities ={"ROLE_ADMIN"} )
-    public void getNumberMonthPositive() throws Exception {
+    @DisplayName("getNumberMonthIfRoleIsCorrect")
+    public void getNumberMonthIfRoleIsCorrect() throws Exception {
         when(settingsService.getNumberOfMonth())
                 .thenReturn(2);
         mockMvc.perform(get("/settings/month"))
@@ -67,7 +69,8 @@ public class SettingControllerTest {
 
     @Test
     @WithMockUser(username = "user", authorities = {"ROLE_USER_FULL"})
-    public void getNumberMonthNegative() throws Exception {
+    @DisplayName("getNumberMonthIfRoleIsIncorrect")
+    public void getNumberMonthIfRoleIsIncorrect() throws Exception {
         // не та роль
         when(settingsService.getNumberOfMonth())
                 .thenReturn(2);
@@ -77,7 +80,8 @@ public class SettingControllerTest {
 
     @Test
     @WithMockUser(username = "admin", authorities ={"ROLE_ADMIN"} )
-    public void getFunctionPositive() throws Exception {
+    @DisplayName("getFunctionIfRoleIsCorrect")
+    public void getFunctionIfRoleIsCorrect() throws Exception {
         when(settingsService.getWarehouseOption())
                 .thenReturn("true");
         mockMvc.perform(get("/settings/month"))
@@ -86,7 +90,8 @@ public class SettingControllerTest {
 
     @Test
     @WithMockUser(username = "user", authorities = {"ROLE_USER_FULL"})
-    public void getFunctionNegative() throws Exception {
+    @DisplayName("getFunctionIfRoleIsIncorrect")
+    public void getFunctionIfRoleIsIncorrect() throws Exception {
         // не та роль
         when(settingsService.getWarehouseOption())
                 .thenReturn("true");
@@ -96,7 +101,8 @@ public class SettingControllerTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
-    public void changeFunctionPositive() throws Exception {
+    @DisplayName("changeFunctionIfAuthoritiesAre")
+    public void changeFunctionIfAuthoritiesAre() throws Exception {
         when(settingsService.setWarehouseFunction(anyString())).thenReturn("true");
         mockMvc.perform(patch("/settings/change-warehouse")
                 .param("func", "true"))
@@ -105,7 +111,8 @@ public class SettingControllerTest {
 
     @Test
     @WithMockUser(username = "admin")
-    public void changeFunctionNegative() throws Exception {
+    @DisplayName("changeFunctionIfAuthoritiesAreNot")
+    public void changeFunctionIfAuthoritiesAreNot() throws Exception {
         when(settingsService.setWarehouseFunction(anyString())).thenReturn("true");
         mockMvc.perform(patch("/settings/change-warehouse")
                         .param("func", "true"))
@@ -114,7 +121,8 @@ public class SettingControllerTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
-    public void changeNumberOfMonthPositive() throws Exception {
+    @DisplayName("changeNumberOfMonthPositiveIfParamIs")
+    public void changeNumberOfMonthPositiveIfParamIs() throws Exception {
         when(settingsService.changeNumberOfMonth(anyInt())).thenReturn("true");
         mockMvc.perform(patch("/settings/change-number")
                         .param("number", "1"))
@@ -123,7 +131,8 @@ public class SettingControllerTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"ROLE_ADMIN"})
-    public void changeNumberOfMonthNegative() throws Exception {
+    @DisplayName("changeNumberOfMonthPositiveIfParamIsNot")
+    public void changeNumberOfMonthPositiveIfParamIsNot() throws Exception {
         when(settingsService.changeNumberOfMonth(anyInt())).thenReturn("true");
         mockMvc.perform(patch("/settings/change-number")
                         )

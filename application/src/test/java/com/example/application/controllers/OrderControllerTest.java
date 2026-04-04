@@ -18,10 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.lang.Assert;
 import jakarta.servlet.Filter;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,6 +105,7 @@ public class OrderControllerTest {
 
     @Test
     @WithMockUser(username = "user_watcher", authorities = {"get_models", "ROLE_USER_WATCHER"})
+    @DisplayName("getOrdersIfUserIsAuthorized")
     void getOrdersPositive()  throws Exception {
         when(bookshop.getSortedOrders(any(OrderSorting.class), any(Logger.class))).thenReturn(getListOrders());
 
@@ -118,7 +116,8 @@ public class OrderControllerTest {
     }
     @Test
     @WithAnonymousUser
-    void getOrdersNegative() throws Exception {
+    @DisplayName("getOrdersIfUserIsUnauthorized")
+    void getOrdersIfUserIsUnauthorized() throws Exception {
 
         when(bookshop.getSortedOrders(any(OrderSorting.class), any(Logger.class)))
                 .thenReturn(getListOrders());
@@ -130,7 +129,8 @@ public class OrderControllerTest {
 
     @Test
     @WithMockUser(username = "user_full", authorities = {"get_models", "ROLE_USER_FULL"})
-    void getOrderPositive()  throws Exception {
+    @DisplayName("getOrderIfCorrectNumberFormat")
+    void getOrderIfCorrectNumberFormat()  throws Exception {
         when(bookshop.getOrderById(anyInt(), any(Logger.class))).thenReturn( getOrderOne());
 
         mockMvc.perform(get("/orders/1")
@@ -138,8 +138,9 @@ public class OrderControllerTest {
     }
 
     @Test
+    @DisplayName("getOrderIfIncorrectNumberFormat")
     @WithMockUser(username = "user_full", authorities = {"get_models", "ROLE_USER_FULL"})
-    void getOrderNegative()  throws Exception {
+    void getOrderIfIncorrectNumberFormat()  throws Exception {
         // обрабатывается ошибка, которая прописана в контроллере
         when(bookshop.getOrderById(anyInt(), any(Logger.class))).thenThrow(NumberFormatException.class);
 
@@ -149,7 +150,8 @@ public class OrderControllerTest {
 
     @Test
     @WithMockUser(username = "user_full", authorities = {"delete_models", "ROLE_USER_FULL"})
-    void deleteOrderPositive()  throws Exception {
+    @DisplayName("deleteOrderIfOrderWasFound")
+    void deleteOrderIfOrderWasFound()  throws Exception {
         when(bookshop.getOrderById(anyInt(), any(Logger.class))).thenReturn( getOrderOne());
         when(bookshop.removeOrder(any(Order.class), any(Logger.class))).thenReturn(true);
         doNothing().when(bookService).cancellOrderRequests(any(Order.class), any(Logger.class));
@@ -160,7 +162,8 @@ public class OrderControllerTest {
 
     @Test
     @WithMockUser(username = "user_full", authorities = {"delete_models", "ROLE_USER_FULL"})
-    void deleteOrderNegative()  throws Exception {
+    @DisplayName("deleteOrderIfOrderWasNotFound")
+    void deleteOrderIfOrderWasNotFound()  throws Exception {
         // не нашлось заказа; не забудь подключить GloballExceptionController
         when(bookshop.getOrderById(anyInt(), any(Logger.class))).thenReturn( null);
         mockMvc.perform(delete("/orders/delete/1")
@@ -170,7 +173,8 @@ public class OrderControllerTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"get_settings", "ROLE_ADMIN"})
-    void getSettingsPositive()  throws Exception {
+    @DisplayName("getSettingsIfAuthoritiesAre")
+    void getSettingsIfAuthoritiesAre()  throws Exception {
         when(bookshop.getDoneOrdersInDiapazon(any(LocalDate.class), any(LocalDate.class),any(OrderSorting.class), any(Logger.class)))
                 .thenReturn(getListOrders());
 
@@ -183,7 +187,8 @@ public class OrderControllerTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"get_models", "ROLE_ADMIN"})
-    void getSettingsNegative()  throws Exception {
+    @DisplayName("getSettingsIfAuthoritiesAreNot")
+    void getSettingsIfAuthoritiesAreNot()  throws Exception {
         // нет прав
         when(bookshop.getDoneOrdersInDiapazon(any(LocalDate.class), any(LocalDate.class),any(OrderSorting.class), any(Logger.class)))
                 .thenReturn(getListOrders());
@@ -197,7 +202,8 @@ public class OrderControllerTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"get_settings", "ROLE_ADMIN"})
-    void getOrderAmountPositive()  throws Exception {
+    @DisplayName("getOrderAmountIfDateIsCorrect")
+    void getOrderAmountIfDateIsCorrect()  throws Exception {
         when(bookshop.getOrdersAmountInDiapazon(any(LocalDate.class), any(LocalDate.class), any(Logger.class)))
                 .thenReturn(3);
 
@@ -209,7 +215,8 @@ public class OrderControllerTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"get_settings", "ROLE_ADMIN"})
-    void getOrderAmountNegative()  throws Exception {
+    @DisplayName("getOrderAmountIfDateIsIncorrect")
+    void getOrderAmountIfDateIsIncorrect()  throws Exception {
         // должна произойти обработка внутри контроллера
         when(bookshop.getOrdersAmountInDiapazon(any(LocalDate.class), any(LocalDate.class), any(Logger.class)))
                 .thenThrow(DateTimeException.class);
@@ -222,7 +229,8 @@ public class OrderControllerTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"ROLE_USER_WATCHER"})
-    void getOrderIncomePositive()  throws Exception {
+    @DisplayName("getOrderIncomeIfDateIsCorrect")
+    void getOrderIncomeIfDateIsCorrect()  throws Exception {
         // должна произойти обработка внутри контроллера
         when(bookshop.getIncomeInDiapazon(any(LocalDate.class), any(LocalDate.class), any(Logger.class)))
                 .thenReturn(12D);
@@ -235,7 +243,8 @@ public class OrderControllerTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"ROLE_USER_WATCHER"})
-    void getOrderIncomeNegative()  throws Exception {
+    @DisplayName("getOrderIncomeIfDateIsIncorrect")
+    void getOrderIncomeIfDateIsIncorrect()  throws Exception {
         // должна произойти обработка внутри контроллера
         when(bookshop.getIncomeInDiapazon(any(LocalDate.class), any(LocalDate.class), any(Logger.class)))
                 .thenThrow(DateTimeException.class);
@@ -258,7 +267,8 @@ public class OrderControllerTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"create_models","ROLE_USER_FULL"})
-    void createOrderPositive()  throws Exception {
+    @DisplayName("createOrderIfAllAuthorities")
+    void createOrderIfAllAuthorities()  throws Exception {
         // должна произойти обработка внутри контроллера
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -276,10 +286,10 @@ public class OrderControllerTest {
 
     @Test
     @WithMockUser(username = "admin", authorities = {"ROLE_USER_FULL"})
-    void createOrderNegative()  throws Exception {
+    @DisplayName("createOrderIfNotAllAuthorities")
+    void createOrderIfNotAllAuthorities()  throws Exception {
         // должна произойти обработка внутри контроллера
         ObjectMapper objectMapper = new ObjectMapper();
-
         when(bookService.getBooksByTitles(anyList(), any(Logger.class))).thenReturn(List.of());
         CreatedOrderDTO dto = new CreatedOrderDTO();
         dto.setStatus(OrderStatus.DONE);

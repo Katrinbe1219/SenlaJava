@@ -54,8 +54,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("positive_tests")
-    @DisplayName("getAllBooksPositive")
-    void getAllBooksPositive(){
+    @DisplayName("getAllBooksIfBooksWereFetched")
+    void getAllBooksIfBooksWereFetched(){
         when(bookHibImpl.getSortedBooks(anyString(), anyBoolean(), eq(logger)))
                 .thenReturn(
                   getListBooks()
@@ -69,8 +69,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("negative_tests")
-    @DisplayName("getAllBooksNegative")
-    void getAllBooksNegative(){
+    @DisplayName("getAllBooksIfFetchingFailed")
+    void getAllBooksIfFetchingFailed(){
         when(bookHibImpl.getSortedBooks(anyString(), anyBoolean(), eq(logger)))
                 .thenThrow(new CanNotMakeExecution("pr"));
 
@@ -79,8 +79,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("positive_tests")
-    @DisplayName("receiveBookPositive")
-    void receiveBookPositive(){
+    @DisplayName("receiveBookIfBookWasReceived")
+    void receiveBookIfBookWasReceived(){
         when(bookHibImpl.save(eq(logger), anyString())).thenReturn(null);
         Assertions.assertTrue(bookService.receiveBook("title", logger));
 
@@ -88,16 +88,16 @@ public class BookServiceTest {
 
     @Test
     @Tag("negative_tests")
-    @DisplayName("receiveBookNegative")
-    void receiveBookNegative(){
+    @DisplayName("receiveBookIfSavingFailed")
+    void receiveBookIfSavingFailed(){
         doThrow(CanNotMakeExecution.class).when(bookHibImpl).save(eq(logger), anyString());
         Assertions.assertFalse(bookService.receiveBook("title", logger));
     }
 
     @Test
     @Tag("positive_tests")
-    @DisplayName("getBookByTitlePositive")
-    void getBookByTitlePositive(){
+    @DisplayName("getBookByTitleIfBookWasFetched")
+    void getBookByTitleIfBookWasFetched(){
         when(bookHibImpl.getBookByTitle(eq(logger), anyString(),eq(null)))
                 .thenReturn(new Book())
                 .thenReturn(null);
@@ -108,8 +108,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("negative_tests")
-    @DisplayName("getBookByTitleNegative")
-    void getBookByTitleNegative(){
+    @DisplayName("getBookByTitleIfFetchingFailed")
+    void getBookByTitleIfFetchingFailed(){
         when(bookHibImpl.getBookByTitle(eq(logger), anyString(), eq(null)))
                 .thenThrow(CanNotMakeExecution.class);
         Assertions.assertNull(bookService.getBookByTitle("negTest", logger));
@@ -117,8 +117,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("positive_tests")
-    @DisplayName("checkBookPositive")
-    void checkBookPositive(){
+    @DisplayName("checkBookIfFetchingSucceeded")
+    void checkBookIfFetchingSucceeded(){
         Book experiment = new Book();
         experiment.setStatus(BookStatus.IN_STOCK);
 
@@ -132,8 +132,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("negative_tests")
-    @DisplayName("checkBookNegative")
-    void checkBookNegative(){
+    @DisplayName("checkBookIfFetchingFailed")
+    void checkBookIfFetchingFailed(){
 
         when(bookHibImpl.getBookById(eq(logger), anyInt()))
                 .thenThrow(CanNotMakeExecution.class);
@@ -142,8 +142,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("positive_tests")
-    @DisplayName("checkBookPositive")
-    void getSortedBooksPositive(){
+    @DisplayName("getSortedBooksIfSortingSucceeded")
+    void getSortedBooksIfSortingSucceeded(){
         when(bookHibImpl.getSortedBooks(anyString(), anyBoolean(), eq(logger))).thenReturn(
                 getListBooks()
         );
@@ -153,8 +153,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("negative_tests")
-    @DisplayName("checkBookNegative")
-    void getSortedBooksNegative(){
+    @DisplayName("getSortedBooksIfSortingFailed")
+    void getSortedBooksIfSortingFailed(){
         when(bookHibImpl.getSortedBooks(anyString(), anyBoolean(), eq(logger))).thenThrow(CanNotMakeExecution.class);
 
         Assertions.assertNull(bookService.getSortedBooks(BookSorting.ALPHABETICAL_UP, logger));
@@ -162,8 +162,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("positive_tests")
-    @DisplayName("checkBookPositive")
-    void getBooksByTitlesPositive(){
+    @DisplayName("getBooksByTitlesIfFetchingSucceeded")
+    void getBooksByTitlesIfFetchingSucceeded(){
         List<Book> check = getListBooks();
         when(bookHibImpl.getBookByTitles(anyList(),  eq(logger))).thenReturn(
                 check
@@ -178,40 +178,40 @@ public class BookServiceTest {
 
     @Test
     @Tag("negative_tests")
-    @DisplayName("checkBookNegative")
-    void getBooksByTitlesNegative(){
+    @DisplayName("getBooksByTitlesIfFetchingFailed")
+    void getBooksByTitlesIfFetchingFailed(){
         when(bookHibImpl.getBookByTitles(anyList(),  eq(logger))).thenThrow(CanNotMakeExecution.class);
         Assertions.assertNull(bookService.getBooksByTitles(List.of("Titles"), logger));
     }
 
     @Test
     @Tag("positive_tests")
-    @DisplayName("getDescriptionPositive")
-    void getDescriptionPositive(){
+    @DisplayName("getDescriptionIfFetchingSucceeded")
+    void getDescriptionIfFetchingSucceeded(){
         when(bookHibImpl.getBookById(eq(logger), anyInt())).thenReturn(null);
         Assertions.assertEquals("Такой книги не нашлось",bookService.getBookDescription( 1,logger));
     }
 
     @Test
     @Tag("negative_tests")
-    @DisplayName("getDescriptionNegative")
-    void getDescriptionNegative(){
+    @DisplayName("getDescriptionIfFetchingFailed")
+    void getDescriptionIfFetchingFailed(){
         when(bookHibImpl.getBookById(eq(logger), anyInt())).thenThrow(CanNotMakeExecution.class);
         Assertions.assertEquals("Ошибка на сервере",bookService.getBookDescription( 1,logger));
     }
 
     @Test
     @Tag("positive_tests")
-    @DisplayName("getLongLiedBooksPositive")
-    void getLongLiedBooksPositive(){
+    @DisplayName("getLongLiedBooksIfFetchingSucceeded")
+    void getLongLiedBooksIfFetchingSucceeded(){
         when(bookHibImpl.getLongLiedBooks(anyInt(), anyString(), anyBoolean(), eq(logger))).thenReturn(getListBooks());
         Assertions.assertNotNull(bookService.getLongLiedBooks(LongLiedBookSorting.PRICE_DOWN, 1,logger));
     }
 
     @Test
     @Tag("negative_tests")
-    @DisplayName("getLongLiedBooksNegative")
-    void getLongLiedBooksNegative(){
+    @DisplayName("getLongLiedBooksIfFetchingFailed")
+    void getLongLiedBooksIfFetchingFailed(){
         when(bookHibImpl.getLongLiedBooks(anyInt(), anyString(), anyBoolean(), eq(logger)))
                 .thenThrow(new CanNotMakeExecution("тест"));
         Assertions.assertNull(bookService.getLongLiedBooks(LongLiedBookSorting.PRICE_DOWN, 1,logger));
@@ -220,8 +220,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("positive_tests")
-    @DisplayName("cancellOrderRequestPositive")
-    void cancellOrderRequestPositive(){
+    @DisplayName("cancellOrderRequestIfDeletingSucceeded")
+    void cancellOrderRequestIfDeletingSucceeded(){
 
         doNothing().when(requestHibImpl).deleteManyByOrder(any(Order.class), eq(logger));
         bookService.cancellOrderRequests(new Order(), logger);
@@ -232,8 +232,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("negative_tests")
-    @DisplayName("cancellOrderRequestNegative")
-    void cancellOrderRequestNegative(){
+    @DisplayName("cancellOrderRequestIfDeletingFailed")
+    void cancellOrderRequestIfDeletingFailed(){
         doThrow(new CanNotMakeExecution("тест")).when(requestHibImpl).deleteManyByOrder(any(Order.class), eq(logger));
         assertDoesNotThrow(() -> bookService.cancellOrderRequests(new Order(), logger));
 
@@ -243,8 +243,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("positive_tests")
-    @DisplayName("cancellRequestByBookPositive")
-    void cancellRequestByBookPositive(){
+    @DisplayName("cancellRequestByBookIfDeletingSucceeded")
+    void cancellRequestByBookIfDeletingSucceeded(){
         doNothing().when(requestHibImpl).deleteManyByBook(any(Book.class), eq(logger));
         bookService.cancellRequestsByBook(new Book(), logger);
         verify(requestHibImpl).deleteManyByBook(any(Book.class), eq(logger));
@@ -254,8 +254,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("negative_tests")
-    @DisplayName("cancellRequestByBookNegative")
-    void cancellRequestByBookNegative(){
+    @DisplayName("cancellRequestByBookIfDeletingFailed")
+    void cancellRequestByBookIfDeletingFailed(){
         doThrow(new CanNotMakeExecution("тест")).when(requestHibImpl).deleteManyByBook(any(Book.class), eq(logger));
         // сам метод не должен ничего бросать, он имеет try-catch
         assertDoesNotThrow(() -> bookService.cancellRequestsByBook(new Book(), logger));
@@ -266,8 +266,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("positive_tests")
-    @DisplayName("getSortedRequestsPositive")
-    void getSortedRequestsPositive(){
+    @DisplayName("getSortedRequestsIfFetchingSucceeded")
+    void getSortedRequestsIfFetchingSucceeded(){
         when(requestHibImpl.getRequestsSorted(anyString(), anyString(), eq(logger)))
                 .thenReturn(
                         List.of(
@@ -284,8 +284,8 @@ public class BookServiceTest {
 
     @Test
     @Tag("negative_tests")
-    @DisplayName("getSortedRequestsNegative")
-    void getSortedRequestsNegative(){
+    @DisplayName("getSortedRequestsIfFetchingFailed")
+    void getSortedRequestsIfFetchingFailed(){
         when(requestHibImpl.getRequestsSorted(anyString(), anyString(), eq(logger)))
                 .thenThrow(new CanNotMakeExecution("тест"));
         assertDoesNotThrow(() ->bookService.getSortedRequests(RequestSorting.ALPHABETICAL_UP, logger));

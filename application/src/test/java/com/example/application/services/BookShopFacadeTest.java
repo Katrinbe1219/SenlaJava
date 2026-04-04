@@ -10,6 +10,7 @@ import com.example.application.model.types.OrderSorting;
 import com.example.application.model.types.OrderStatus;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -66,7 +67,8 @@ public class BookShopFacadeTest {
 
     // ── createOrder ────────────────────────────────────────────
     @Test
-    public void createOrderPositive() {
+    @DisplayName("createOrderIfOrderWasCreated")
+    public void createOrderIfOrderWasCreated() {
         Order order = getOrder();
         doNothing().when(orderHibImpl).save(any(Order.class), eq(logger));
         when(requestHibImpl.insertMany(anyList(), any(Order.class), eq(logger))).thenReturn(null);
@@ -76,7 +78,8 @@ public class BookShopFacadeTest {
     }
 
     @Test
-    public void createOrderNegative() {
+    @DisplayName("createOrderIfSavingWasFailed")
+    public void createOrderIfSavingWasFailed() {
         try (MockedStatic<TransactionAspectSupport> mockedStatic = mockStatic(TransactionAspectSupport.class)){
             TransactionStatus mockStatus = Mockito.mock(TransactionStatus.class);
             mockedStatic.when(TransactionAspectSupport::currentTransactionStatus).thenReturn(mockStatus);
@@ -92,7 +95,8 @@ public class BookShopFacadeTest {
     }
 
     @Test
-    public void removeOrderPositive() {
+    @DisplayName("removeOrderIfOrderWasRemoved")
+    public void removeOrderIfOrderWasRemoved() {
         Order order = new Order();
         doNothing().when(orderHibImpl).update(eq(order), eq(logger));
         Assertions.assertTrue(bookShopFacade.removeOrder(order, logger));
@@ -101,7 +105,8 @@ public class BookShopFacadeTest {
 
 
     @Test
-    public void removeOrderNegative() {
+    @DisplayName("removeOrderIfUpdatingWasFailed")
+    public void removeOrderIfUpdatingWasFailed() {
         Order order = new Order();
         // если написать Exception - checked exception, а метод изначально не помечен как бросающий
         // будет проблема
@@ -114,7 +119,8 @@ public class BookShopFacadeTest {
 
     // ── updateOrders ───────────────────────────────────────────
     @Test
-    public void updateOrdersPositive() {
+    @DisplayName("updateOrdersIfOrderWasUpdated")
+    public void updateOrdersIfOrderWasUpdated() {
         List<Order> order = new ArrayList<>();
         doNothing().when(orderHibImpl).update(eq(order), eq(logger));
         bookShopFacade.updateOrders(order, logger);
@@ -123,7 +129,8 @@ public class BookShopFacadeTest {
     }
 
     @Test
-    public void updateOrdersNegative() {
+    @DisplayName("updateOrdersIfUpdatingWasFailed")
+    public void updateOrdersIfUpdatingWasFailed() {
         List<Order> order = new ArrayList<>();
         doThrow(CanNotMakeExecution.class).when(orderHibImpl).update(eq(order), eq(logger));
         bookShopFacade.updateOrders(order, logger);
@@ -135,14 +142,16 @@ public class BookShopFacadeTest {
 
     // ── getSortedOrders ────────────────────────────────────────
     @Test
-    public void getSortedOrdersNegative() {
+    @DisplayName("getSortedOrdersIfSoringWasFailed")
+    public void getSortedOrdersIfSoringWasFailed() {
         when(orderHibImpl.getOrdersSorted(OrderStatus.DONE, logger)).thenThrow(new CanNotMakeExecution("pr"));
         Assertions.assertNull(bookShopFacade.getSortedOrders(OrderSorting.DONE, logger) );
         verify(logger).error("Проблема при получении заказов SQl type: pr");
     }
 
     @Test
-    public void getSortedOrdersPositive() {
+    @DisplayName("getSortedOrdersIfOrdersWereFetched")
+    public void getSortedOrdersIfOrdersWereFetched() {
         List<Order> orders = getOrdersList();
         when(orderHibImpl.getOrdersSorted(OrderStatus.DONE, logger)).thenReturn(orders);
         Assertions.assertEquals(orders,bookShopFacade.getSortedOrders(OrderSorting.DONE, logger) );
@@ -150,14 +159,16 @@ public class BookShopFacadeTest {
 
     // ── getDoneOrdersInDiapazon ────────────────────────────────
     @Test
-    public void getDoneOrdersInDiapazonPositive() {
+    @DisplayName("getDoneOrdersInDiapazonIfOrdersWereFetched")
+    public void getDoneOrdersInDiapazonIfOrdersWereFetched() {
         List<Order> orders = getOrdersList();
         when(orderHibImpl.getSortedDoneOrders(any(LocalDate.class), any(LocalDate.class), eq(logger))).thenReturn(orders);
         Assertions.assertEquals(orders, bookShopFacade.getDoneOrdersInDiapazon( LocalDate.now(), LocalDate.now(),OrderSorting.PRICE_UP, logger));
     }
 
     @Test
-    public void getDoneOrdersInDiapazonNegative() {
+    @DisplayName("getDoneOrdersInDiapazonIfSortingWasFailed")
+    public void getDoneOrdersInDiapazonIfSortingWasFailed() {
         when(orderHibImpl.getSortedDoneOrders(any(LocalDate.class), any(LocalDate.class), eq(logger))).thenThrow(new CanNotMakeExecution("pr"));
         Assertions.assertNull( bookShopFacade.getDoneOrdersInDiapazon( LocalDate.now(), LocalDate.now(),OrderSorting.PRICE_UP, logger));
         verify(logger).error(contains("pr"));
@@ -165,7 +176,8 @@ public class BookShopFacadeTest {
 
     // ── getOrdersAmountInDiapazon ──────────────────────────────
     @Test
-    public void getOrdersAmountInDiapazonPositive() {
+    @DisplayName("getOrdersAmountInDiapazonIfOrdersWereFetched")
+    public void getOrdersAmountInDiapazonIfOrdersWereFetched() {
         List<Order> orders = getOrdersList();
         when(orderHibImpl.getOrdersInDiapazon(any(LocalDate.class), any(LocalDate.class), eq(logger)))
                 .thenReturn(orders);
@@ -173,7 +185,8 @@ public class BookShopFacadeTest {
     }
 
     @Test
-    public void getOrdersAmountInDiapazonNegative() {
+    @DisplayName("getOrdersAmountInDiapazonIfFetchingWasFailed")
+    public void getOrdersAmountInDiapazonIfFetchingWasFailed() {
         when(orderHibImpl.getOrdersInDiapazon(any(LocalDate.class), any(LocalDate.class), eq(logger)))
                 .thenThrow(CanNotMakeExecution.class);
         bookShopFacade.getOrdersAmountInDiapazon(LocalDate.now(), LocalDate.now(), logger);
@@ -182,14 +195,16 @@ public class BookShopFacadeTest {
 
     // ── getIncomeInDiapazon ────────────────────────────────────
     @Test
-    public void getIncomeInDiapazonPositive() {
+    @DisplayName("getIncomeInDiapazonIfOrdersWereFetched")
+    public void getIncomeInDiapazonIfOrdersWereFetched() {
         when(orderHibImpl.getOrdersInDiapazon(any(LocalDate.class), any(LocalDate.class), eq(logger)))
                 .thenReturn(getOrdersList());
         Assertions.assertEquals(1000, bookShopFacade.getIncomeInDiapazon(LocalDate.now(), LocalDate.now(), logger));
     }
 
     @Test
-    public void getIncomeInDiapazonNegative() {
+    @DisplayName("getIncomeInDiapazonIfFetchingWasFailed")
+    public void getIncomeInDiapazonIfFetchingWasFailed() {
         when(orderHibImpl.getOrdersInDiapazon(any(LocalDate.class), any(LocalDate.class), eq(logger)))
                 .thenThrow(new CanNotMakeExecution("pr"));
         Assertions.assertEquals(0, bookShopFacade.getIncomeInDiapazon(LocalDate.now(), LocalDate.now(), logger));
@@ -198,7 +213,8 @@ public class BookShopFacadeTest {
 
     // ── getOrderById ───────────────────────────────────────────
     @Test
-    public void getOrderByIdPositive() {
+    @DisplayName("getOrderByIdIfOrderWasFetched")
+    public void getOrderByIdIfOrderWasFetched() {
         when(orderHibImpl.getById(anyInt(), eq(logger)))
                 .thenReturn(null);
         Assertions.assertNull(bookShopFacade.getOrderById(1, logger));
@@ -206,7 +222,8 @@ public class BookShopFacadeTest {
     }
 
     @Test
-    public void getOrderByIdNegative() {
+    @DisplayName("getOrderByIdIfFetchingWasFailed")
+    public void getOrderByIdIfFetchingWasFailed() {
         when(orderHibImpl.getById(anyInt(), eq(logger)))
                 .thenThrow(new CanNotMakeExecution("pr"));
         Assertions.assertNull(bookShopFacade.getOrderById(1, logger));

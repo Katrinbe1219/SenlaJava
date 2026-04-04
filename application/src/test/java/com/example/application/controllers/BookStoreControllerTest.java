@@ -11,6 +11,7 @@ import com.example.application.services.SettingsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -69,7 +70,8 @@ public class BookStoreControllerTest {
 
     @Test
     @WithMockUser(username ="admin" , authorities ={"ROLE_ADMIN"} )
-    public void receiveBookPositive() throws Exception {
+    @DisplayName("receiveBookIfBookIsFound")
+    public void receiveBookIfBookIsFound() throws Exception {
 
         ReceiveRequest req = new ReceiveRequest();
         ObjectMapper obj = new ObjectMapper();
@@ -86,7 +88,8 @@ public class BookStoreControllerTest {
 
     @Test
     @WithMockUser(username ="admin" , authorities ={"ROLE_ADMIN"} )
-    public void receiveBookNegative() throws Exception {
+    @DisplayName("receiveBookIfBookIsNotFound")
+    public void receiveBookIfBookIsNotFound() throws Exception {
 
         ReceiveRequest req = new ReceiveRequest();
         ObjectMapper obj = new ObjectMapper();

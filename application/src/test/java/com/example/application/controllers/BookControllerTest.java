@@ -15,6 +15,7 @@ import com.example.application.services.BookService;
 import io.jsonwebtoken.Claims;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -105,7 +106,8 @@ public class BookControllerTest {
 
     @Test
     @Tag("positive")
-    public void displayAllBooksPositive() throws Exception {
+    @DisplayName("displayAllBooksIfRoleIsValid")
+    public void displayAllBooksIfRoleIsValid() throws Exception {
         //настраиваем поведение, что как будто бы заходит администратор
         when(claims.getSubject()).thenReturn("admin");
         when(jwtService.parseToken("token")).thenReturn(claims);
@@ -127,7 +129,8 @@ public class BookControllerTest {
     @Test
     @Tag("negative")
     @Tag("401")
-    public void displayAllBooksNegative() throws Exception {
+    @DisplayName("displayAllBooksIfTokenIsInvalid")
+    public void displayAllBooksIfTokenIsInvalid() throws Exception {
         // неправильный токен
         when(claims.getSubject()).thenReturn("admin");
         when(jwtService.parseToken("token")).thenReturn(claims);
@@ -145,7 +148,8 @@ public class BookControllerTest {
 
     @Test
     @Tag("positive")
-    public void displaySortedBooksPositive() throws Exception {
+    @DisplayName("displaySortedBooksIfTokenIsValid")
+    public void displaySortedBooksIfTokenIsValid() throws Exception {
 
         when(claims.getSubject()).thenReturn("admin");
         when(jwtService.parseToken("token")).thenReturn(claims);
@@ -169,7 +173,8 @@ public class BookControllerTest {
 
     @Test
     @Tag("negative")
-    public void displaySortedBooksNegative() throws Exception {
+    @DisplayName("displaySortedBooksIfNoParametersInRequest")
+    public void displaySortedBooksIfNoParametersInRequest() throws Exception {
         // нет параметров
         mockMvc.perform(get("/books/sorted")
                         .header("Authorization", "Bearer token")
@@ -180,7 +185,8 @@ public class BookControllerTest {
 
     @Test
     @Tag("positive")
-    public void displayLonLiedBooksPositive() throws Exception {
+    @DisplayName("displayLonLiedBooksIfAllParametersOccured")
+    public void displayLonLiedBooksIfAllParametersOccured() throws Exception {
         when(claims.getSubject()).thenReturn("admin");
         when(jwtService.parseToken("token")).thenReturn(claims);
         when(userDetailsService.loadUserByUsername(
@@ -198,7 +204,8 @@ public class BookControllerTest {
 
     @Test
     @Tag("negative")
-    public void displayLonLiedBooksNegative() throws Exception {
+    @DisplayName("displayLonLiedBooksIfNotCorrectUser")
+    public void displayLonLiedBooksIfNotCorrectUser() throws Exception {
         // не найден такой user
         when(claims.getSubject()).thenReturn("admin");
         when(jwtService.parseToken("token")).thenReturn(claims);
@@ -217,7 +224,8 @@ public class BookControllerTest {
 
     @Test
     @Tag("positive")
-    public void getDescriptionPositive() throws Exception {
+    @DisplayName("getDescriptionIfUsernameIsFound")
+    public void getDescriptionIfUsernameIsFound() throws Exception {
         when(claims.getSubject()).thenReturn("admin");
         when(jwtService.parseToken("token")).thenReturn(claims);
         when(userDetailsService.loadUserByUsername(
@@ -233,7 +241,8 @@ public class BookControllerTest {
 
     @Test
     @Tag("negative")
-    public void getDescriptionNegative() throws Exception {
+    @DisplayName("getDescriptionIfUsernameNotFound")
+    public void getDescriptionIfUsernameNotFound() throws Exception {
         // не найдено username
         when(claims.getSubject()).thenReturn("someBody");
         when(jwtService.parseToken("token")).thenReturn(claims);
@@ -252,7 +261,8 @@ public class BookControllerTest {
 
     @Test
     @Tag("positive")
-    public void checkBookPositive() throws Exception {
+    @DisplayName("checkBookIfUsernameIsFound")
+    public void checkBookIfUsernameIsFound() throws Exception {
         when(claims.getSubject()).thenReturn("admin");
         when(jwtService.parseToken("token")).thenReturn(claims);
         when(userDetailsService.loadUserByUsername(
@@ -268,7 +278,8 @@ public class BookControllerTest {
 
     @Test
     @Tag("negative")
-    public void checkBookNegative() throws Exception {
+    @DisplayName("checkBookIfUsernameNotFound")
+    public void checkBookIfUsernameNotFound() throws Exception {
         // не найдено username
         when(claims.getSubject()).thenReturn("someBody");
         when(jwtService.parseToken("token")).thenReturn(claims);
