@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="insert-tables-001"  author="java_senla">
+        <insert tableName="authors">
+            <column name="name" value="Иван"/>
+            <column name="paternal" value="Александрович"/>
+            <column name="surname" value="Гончаров"/>
+
+        </insert>
+
+        <insert tableName="authors">
+            <column name="name" value="Лев"/>
+            <column name="paternal" value="Николаевич"/>
+            <column name="surname" value="Тостой"/>
+
+        </insert>
+
+        <insert tableName="authors">
+            <column name="name" value="Михаил"/>
+            <column name="paternal" value="Афанасьевич"/>
+            <column name="surname" value="Булгаков"/>
+
+        </insert>
+    </changeSet>
+
+    <changeSet id="insert-tables-002"  author="java_senla">
+        <insert tableName="genres">
+            <column name="genre_name" value="фэнтази"/>
+        </insert>
+
+        <insert tableName="genres">
+            <column name="genre_name" value="история"/>
+        </insert>
+
+        <insert tableName="genres">
+            <column name="genre_name" value="классика"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="insert-tables-003"  author="java_senla">
+        <insert tableName="books">
+            <column name="title" value="Война и Мир"/>
+            <column name="genre_id" valueNumeric="2"/>
+            <column name="author_id" valueNumeric="2"/>
+            <column name="year" valueNumeric="1870"/>
+            <column name="status" value="I"/>
+            <column name="price" valueNumeric="2000"/>
+
+        </insert>
+
+        <insert tableName="books">
+            <column name="title" value="Мастер и Маргарита"/>
+            <column name="genre_id" valueNumeric="3"/>
+            <column name="author_id" valueNumeric="3"/>
+            <column name="year" valueNumeric="1930"/>
+            <column name="status" value="I"/>
+            <column name="price" valueNumeric="2200"/>
+        </insert>
+
+        <insert tableName="books">
+            <column name="title" value="Обломов"/>
+            <column name="genre_id" valueNumeric="3"/>
+            <column name="author_id" valueNumeric="1"/>
+            <column name="year" valueNumeric="1850"/>
+            <column name="status" value="O"/>
+            <column name="price" valueNumeric="1500"/>
+        </insert>
+
+        <insert tableName="books">
+            <column name="title" value="Воскресенье"/>
+            <column name="genre_id" valueNumeric="3"/>
+            <column name="author_id" valueNumeric="2"/>
+            <column name="year" valueNumeric="1870"/>
+            <column name="status" value="O"/>
+            <column name="price" valueNumeric="2000"/>
+        </insert>
+
+    </changeSet>
+</databaseChangeLog>

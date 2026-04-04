@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+    
+    <changeSet id="insert-user-table-001" author="java_senla">
+        <createTable tableName="privileges">
+            <column name="privilege_id" type="serial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+
+        </createTable>
+
+        <createTable tableName="roles">
+            <column name="role_id" type="serial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="name" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="role_privileges">
+            <column name="role_id" type="int"  >
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="privilege_id" type="int"  >
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addPrimaryKey tableName="role_privileges"
+                       columnNames="role_id, privilege_id"
+                       constraintName="pk_role_privilege"/>
+
+
+        <addForeignKeyConstraint baseTableName="role_privileges"
+                                 baseColumnNames="role_id"
+                                 constraintName="fk_role_id"
+                                 referencedTableName="roles"
+                                 referencedColumnNames="role_id"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="role_privileges"
+                                 baseColumnNames="privilege_id"
+                                 constraintName="fk_privilege_id"
+                                 referencedTableName="privileges"
+                                 referencedColumnNames="privilege_id"
+                                 onDelete="CASCADE"/>
+
+        <createTable tableName="users">
+            <column name="user_id" type="serial" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+
+            <column name="login" type="VARCHAR(20)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="password" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="role_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="users"
+                                 baseColumnNames="role_id"
+                                 constraintName="fk_user_id"
+                                 referencedTableName="roles"
+                                 referencedColumnNames="role_id"
+                                 onDelete="CASCADE"/>
+
+    </changeSet>
+
+
+</databaseChangeLog>
