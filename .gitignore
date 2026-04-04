@@ -6,3 +6,5 @@ processing_annotations/.gradle
 new_out
 consumer_application
 init-db.sql
+application/target
+

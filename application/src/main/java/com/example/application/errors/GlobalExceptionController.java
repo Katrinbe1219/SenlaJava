@@ -25,7 +25,7 @@ public class GlobalExceptionController {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<String> handleExceptions(Exception ex){
-        return new ResponseEntity<>("An unexpected error occured: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>("An unexpected error occured: " + ex.getMessage(), HttpStatus.NOT_FOUND);
 
     }
 
