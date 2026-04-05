@@ -73,7 +73,7 @@ public class OrderController {
     }
 
 
-    @GetMapping
+    @GetMapping("/")
     @PreAuthorize("hasAuthority('get_models')")
     List<OrderDTO> getAllOrders(@RequestParam("type") String type){
         OrderSorting sorting = getOrderSorting(type);

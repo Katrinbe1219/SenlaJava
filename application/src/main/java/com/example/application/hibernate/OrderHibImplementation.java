@@ -30,7 +30,8 @@ public class OrderHibImplementation extends HibernateAbstractDao<Order, Integer,
     }
 
     @Transactional
-    public void update(List<Order> order, Logger logger) throws CanNotMakeExecution {
+    public void
+    update(List<Order> order, Logger logger) throws CanNotMakeExecution {
         Session session = getSessionFactory().getCurrentSession();
 
 

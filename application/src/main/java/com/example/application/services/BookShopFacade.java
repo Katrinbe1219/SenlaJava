@@ -82,6 +82,7 @@ public class BookShopFacade {
             throw new CanNotMakeExecution("Проблема создания заказа CAnNotMakeException or others : " + e1.getMessage());
         }
 
+
         CreatedOrderDTO createdOrderDTO = new CreatedOrderDTO();
         createdOrderDTO.setStatus(order.getStatus());
         createdOrderDTO.setBooks(books.stream().map(this::toBookDTO).toList());
