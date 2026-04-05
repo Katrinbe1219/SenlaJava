@@ -33,8 +33,9 @@ public class HibernateAbstractDao<T, ID extends Serializable, Logger> implements
     }
 
     @Override
+    @Transactional
     public void update(T entity, Logger logger) {
-
+        getSessionFactory().getCurrentSession().merge(entity);
     }
 
     @Override
@@ -43,6 +44,7 @@ public class HibernateAbstractDao<T, ID extends Serializable, Logger> implements
     }
 
     @Override
+    @Transactional
     public T findById(ID id, Logger logger) {
         return null;
     }

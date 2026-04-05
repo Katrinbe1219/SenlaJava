@@ -8,6 +8,7 @@ import java.util.Comparator;
 @Entity(name = "customers")
 public class Customer  implements Comparable<Customer>, Serializable {
 
+
     @Column(name="name")
     String name;
     @Column(name="surname")
@@ -70,7 +71,4 @@ public class Customer  implements Comparable<Customer>, Serializable {
                 .compare(this, o);
     }
 
-    public String getCsvInfo(){
-        return name + ";" + surname + ";" + email;
-    }
 }

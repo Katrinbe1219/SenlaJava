@@ -6,6 +6,7 @@ import com.example.application.model.types.RequestSorting;
 import com.example.application.services.BookService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class RequestController {
 
 
     @GetMapping
+    @PreAuthorize("hasAuthority('get_models')")
     List<RequestResult> getAllRequests(@RequestParam("type") String type){
         RequestSorting sorting = getRequestSorting(type);
         return bookService.getSortedRequests(sorting, logger);

@@ -161,13 +161,13 @@ public class BookShopFacade {
                     yield orders;
                 }
                 case PRICE_UP -> {
-                    orders = orderHibImpl.findAll( logger);
+                    orders = orderHibImpl.getOrdersSorted("id", true, logger);
                     orders.forEach(Order::countTotalCost);
                     orders = orders.stream().sorted(Comparator.comparing(Order::getTotalCost)).toList();
                     yield orders;
                 }
                 case PRICE_DOWN -> {
-                    orders = orderHibImpl.findAll( logger);
+                    orders = orderHibImpl.getOrdersSorted("id", true, logger);
                     orders.forEach(Order::countTotalCost);
                     orders = orders.stream().sorted(Comparator.comparing(Order::getTotalCost).reversed()).toList();
                     yield orders;

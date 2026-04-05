@@ -1,10 +1,7 @@
 package com.example.application.controllers;
 
 import com.example.application.dto.*;
-import com.example.application.model.Author;
-import com.example.application.model.Book;
-import com.example.application.model.Customer;
-import com.example.application.model.Order;
+import com.example.application.model.*;
 import com.example.application.model.types.OrderSorting;
 import com.example.application.model.types.OrderStatus;
 import com.example.application.services.BookService;
@@ -12,6 +9,9 @@ import com.example.application.services.BookShopFacade;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,6 +53,7 @@ public class OrderController {
     }
 
     @PostMapping(value = "/create")
+    @PreAuthorize("hasAuthority('create_models')")
     public CreatedOrderDTO createOrder(@RequestBody OrderCreateDto order) {
         Order orderObject = new Order();
         orderObject.setCustomer(toCustomer(order.getCustomer()));
@@ -73,6 +74,7 @@ public class OrderController {
 
 
     @GetMapping
+    @PreAuthorize("hasAuthority('get_models')")
     List<OrderDTO> getAllOrders(@RequestParam("type") String type){
         OrderSorting sorting = getOrderSorting(type);
         List<Order> orders = bookshop.getSortedOrders(sorting, logger);
@@ -80,6 +82,7 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}")
+    @PreAuthorize("hasAuthority('get_models')")
     OrderDTO getOrder(@PathVariable("orderId") int orderId){
         try {
             return toOrderDTO(bookshop.getOrderById(orderId, logger));
@@ -90,10 +93,15 @@ public class OrderController {
     }
 
     @DeleteMapping("/delete/{orderId}")
+    @PreAuthorize("hasAuthority('delete_models')")
     public StrinResponse deleteOrder(@PathVariable("orderId") int orderId) throws Exception{
         Order order = bookshop.getOrderById(orderId, logger);
-        if (order == null) throw new Exception("Такого нет заказа");
 
+        if (order == null) throw new Exception("Does not exist");
+        UserSecured user = (UserSecured) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!order.getCustomer().getName().equals(user.getUsername()) && !user.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+            throw new Exception("It is not your order");
+        }
 
         Boolean result = bookshop.removeOrder(order, logger);
         if (result){
@@ -105,6 +113,7 @@ public class OrderController {
     }
 
     @GetMapping("/diapazon")
+    @PreAuthorize("hasAuthority('get_settings')")
     List<OrderDTO> displayOrdersInDiapazon(@RequestParam("firstDate") String firstDate,
                                         @RequestParam("secondDate") String secondDate,
                                         @RequestParam("type") String type){
